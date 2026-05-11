@@ -2,179 +2,360 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Телеком-Сервис{% endblock %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-        }
-      /* Уникальная градиентная шапка */
-.header {
-   background: linear-gradient(90deg, #0a0a0a 0%, #2a1a1a 30%, #dc3545 50%, #2a1a1a 70%, #0a0a0a 100%);
-    background-size: 200% 200%;
-    animation: gradientShift 8s ease infinite;
-    color: white;
-    padding: 12px 0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 2px solid rgba(220, 53, 69, 0.5);
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        /* Логотип с анимацией */
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logo-icon {
-            font-size: 28px;
-            filter: drop-shadow(0 0 5px rgba(220, 53, 69, 0.5));
-            transition: transform 0.3s;
-        }
-        .logo-icon:hover {
-            transform: rotate(10deg) scale(1.1);
-        }
-        .logo a {
-    font-size: 24px;
-    font-weight: 700;
-    color: white;
-    text-decoration: none;
-    letter-spacing: -0.5px;
-    transition: all 0.3s ease;
-    position: relative;
-}
-.logo a::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: #dc3545;
-    transition: width 0.3s ease;
-}
-.logo a:hover {
-    color: #dc3545;
-}
-.logo a:hover::after {
-    width: 100%;
-}
-        /* Навигация */
-        .nav {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .nav a {
-            color: #e0e0e0;
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 30px;
-            transition: all 0.3s;
-            font-weight: 500;
-            font-size: 14px;
-            position: relative;
-        }
-        .nav a:hover {
-            background: rgba(220, 53, 69, 0.2);
-            color: white;
-            transform: translateY(-2px);
-        }
-        /* Активная ссылка */
-        .nav a:active {
-            transform: translateY(0);
-        }
-        /* Кнопка профиля */
-        .nav a:last-child {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .nav a:last-child:hover {
-            background: #dc3545;
-            border-color: #dc3545;
-        }
-        /* Счётчик уведомлений */
-        .notification-badge {
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            margin-left: 5px;
-            position: relative;
-            top: -8px;
-        }
-        .main {
-            min-height: calc(100vh - 200px);
-            padding: 40px 0;
-        }
-        .footer {
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-            color: #888;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .footer p {
-            font-size: 13px;
-        }
-        /* Кнопки */
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 30px;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
-        }
-        .btn-secondary {
-            background: #1a1a1a;
-            color: white;
-            border: 1px solid #333;
-        }
-        .btn-secondary:hover {
-            background: #333;
-            transform: translateY(-2px);
-        }
-    </style>
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    /* Светлая тема */
+    body.light {
+        background-color: #f5f7fa;
+        color: #1a1a1a;
+    }
+    /* Тёмная тема */
+    body.dark {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+    /* ========== ШАПКА ========== */
+    .header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        color: white;
+        padding: 12px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        border-bottom: 2px solid #dc3545;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    body.dark .header {
+        background: linear-gradient(135deg, #0a0a0a 0%, #dc3545 100%);
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .logo-icon {
+        font-size: 28px;
+        transition: transform 0.3s;
+    }
+    .logo-icon:hover {
+        transform: rotate(10deg) scale(1.1);
+    }
+    .logo a {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        text-decoration: none;
+        letter-spacing: -0.5px;
+        transition: color 0.3s ease;
+    }
+    .logo a:hover {
+        color: #ff6666;
+    }
+    .nav {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .nav a, .theme-toggle {
+        color: white;
+        text-decoration: none;
+        padding: 8px 16px;
+        border-radius: 30px;
+        transition: all 0.3s;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        background: transparent;
+        border: none;
+    }
+    .nav a:hover, .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+    .notification-badge {
+        background: #ff4444;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 10px;
+        margin-left: 5px;
+        position: relative;
+        top: -8px;
+    }
+    .main {
+        min-height: calc(100vh - 200px);
+        padding: 40px 0;
+    }
+    .footer {
+        background: #1a1a1a;
+        color: #888;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 2px solid #dc3545;
+    }
+    body.dark .footer {
+        background: #0a0a0a;
+    }
+    /* ========== ОБЩИЕ КАРТОЧКИ В ТЁМНОЙ ТЕМЕ ========== */
+    body.dark .analytics-card,
+    body.dark .order-card,
+    body.dark .contract-card,
+    body.dark .package-card,
+    body.dark .stat-card,
+    body.dark .detail-card,
+    body.dark .contract-card-compact,
+    body.dark .chat-container,
+    body.dark .login-container,
+    body.dark .register-container,
+    body.dark .chart-container,
+    body.dark .feature-item {
+        background: #1e1e2e;
+        border-color: #dc3545;
+        color: #e0e0e0;
+    }
+    body.dark .detail-card {
+        background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3a 100%);
+    }
+    /* ========== ГЛАВНАЯ СТРАНИЦА (hero, преимущества) ========== */
+    .hero {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        color: white;
+        padding: 60px 0;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    .hero h1, .hero p {
+        color: white;
+    }
+    body.dark .hero {
+        background: linear-gradient(135deg, #0a0a0a 0%, #dc3545 100%);
+    }
+    .feature-item {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    body.dark .feature-item p,
+    body.dark .feature-item h3 {
+        color: #e0e0e0;
+    }
+    .feature-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    /* ========== КАРТОЧКИ ТОВАРОВ ========== */
+    .package-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s;
+    }
+    .package-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(220, 53, 69, 0.2);
+    }
+    .package-header {
+        background: linear-gradient(135deg, #dc3545 0%, #1a1a1a 100%);
+        color: white;
+        padding: 20px;
+        text-align: center;
+    }
+    .package-description {
+        padding: 20px;
+        color: #555;
+        line-height: 1.5;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+    body.dark .package-description {
+        color: #e0e0e0;
+        border-bottom-color: #333;
+    }
+    .package-services {
+        padding: 15px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    body.dark .package-services {
+        background: #2a2a3a;
+    }
+    .package-services strong {
+        color: #1a1a1a;
+    }
+    body.dark .package-services strong {
+        color: #e0e0e0;
+    }
+    .services-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .services-list li {
+        padding: 6px 0;
+        color: #555;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    body.dark .services-list li {
+        color: #e0e0e0;
+    }
+    .services-list li:before {
+        content: "✓";
+        color: #dc3545;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .package-price {
+        padding: 15px 20px;
+        text-align: center;
+        background: #fff0f0;
+        border-bottom: 1px solid #eee;
+    }
+    body.dark .package-price {
+        background: #2a2a3a;
+    }
+    .package-price .price {
+        font-size: 32px;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .catalog-title {
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 32px;
+        color: #1a1a1a;
+        position: relative;
+    }
+    body.dark .catalog-title {
+        color: #e0e0e0;
+    }
+    .catalog-title:after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: #dc3545;
+        margin: 15px auto 0;
+        border-radius: 3px;
+    }
+    /* ========== КНОПКИ ========== */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    }
+    /* ========== ФИЛЬТРЫ ========== */
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 50px;
+    }
+    body.dark .filter-bar {
+        background: #2a2a3a;
+    }
+    .filter-btn {
+        padding: 8px 20px;
+        background: transparent;
+        border: none;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    body.dark .filter-btn {
+        color: #e0e0e0;
+    }
+    .filter-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    /* ========== АНАЛИТИКА ========== */
+    .analytics-card h3,
+    .big-number {
+        color: #dc3545;
+    }
+    body.dark .analytics-card h3 {
+        color: #dc3545;
+    }
+    body.dark .big-number {
+        color: #dc3545;
+    }
+    body.dark .stat-label,
+    body.dark .stat-value,
+    body.dark .detail-label,
+    body.dark .detail-value {
+        color: #e0e0e0;
+    }
+    /* ========== ФОРМЫ ========== */
+    body.dark input,
+    body.dark select,
+    body.dark textarea {
+        background: #2a2a3a;
+        color: #e0e0e0;
+        border-color: #dc3545;
+    }
+    body.dark input:focus,
+    body.dark select:focus {
+        border-color: #ff6666;
+        outline: none;
+    }
+</style>
 </head>
-<body>
+<body class="light">
     <div class="header">
         <div class="container">
             <div class="header-content">
@@ -194,6 +375,7 @@
                         <a href="/accounts/login/">🔐 Вход</a>
                         <a href="/accounts/register/">📝 Регистрация</a>
                     {% endif %}
+                    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
                 </div>
             </div>
         </div>
@@ -211,5 +393,32 @@
             <p>© 2026 Телеком-Сервис — профессиональные решения для вашего бизнеса</p>
         </div>
     </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('themeBtn');
+            
+            if (body.classList.contains('light')) {
+                body.classList.remove('light');
+                body.classList.add('dark');
+                themeBtn.innerHTML = '☀️';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark');
+                body.classList.add('light');
+                themeBtn.innerHTML = '🌙';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+        
+        // Загрузка сохранённой темы
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.remove('light');
+            document.body.classList.add('dark');
+            document.getElementById('themeBtn').innerHTML = '☀️';
+        }
+    </script>
 </body>
 </html>
