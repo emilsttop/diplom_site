@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<h1>🛒 Корзина</h1>
+
+{% if cart_items %}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>Услуга</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr style="border-bottom: 1px solid #ddd;">
+                <td>{{ item.package.name }}</td>
+                <td>{{ item.package.price }} ₽</td>
+                <td>
+                    <form method="post" action="{% url 'update_cart' item.package.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" style="width: 60px;">
+                        <button type="submit">Обновить</button>
+                    </form>
+                </td>
+                <td>{{ item.subtotal }} ₽</td>
+                <td>
+                    <a href="{% url 'remove_from_cart' item.package.id %}">❌ Удалить</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="font-weight: bold;">
+                <td colspan="3">Итого:</td>
+                <td>{{ total }} ₽</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'catalog' %}" style="padding: 10px 20px; background: #6c757d; color: white; text-decoration: none;">Продолжить покупки</a>
+        <a href="{% url 'checkout' %}" style="padding: 10px 20px; background: #28a745; color: white; text-decoration: none;">✅ Оформить заказ</a>
+    </div>
+{% else %}
+    <p>Корзина пуста</p>
+    <a href="{% url 'catalog' %}">Перейти в каталог</a>
+{% endif %}
+{% endblock %}

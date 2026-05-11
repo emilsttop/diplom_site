@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+db.sqlite3
+*.log
+*.pot
+*.pyc
+local_settings.py
+.env
+.venv
+venv/
+env/
+.DS_Store
+*.sqlite3
+migrations/
+__pycache__/
+*.pyc

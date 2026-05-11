@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+
+{% block title %}Аналитика менеджера{% endblock %}
+
+{% block content %}
+<style>
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .analytics-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .analytics-card h3 {
+        margin-top: 0;
+        color: #333;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+    }
+    .big-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        text-align: center;
+        margin: 20px 0;
+    }
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .stat-label {
+        font-weight: bold;
+    }
+    .stat-value {
+        color: #666;
+    }
+    .debt-item {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .chart-bar {
+        background: #28a745;
+        height: 30px;
+        border-radius: 5px;
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding-right: 10px;
+        color: white;
+        font-weight: bold;
+    }
+    .status-new { background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; }
+    .status-processing { background: #ffc107; color: black; padding: 3px 8px; border-radius: 3px; }
+    .status-completed { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; }
+    .status-cancelled { background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; }
+    .btn-analytics {
+        background: #667eea;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 10px 5px;
+    }
+</style>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>📊 Аналитика менеджера</h1>
+    <div>
+        <a href="{% url 'manager_dashboard' %}" class="btn-analytics">← Назад к заказам</a>
+    </div>
+</div>
+
+<!-- Общие показатели -->
+<div class="analytics-grid">
+    <div class="analytics-card">
+        <h3>📦 Всего заказов</h3>
+        <div class="big-number">{{ total_orders }}</div>
+        <div class="stat-item">
+            <span class="stat-label">Новых:</span>
+            <span class="stat-value">{{ status_stats.new }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">В обработке:</span>
+            <span class="stat-value">{{ status_stats.processing }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Выполнено:</span>
+            <span class="stat-value">{{ status_stats.completed }}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Отменено:</span>
+            <span class="stat-value">{{ status_stats.cancelled }}</span>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>💰 Финансы</h3>
+        <div class="big-number">{{ total_revenue|floatformat:0 }} ₽</div>
+        <div class="stat-item">
+            <span class="stat-label">Общая выручка:</span>
+            <span class="stat-value">{{ total_revenue|floatformat:2 }} ₽</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Средний чек:</span>
+            <span class="stat-value">
+                {% if total_orders > 0 %}
+                    {{ total_revenue|floatformat:0|divisibleby:total_orders }} ₽
+                {% else %}
+                    0 ₽
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="analytics-card">
+        <h3>⚠️ Задолженности</h3>
+        <div class="big-number" style="color: #dc3545;">{{ debt_total|floatformat:0 }} ₽</div>
+        <div class="stat-item">
+            <span class="stat-label">Клиентов с долгами:</span>
+            <span class="stat-value">{{ debts.count }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Динамика заказов -->
+<div class="analytics-card" style="margin-bottom: 30px;">
+    <h3>📈 Динамика заказов (последние 7 дней)</h3>
+    {% for day in orders_by_day %}
+    <div class="stat-item">
+        <span class="stat-label">{{ day.date }}:</span>
+        <span class="stat-value">{{ day.count }} заказов на {{ day.total|floatformat:0 }} ₽</span>
+    </div>
+    <div class="chart-bar" style="width: {% widthratio day.count total_orders 100 %}%; max-width: 100%;">
+        {{ day.count }}
+    </div>
+    {% empty %}
+        <p>Нет данных за последние 7 дней</p>
+    {% endfor %}
+</div>
+
+<!-- Дебиторская задолженность -->
+<div class="analytics-card" style="margin-bottom: 30px;">
+    <h3>⚠️ Дебиторская задолженность (заказы в работе)</h3>
+    {% if debts %}
+        {% for debt in debts %}
+        <div class="debt-item">
+            <strong>Заказ №{{ debt.id }}</strong><br>
+            Клиент: {{ debt.client.username }}<br>
+            Сумма: {{ debt.total_price }} ₽<br>
+            Статус: <span class="status-processing">В обработке</span><br>
+            Дата создания: {{ debt.created_at|date:"d.m.Y" }}
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>✅ Нет задолженностей</p>
+    {% endif %}
+</div>
+
+<!-- Топ клиентов -->
+<div class="analytics-grid">
+    <div class="analytics-card">
+        <h3>🏆 Топ-5 клиентов по сумме заказов</h3>
+        {% for client in top_clients %}
+        <div class="stat-item">
+            <span class="stat-label">{{ forloop.counter }}. {{ client.client__username }}</span>
+            <span class="stat-value">{{ client.total_spent|floatformat:0 }} ₽ ({{ client.orders_count }} заказов)</span>
+        </div>
+        {% empty %}
+            <p>Нет данных о клиентах</p>
+        {% endfor %}
+    </div>
+
+    <div class="analytics-card">
+        <h3>🔥 Самые популярные услуги</h3>
+        {% for service in popular_services %}
+        <div class="stat-item">
+            <span class="stat-label">{{ service.name }}</span>
+            <span class="stat-value">{{ service.orders_count }} заказов</span>
+        </div>
+        {% empty %}
+            <p>Нет данных об услугах</p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Цитата дня для менеджера -->
+<div class="analytics-card" style="margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <h3 style="color: white;">💡 Совет дня</h3>
+    <p>Больше всего заказов в обработке — {{ status_stats.processing }} шт. Обратите на них внимание!</p>
+    <p>Активных заказов сейчас: {{ status_stats.new|add:status_stats.processing }} шт.</p>
+</div>
+{% endblock %}

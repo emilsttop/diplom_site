@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<style>
+    .profile-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 10px;
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        padding: 10px 20px;
+        background: #f0f0f0;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.3s;
+        font-size: 16px;
+    }
+    .tab-btn:hover {
+        background: #ddd;
+    }
+    .tab-btn.active {
+        background: #007bff;
+        color: white;
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+    .order-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        background: white;
+    }
+    .status-new { color: #007bff; font-weight: bold; }
+    .status-processing { color: #ffc107; font-weight: bold; }
+    .status-completed { color: #28a745; font-weight: bold; }
+    .status-cancelled { color: #dc3545; font-weight: bold; }
+    .tracking-step {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        font-weight: bold;
+    }
+    .step-circle.completed {
+        background: #007bff;
+        color: white;
+    }
+    .message {
+        background: #f8f9fa;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+    .message-client {
+        background: #e3f2fd;
+        border-left: 3px solid #2196f3;
+    }
+    .message-manager {
+        background: #f3e5f5;
+        border-left: 3px solid #9c27b0;
+    }
+    .chat-input {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
+    .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+    .btn-success {
+        background: #28a745;
+        color: white;
+        padding: 5px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+    }
+</style>
+
+<h1>👋 Личный кабинет: {{ user.username }}</h1>
+
+<div class="profile-tabs">
+    <button class="tab-btn active" onclick="showTab('orders')">📋 Мои заказы</button>
+    <button class="tab-btn" onclick="showTab('tracking')">🗺️ Карта движения</button>
+    <button class="tab-btn" onclick="showTab('chat')">💬 Чат с менеджером</button>
+</div>
+
+<!-- Вкладка: Мои заказы -->
+<div id="orders" class="tab-content active">
+    <h2>📋 Мои заказы</h2>
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card" data-order-id="{{ order.id }}">
+            <h3>Заказ №{{ order.id }}</h3>
+            <p><strong>📅 Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+            <p><strong>📊 Статус:</strong> 
+                <span class="status-{{ order.status }}">
+                    {% if order.status == 'new' %}🆕 Новый
+                    {% elif order.status == 'processing' %}⚙️ В обработке
+                    {% elif order.status == 'completed' %}✅ Выполнен
+                    {% elif order.status == 'cancelled' %}❌ Отменён
+                    {% endif %}
+                </span>
+            </p>
+            <p><strong>💰 Сумма:</strong> {{ order.total_price }} ₽</p>
+            <details>
+                <summary style="cursor: pointer; color: #007bff;">📦 Состав заказа</summary>
+                <ul>
+                    {% for item in order.items.all %}
+                    <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
+                    {% endfor %}
+                </ul>
+            </details>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>😕 У вас пока нет заказов</p>
+        <a href="{% url 'catalog' %}" class="btn-success">Перейти в каталог</a>
+    {% endif %}
+</div>
+
+<!-- Вкладка: Карта движения -->
+<div id="tracking" class="tab-content">
+    <h2>🗺️ Карта движения заказов</h2>
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <h3>Заказ №{{ order.id }}</h3>
+            <div class="tracking-step">
+                <div class="step-circle {% if order.status != 'cancelled' %}completed{% endif %}">1</div>
+                <div class="step-text"><strong>🆕 Новый заказ</strong><br>Заказ создан</div>
+            </div>
+            <div class="tracking-step">
+                <div class="step-circle {% if order.status == 'processing' or order.status == 'completed' %}completed{% endif %}">2</div>
+                <div class="step-text"><strong>⚙️ В обработке</strong><br>Менеджер работает</div>
+            </div>
+            <div class="tracking-step">
+                <div class="step-circle {% if order.status == 'completed' %}completed{% endif %}">3</div>
+                <div class="step-text"><strong>✅ Выполнен</strong><br>Заказ готов</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>😕 Нет заказов</p>
+    {% endif %}
+</div>
+
+<!-- Вкладка: Чат -->
+<div id="chat" class="tab-content">
+    <h2>💬 Чат с менеджером</h2>
+    {% if orders %}
+        <select id="chat-order-select" onchange="loadChat()" style="width: 100%; padding: 10px; margin-bottom: 20px;">
+            <option value="">-- Выберите заказ --</option>
+            {% for order in orders %}
+            <option value="{{ order.id }}">Заказ №{{ order.id }}</option>
+            {% endfor %}
+        </select>
+        <div id="chat-messages" style="border:1px solid #ddd; border-radius:10px; padding:15px; min-height:300px; overflow-y:auto;"></div>
+        <div class="chat-input">
+            <input type="text" id="chat-message-input" placeholder="Введите сообщение...">
+            <button onclick="sendMessage()">📤 Отправить</button>
+        </div>
+    {% else %}
+        <p>😕 У вас пока нет заказов</p>
+    {% endif %}
+</div>
+
+<script>
+    let currentOrderId = null;
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+        if (tabId === 'chat') loadChat();
+    }
+
+    async function loadChat() {
+        const orderId = document.getElementById('chat-order-select').value;
+        if (!orderId) return;
+        currentOrderId = orderId;
+        const container = document.getElementById('chat-messages');
+        container.innerHTML = 'Загрузка...';
+        try {
+            const res = await fetch(`/chat/api/messages/${orderId}/`);
+            const data = await res.json();
+            if (data.messages?.length) {
+                container.innerHTML = data.messages.map(msg => `
+                    <div class="message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}">
+                        <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${msg.message}<br>
+                        <small>${msg.created_at}</small>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p>Нет сообщений</p>';
+            }
+        } catch(e) {
+            container.innerHTML = '<p>Ошибка</p>';
+        }
+    }
+
+    async function sendMessage() {
+        const msg = document.getElementById('chat-message-input').value.trim();
+        if (!msg || !currentOrderId) return;
+        const formData = new FormData();
+        formData.append('message', msg);
+        await fetch(`/chat/api/send/${currentOrderId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        document.getElementById('chat-message-input').value = '';
+        await loadChat();
+    }
+
+    function getCookie(name) {
+        let v = null;
+        if (document.cookie) {
+            document.cookie.split(';').forEach(c => {
+                let [k,val] = c.trim().split('=');
+                if (k === name) v = decodeURIComponent(val);
+            });
+        }
+        return v;
+    }
+
+    setInterval(() => {
+        if (document.getElementById('chat').classList.contains('active') && currentOrderId) loadChat();
+    }, 5000);
+</script>
+{% endblock %}

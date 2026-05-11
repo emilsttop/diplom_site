@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Каталог услуг{% endblock %}
+
+{% block content %}
+<h1>Пакеты услуг для мебельных компаний</h1>
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    {% for package in packages %}
+    <div style="border: 1px solid #ccc; padding: 15px; width: 300px; border-radius: 10px;">
+        <h2>{{ package.name }}</h2>
+        <p>{{ package.description }}</p>
+        <p><strong>Входит:</strong> {{ package.services_list }}</p>
+        <p><strong>Цена:</strong> {{ package.price }} ₽</p>
+        <a href="{% url 'add_to_cart' package.id %}" 
+           style="display: inline-block; background: #007bff; color: white; padding: 10px; text-decoration: none; text-align: center; width: 100%;">
+           🛒 Добавить в корзину
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
