@@ -4,6 +4,7 @@ from .models import Order
 from django.db.models import Sum, Count, Q
 from datetime import datetime, timedelta
 from django.utils import timezone
+from chat.models import ChatMessage  
 
 @login_required
 def my_orders(request):
@@ -16,6 +17,15 @@ def manager_dashboard(request):
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     orders = Order.objects.all().order_by('-created_at')
+    
+    # Для каждого заказа добавляем флаг: есть ли непрочитанные сообщения от клиента
+    for order in orders:
+        order.has_unread_messages = ChatMessage.objects.filter(
+            order=order, 
+            sender__role='client', 
+            is_read=False
+        ).exists()
+    
     return render(request, 'orders/manager_dashboard.html', {'orders': orders})
 
 @login_required

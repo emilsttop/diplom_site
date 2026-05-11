@@ -4,6 +4,31 @@
 
 {% block content %}
 <style>
+    .order-card {
+        transition: all 0.3s;
+    }
+    .order-card.has-unread {
+        background: #fff8f0;
+        border-left: 4px solid #dc3545;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
+    }
+    .unread-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+</style>
+
+<style>
+    .order-card.has-new-message {
+        border-left: 4px solid red;
+        background: #fff8f0;
+    }
+</style>
+<style>
     .dashboard-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -106,10 +131,16 @@
 <h2>📦 Заказы клиентов</h2>
 <div id="orders-list">
     {% for order in orders %}
-    <div class="order-card" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
+ <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
+     {% if order.messages.filter.is_read == False %} style="border-left: 4px solid red; background: #fff8f0;"{% endif %}>
         <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
             <div>
-                <h3>Заказ №{{ order.id }}</h3>
+                <h3>
+    Заказ №{{ order.id }}
+    {% if order.has_unread_messages %}
+        <span class="unread-badge">🔔 Новое сообщение</span>
+    {% endif %}
+</h3>
                 <p><strong>👤 Клиент:</strong> {{ order.client.username }} ({{ order.client.email }})</p>
                 <p><strong>📅 Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
                 <p><strong>💰 Сумма:</strong> {{ order.total_price }} ₽</p>

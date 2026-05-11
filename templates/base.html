@@ -72,12 +72,18 @@
                     <a href="/">МебельРеклама</a>
                 </div>
                 <div class="nav">
- <span style="color: yellow; background: red; padding: 5px;">Роль: {{ user.role }}</span>
     <a href="/">Каталог</a>
     <a href="/cart/">🛒 Корзина {% if cart_count %}({{ cart_count }}){% endif %}</a>
     {% if user.is_authenticated %}
        {% if user.role == 'manager' %}
-    <a href="/orders/manager/dashboard/" style="background: #28a745; border-radius: 5px;">👨‍💼 Заказы</a>
+    <a href="/orders/manager/dashboard/" style="background: #28a745; border-radius: 5px; position: relative;">
+    👨‍💼 Заказы
+    {% if user.role == 'manager' or user.role == 'admin' %}
+        {% if unread_messages_count > 0 %}
+            <span style="background: red; color: white; border-radius: 50%; padding: 2px 8px; margin-left: 5px; font-size: 12px;">{{ unread_messages_count }}</span>
+        {% endif %}
+    {% endif %}
+</a>
     <a href="/orders/manager/analytics/" style="background: #17a2b8; border-radius: 5px;">📊 Аналитика</a>
 {% endif %}
         <a href="/accounts/profile/">👤 {{ user.username }}</a>
@@ -103,5 +109,29 @@
             <p>© 2026 Рекламное агентство для мебельных компаний</p>
         </div>
     </div>
+<script>
+    function updateUnreadCount() {
+        fetch('/chat/api/unread-count/')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('a[href="/orders/manager/dashboard/"] span');
+                if (badge) {
+                    if (data.unread_count > 0) {
+                        badge.textContent = data.unread_count;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+    
+    // Обновляем каждые 10 секунд
+    setInterval(updateUnreadCount, 10000);
+    
+    // При загрузке страницы
+    document.addEventListener('DOMContentLoaded', updateUnreadCount);
+</script>
 </body>
 </html>
