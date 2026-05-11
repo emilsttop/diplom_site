@@ -33,5 +33,10 @@ def user_logout(request):
 
 @login_required
 def profile(request):
+    # Если пользователь менеджер или админ — отправляем в его панель
+    if request.user.role in ['manager', 'admin']:
+        return redirect('manager_dashboard')
+    
+    # Для клиента показываем личный кабинет
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
     return render(request, 'accounts/profile.html', {'orders': orders})

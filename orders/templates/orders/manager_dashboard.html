@@ -141,7 +141,7 @@
                         {% endif %}
                     </span>
                 </p>
-                <a href="javascript:void(0)" onclick="window.location.href='/accounts/profile/#chat'; setTimeout(() => { if(window.openChatWithOrder) openChatWithOrder({{ order.id }}); }, 500);" style="background: #17a2b8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">💬 Чат с клиентом</a>
+                <a href="{% url 'manager_chat' order.id %}" style="background: #17a2b8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">💬 Чат с клиентом</a>
             </div>
         </div>
     </div>

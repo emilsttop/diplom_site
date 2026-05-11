@@ -111,3 +111,12 @@ def manager_analytics(request):
     }
     
     return render(request, 'orders/manager_analytics.html', context)
+
+@login_required
+def manager_chat(request, order_id):
+    """Отдельная страница чата для менеджера"""
+    if request.user.role not in ['manager', 'admin']:
+        return redirect('catalog')
+    
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'orders/manager_chat.html', {'order': order})
