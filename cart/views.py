@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from services.models import ServicePackage
 from orders.models import Order, OrderItem
 from decimal import Decimal
+from orders.utils import assign_manager_to_order
+from django.http import JsonResponse
 
 @login_required
 def cart_view(request):
@@ -28,16 +30,26 @@ def cart_view(request):
 
 @login_required
 def add_to_cart(request, package_id):
-    """Добавление пакета в корзину"""
-    cart = request.session.get('cart', {})
-    package_id_str = str(package_id)
+    """Добавление пакета в корзину (поддерживает AJAX)"""
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        package_id_str = str(package_id)
+        
+        if package_id_str in cart:
+            cart[package_id_str] += 1
+        else:
+            cart[package_id_str] = 1
+        
+        request.session['cart'] = cart
+        
+        # AJAX-запрос
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            from django.http import JsonResponse
+            return JsonResponse({'success': True, 'cart_count': sum(cart.values())})
+        
+        return redirect('catalog')
     
-    if package_id_str in cart:
-        cart[package_id_str] += 1
-    else:
-        cart[package_id_str] = 1
-    
-    request.session['cart'] = cart
+    # GET-запрос (перенаправление)
     return redirect('catalog')
 
 @login_required
@@ -98,6 +110,9 @@ def checkout(request):
     
     order.total_price = total
     order.save()
+    
+    # 🆕 Автоматически назначаем менеджера
+    assign_manager_to_order(order)
     
     # Очищаем корзину
     request.session['cart'] = {}

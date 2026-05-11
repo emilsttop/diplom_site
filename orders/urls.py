@@ -8,4 +8,5 @@ urlpatterns = [
     path('manager/analytics/', views.manager_analytics, name='manager_analytics'),
     path('manager/chat/<int:order_id>/', views.manager_chat, name='manager_chat'),
     path('contract/download/<int:order_id>/', views.download_contract, name='download_contract'),
+    path('reassign/<int:order_id>/', views.reassign_order, name='reassign_order'),
 ]

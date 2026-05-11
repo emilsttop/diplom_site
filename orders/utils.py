@@ -80,3 +80,39 @@ def generate_contract(order):
     p.save()
     
     return response
+from users.models import User
+from .models import Order
+from chat.models import ChatMessage
+def assign_manager_to_order(order):
+    """Автоматически назначает менеджера с наименьшим количеством активных заказов"""
+    managers = User.objects.filter(role='manager', is_active=True)
+    
+    if not managers:
+        return None
+    
+    # Считаем количество активных заказов (не завершённых) у каждого менеджера
+    manager_load = []
+    for manager in managers:
+        active_orders_count = Order.objects.filter(
+            assigned_manager=manager
+        ).exclude(status='completed').exclude(status='cancelled').count()
+        manager_load.append((manager, active_orders_count))
+    
+    # Сортируем по загрузке и выбираем самого свободного
+    manager_load.sort(key=lambda x: x[1])
+    assigned_manager = manager_load[0][0]
+    
+    # Назначаем менеджера заказу
+    order.assigned_manager = assigned_manager
+    order.save()
+    
+    # ✅ Убираем сообщение в чат
+    # Сообщение больше не создаётся, чтобы клиент его не видел
+    
+    return assigned_manager
+
+def get_manager_name(manager):
+    """Возвращает имя менеджера или username"""
+    if manager:
+        return manager.get_full_name() or manager.username
+    return "Не назначен"

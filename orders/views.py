@@ -4,7 +4,8 @@ from django.db.models import Sum, Count
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Order, OrderItem
-from .utils import generate_contract
+from .utils import generate_contract, assign_manager_to_order
+from users.models import User
 
 @login_required
 def my_orders(request):
@@ -13,25 +14,32 @@ def my_orders(request):
 
 @login_required
 def manager_dashboard(request):
-    """Панель менеджера - все заказы (только для менеджеров и админов)"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
-    orders = Order.objects.all().order_by('-created_at')
     
-    # Для каждого заказа добавляем флаг: есть ли непрочитанные сообщения от клиента
-    from chat.models import ChatMessage
+    if request.user.role == 'admin':
+        orders = Order.objects.all().order_by('-created_at')
+    else:
+        orders = Order.objects.filter(assigned_manager=request.user).order_by('-created_at')
+    
+    # Получаем всех менеджеров для передачи заказов
+    managers = User.objects.filter(role='manager', is_active=True)
+    
     for order in orders:
+        from chat.models import ChatMessage
         order.has_unread_messages = ChatMessage.objects.filter(
             order=order, 
             sender__role='client', 
             is_read=False
         ).exists()
     
-    return render(request, 'orders/manager_dashboard.html', {'orders': orders})
+    return render(request, 'orders/manager_dashboard.html', {
+        'orders': orders,
+        'managers': managers,
+    })
 
 @login_required
 def manager_update_order_status(request, order_id):
-    """Менеджер меняет статус заказа"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     if request.method == 'POST':
@@ -44,79 +52,131 @@ def manager_update_order_status(request, order_id):
 
 @login_required
 def manager_chat(request, order_id):
-    """Отдельная страница чата для менеджера"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
-    
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/manager_chat.html', {'order': order})
 
 @login_required
 def manager_analytics(request):
-    """Аналитика для менеджера: графики, отчёты"""
+    """Аналитика с вкладками: личная и общая"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
+    # Личная аналитика
+    personal_orders = Order.objects.filter(assigned_manager=request.user)
+    
+    personal_stats = {
+        'total_orders': personal_orders.count(),
+        'total_revenue': personal_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
+        'new': personal_orders.filter(status='new').count(),
+        'processing': personal_orders.filter(status='processing').count(),
+        'completed': personal_orders.filter(status='completed').count(),
+        'cancelled': personal_orders.filter(status='cancelled').count(),
+    }
+    
+    today = timezone.now().date()
+    personal_orders_by_month = []
+    for i in range(29, -1, -1):
+        day = today - timedelta(days=i)
+        day_start = datetime.combine(day, datetime.min.time())
+        day_end = datetime.combine(day, datetime.max.time())
+        count = personal_orders.filter(created_at__range=(day_start, day_end)).count()
+        personal_orders_by_month.append({'date': day.strftime('%d.%m'), 'count': count})
+    
+    personal_top_clients = personal_orders.filter(status='completed').values('client__username').annotate(
+        total_spent=Sum('total_price'),
+        orders_count=Count('id')
+    ).order_by('-total_spent')[:5]
+    
+    # Общая аналитика
     all_orders = Order.objects.all()
     
-    # Статистика по статусам
-    status_stats = {
+    company_stats = {
+        'total_orders': all_orders.count(),
+        'total_revenue': all_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
         'new': all_orders.filter(status='new').count(),
         'processing': all_orders.filter(status='processing').count(),
         'completed': all_orders.filter(status='completed').count(),
         'cancelled': all_orders.filter(status='cancelled').count(),
     }
     
-    # Динамика заказов по дням (последние 30 дней)
-    today = timezone.now().date()
-    orders_by_month = []
+    company_orders_by_month = []
     for i in range(29, -1, -1):
         day = today - timedelta(days=i)
         day_start = datetime.combine(day, datetime.min.time())
         day_end = datetime.combine(day, datetime.max.time())
         count = all_orders.filter(created_at__range=(day_start, day_end)).count()
-        orders_by_month.append({
-            'date': day.strftime('%d.%m'),
-            'count': count,
-        })
+        company_orders_by_month.append({'date': day.strftime('%d.%m'), 'count': count})
     
-    # Топ-5 клиентов по сумме заказов
-    top_clients = all_orders.filter(status='completed').values('client__username').annotate(
+    company_top_clients = all_orders.filter(status='completed').values('client__username').annotate(
         total_spent=Sum('total_price'),
         orders_count=Count('id')
     ).order_by('-total_spent')[:5]
     
-    # Самые популярные услуги
     from services.models import ServicePackage
     popular_services = []
     for package in ServicePackage.objects.all():
         order_count = all_orders.filter(items__package=package).count()
-        popular_services.append({
-            'name': package.name,
-            'orders_count': order_count,
-        })
+        popular_services.append({'name': package.name, 'orders_count': order_count})
     popular_services = sorted(popular_services, key=lambda x: x['orders_count'], reverse=True)[:5]
     
+    managers_stats = []
+    for manager in User.objects.filter(role='manager', is_active=True):
+        manager_orders = Order.objects.filter(assigned_manager=manager)
+        managers_stats.append({
+            'name': manager.get_full_name() or manager.username,
+            'orders_count': manager_orders.count(),
+            'revenue': manager_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
+        })
+    managers_stats.sort(key=lambda x: x['revenue'], reverse=True)
+    
     context = {
-        'status_stats': status_stats,
-        'orders_by_month': orders_by_month,
-        'top_clients': top_clients,
+        'personal_stats': personal_stats,
+        'personal_orders_by_month': personal_orders_by_month,
+        'personal_top_clients': personal_top_clients,
+        'company_stats': company_stats,
+        'company_orders_by_month': company_orders_by_month,
+        'company_top_clients': company_top_clients,
         'popular_services': popular_services,
-        'total_orders': all_orders.count(),
-        'total_revenue': all_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
+        'managers_stats': managers_stats,
     }
     
     return render(request, 'orders/manager_analytics.html', context)
 
 @login_required
 def download_contract(request, order_id):
-    """Скачать PDF-договор"""
     order = get_object_or_404(Order, id=order_id)
-    
-    # Проверка прав
     if request.user.role == 'client' and order.client != request.user:
         return redirect('catalog')
     if request.user.role not in ['manager', 'admin', 'client']:
         return redirect('catalog')
-    
     return generate_contract(order)
+
+@login_required
+def reassign_order(request, order_id):
+    """Передача заказа другому менеджеру"""
+    if request.user.role not in ['manager', 'admin']:
+        return redirect('catalog')
+    
+    order = get_object_or_404(Order, id=order_id)
+    
+    if request.user.role != 'admin' and order.assigned_manager != request.user:
+        return redirect('manager_dashboard')
+    
+    if request.method == 'POST':
+        new_manager_id = request.POST.get('new_manager')
+        if new_manager_id:
+            new_manager = get_object_or_404(User, id=new_manager_id, role='manager')
+            order.assigned_manager = new_manager
+            order.save()
+            
+            from chat.models import ChatMessage
+            ChatMessage.objects.create(
+                order=order,
+                sender=request.user,
+                message=f"🔄 Заказ передан менеджеру {new_manager.get_full_name() or new_manager.username}",
+                is_read=False
+            )
+    
+    return redirect('manager_dashboard')

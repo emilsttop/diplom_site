@@ -167,6 +167,8 @@
         transition: all 0.3s;
         text-align: center;
         box-sizing: border-box;
+        border: none;
+        cursor: pointer;
     }
     .btn-card:hover {
         background: #bb2d3b;
@@ -235,7 +237,7 @@
         </div>
         <div class="package-footer">
             {% if user.role != 'manager' and user.role != 'admin' %}
-                <a href="{% url 'add_to_cart' package.id %}" class="btn-card">🛒 Добавить в корзину</a>
+                <button onclick="addToCart({{ package.id }})" class="btn-card">🛒 Добавить в корзину</button>
             {% else %}
                 <span class="btn-card-disabled">🔒 Только для клиентов</span>
             {% endif %}
@@ -243,4 +245,58 @@
     </div>
     {% endfor %}
 </div>
+
+<script>
+    async function addToCart(packageId) {
+        try {
+            const formData = new FormData();
+            formData.append('package_id', packageId);
+            
+            const response = await fetch(`/cart/add/${packageId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Обновляем счётчик корзины в шапке
+                const cartLink = document.querySelector('a[href="/cart/"]');
+                if (cartLink) {
+                    const match = cartLink.innerHTML.match(/\((\d+)\)/);
+                    if (match) {
+                        cartLink.innerHTML = cartLink.innerHTML.replace(/\(\d+\)/, `(${data.cart_count})`);
+                    } else {
+                        cartLink.innerHTML = `🛒 Корзина (${data.cart_count})`;
+                    }
+                }
+                // Визуальный эффект на кнопке
+                const btn = event.target;
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => { btn.style.transform = ''; }, 200);
+            }
+        } catch(e) {
+            console.error('Ошибка:', e);
+        }
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}

@@ -6,21 +6,22 @@ from .models import ChatMessage
 
 @login_required
 def get_messages(request, order_id):
-    """API: получить сообщения для заказа (AJAX)"""
     order = get_object_or_404(Order, id=order_id)
     
-    # Проверка прав: клиент видит только свои заказы, менеджер/админ - все
     if request.user.role == 'client' and order.client != request.user:
         return JsonResponse({'error': 'Нет доступа'}, status=403)
     
     messages = ChatMessage.objects.filter(order=order)
     
-    # Отмечаем сообщения как прочитанные (для получателя)
+    # ⬇️ ДОБАВЬ ЭТОТ ФИЛЬТР ⬇️
+    # Клиент не должен видеть технические сообщения
+    if request.user.role == 'client':
+        messages = messages.exclude(message__startswith='🔔 Новый заказ')
+    
+    # Отмечаем сообщения как прочитанные
     if request.user.role in ['manager', 'admin']:
-        # Менеджер читает сообщения от клиента
         messages.filter(sender__role='client', is_read=False).update(is_read=True)
     else:
-        # Клиент читает сообщения от менеджера
         messages.filter(sender__role='manager', is_read=False).update(is_read=True)
     
     data = []

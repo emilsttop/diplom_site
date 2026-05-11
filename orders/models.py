@@ -16,6 +16,17 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Итого')
     
+    # Ответственный менеджер
+    assigned_manager = models.ForeignKey(
+        User, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='assigned_orders',
+        verbose_name='Ответственный менеджер',
+        limit_choices_to={'role': 'manager'}
+    )
+    
     def __str__(self):
         return f"Заказ #{self.id} - {self.client.username}"
     

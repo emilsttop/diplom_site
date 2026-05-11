@@ -451,7 +451,13 @@
             </div>
             <div>
                 <div class="contract-label">Менеджер</div>
-                <div class="contract-value">Анна Иванова</div>
+                <div class="contract-value">
+                    {% if order.assigned_manager %}
+                        {{ order.assigned_manager.get_full_name|default:order.assigned_manager.username }}
+                    {% else %}
+                        Назначается
+                    {% endif %}
+                </div>
             </div>
         </div>
         
@@ -459,8 +465,7 @@
             <a href="{% url 'download_contract' order.id %}" class="contract-btn">📥 Скачать</a>
         </div>
     </div>
-</div>
-            
+</div>            
             <!-- Состав заказа -->
             <div class="detail-content" id="composition-{{ order.id }}">
                 <ul style="margin: 0; padding-left: 20px;">
