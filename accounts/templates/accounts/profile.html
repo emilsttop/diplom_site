@@ -41,6 +41,13 @@
         border-radius: 10px;
         background: white;
     }
+    .contract-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        background: white;
+    }
     .status-new { color: #007bff; font-weight: bold; }
     .status-processing { color: #ffc107; font-weight: bold; }
     .status-completed { color: #28a745; font-weight: bold; }
@@ -106,6 +113,7 @@
     <button class="tab-btn active" onclick="showTab('orders')">📋 Мои заказы</button>
     <button class="tab-btn" onclick="showTab('tracking')">🗺️ Карта движения</button>
     <button class="tab-btn" onclick="showTab('chat')">💬 Чат с менеджером</button>
+    <button class="tab-btn" onclick="showTab('contracts')">📄 Договоры</button>
 </div>
 
 <!-- Вкладка: Мои заказы -->
@@ -188,6 +196,22 @@
     {% endif %}
 </div>
 
+<!-- Вкладка: Договоры -->
+<div id="contracts" class="tab-content">
+    <h2>📄 Договоры</h2>
+    {% if orders %}
+        {% for order in orders %}
+        <div class="contract-card">
+            <h3>Договор к заказу №{{ order.id }}</h3>
+            <p><strong>📅 Дата создания:</strong> {{ order.created_at|date:"d.m.Y" }}</p>
+            <p><strong>💰 Сумма договора:</strong> {{ order.total_price }} ₽</p>
+            <a href="{% url 'download_contract' order.id %}" class="btn-success" style="background: #007bff;">📥 Скачать договор (PDF)</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>😕 У вас пока нет договоров</p>
+    {% endif %}
+</div>
 <script>
     let currentOrderId = null;
 

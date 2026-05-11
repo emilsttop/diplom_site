@@ -4,6 +4,17 @@
 
 {% block content %}
 <style>
+.btn-warning {
+    background: #ffc107;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    display: inline-block;
+}
+</style>
+
+<style>
     .order-card {
         transition: all 0.3s;
     }
@@ -153,27 +164,30 @@
                     </ul>
                 </details>
             </div>
-            <div>
-                <form method="post" action="{% url 'manager_update_status' order.id %}" style="display: inline-block;">
-                    {% csrf_token %}
-                    <select name="status" class="status-select" onchange="this.form.submit()">
-                        <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
-                        <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
-                        <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
-                        <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
-                    </select>
-                </form>
-                <p style="margin-top: 10px;">
-                    <span class="status-{{ order.status }}">
-                        {% if order.status == 'new' %}🆕 Новый
-                        {% elif order.status == 'processing' %}⚙️ В обработке
-                        {% elif order.status == 'completed' %}✅ Выполнен
-                        {% elif order.status == 'cancelled' %}❌ Отменён
-                        {% endif %}
-                    </span>
-                </p>
-                <a href="{% url 'manager_chat' order.id %}" style="background: #17a2b8; color: white; padding: 8px 15px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">💬 Чат с клиентом</a>
-            </div>
+           <div>
+    <form method="post" action="{% url 'manager_update_status' order.id %}" style="display: inline-block;">
+        {% csrf_token %}
+        <select name="status" class="status-select" onchange="this.form.submit()">
+            <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
+            <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
+            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
+            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
+        </select>
+    </form>
+    
+    <p style="margin-top: 10px;">
+        <span class="status-{{ order.status }}">
+            {% if order.status == 'new' %}🆕 Новый
+            {% elif order.status == 'processing' %}⚙️ В обработке
+            {% elif order.status == 'completed' %}✅ Выполнен
+            {% elif order.status == 'cancelled' %}❌ Отменён
+            {% endif %}
+        </span>
+    </p>
+    
+    <a href="{% url 'download_contract' order.id %}" style="background: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block;">📥 Скачать договор</a>
+
+</div>
         </div>
     </div>
     {% empty %}

@@ -5,6 +5,8 @@ from django.db.models import Sum, Count, Q
 from datetime import datetime, timedelta
 from django.utils import timezone
 from chat.models import ChatMessage  
+from django.utils import timezone
+from .utils import generate_contract
 
 @login_required
 def my_orders(request):
@@ -130,3 +132,17 @@ def manager_chat(request, order_id):
     
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/manager_chat.html', {'order': order})
+
+@login_required
+def download_contract(request, order_id):
+    """Скачать PDF-договор"""
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Проверка прав
+    if request.user.role == 'client' and order.client != request.user:
+        return redirect('catalog')
+    if request.user.role not in ['manager', 'admin', 'client']:
+        return redirect('catalog')
+    
+    return generate_contract(order)
+
