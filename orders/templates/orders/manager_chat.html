@@ -5,17 +5,26 @@
 {% block content %}
 <style>
     .chat-container {
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
         background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         overflow: hidden;
     }
     .chat-header {
-        background: #2c3e50;
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
         color: white;
-        padding: 15px 20px;
+        padding: 20px 25px;
+    }
+    .chat-header h3 {
+        margin: 0 0 5px 0;
+        font-size: 20px;
+    }
+    .chat-header p {
+        margin: 0;
+        opacity: 0.9;
+        font-size: 14px;
     }
     .chat-messages {
         height: 500px;
@@ -25,54 +34,107 @@
     }
     .message {
         margin-bottom: 15px;
-        padding: 10px 15px;
-        border-radius: 10px;
-        max-width: 70%;
+        padding: 12px 15px;
+        border-radius: 12px;
+        max-width: 75%;
+        animation: fadeInMessage 0.3s ease;
+        word-wrap: break-word;
+    }
+    @keyframes fadeInMessage {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     .message-client {
-        background: #e3f2fd;
-        border-left: 3px solid #2196f3;
+        background: #fff0f0;
+        border-left: 4px solid #dc3545;
         margin-right: auto;
     }
     .message-manager {
-        background: #f3e5f5;
-        border-left: 3px solid #9c27b0;
+        background: #1a1a1a;
+        color: white;
+        border-left: 4px solid #dc3545;
         margin-left: auto;
     }
+    .message-manager strong {
+        color: #dc3545;
+    }
     .message-meta {
-        font-size: 12px;
-        color: #666;
+        font-size: 11px;
         margin-top: 5px;
+        opacity: 0.7;
+    }
+    .message-client .message-meta {
+        color: #666;
+    }
+    .message-manager .message-meta {
+        color: #ccc;
     }
     .chat-input {
         padding: 20px;
         background: white;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid #eee;
         display: flex;
-        gap: 10px;
+        gap: 12px;
     }
     .chat-input input {
         flex: 1;
-        padding: 10px;
+        padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 25px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .chat-input input:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 5px rgba(220, 53, 69, 0.3);
     }
     .chat-input button {
-        padding: 10px 20px;
-        background: #007bff;
+        padding: 12px 25px;
+        background: #dc3545;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 25px;
         cursor: pointer;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    .chat-input button:hover {
+        background: #bb2d3b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
     }
     .back-btn {
         display: inline-block;
         margin-bottom: 20px;
         padding: 10px 20px;
-        background: #6c757d;
+        background: #1a1a1a;
         color: white;
         text-decoration: none;
-        border-radius: 5px;
+        border-radius: 25px;
+        transition: all 0.3s;
+    }
+    .back-btn:hover {
+        background: #dc3545;
+        transform: translateX(-3px);
+    }
+    .empty-messages {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+    .typing-indicator {
+        display: none;
+        padding: 10px 20px;
+        color: #666;
+        font-size: 12px;
+        font-style: italic;
     }
 </style>
 
@@ -86,14 +148,18 @@
     <div class="chat-messages" id="chat-messages">
         <div style="text-align: center; padding: 20px;">Загрузка сообщений...</div>
     </div>
+    <div class="typing-indicator" id="typing-indicator">
+        Клиент печатает...
+    </div>
     <div class="chat-input">
-        <input type="text" id="message-input" placeholder="Введите сообщение...">
+        <input type="text" id="message-input" placeholder="Введите сообщение..." autocomplete="off">
         <button onclick="sendMessage()">📤 Отправить</button>
     </div>
 </div>
 
 <script>
     const orderId = {{ order.id }};
+    let lastMessageCount = 0;
     
     async function loadMessages() {
         const container = document.getElementById('chat-messages');
@@ -102,24 +168,36 @@
             const data = await response.json();
             
             if (data.messages && data.messages.length > 0) {
-                container.innerHTML = '';
-                data.messages.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = `message message-${msg.sender_role}`;
-                    const senderName = msg.sender_role === 'client' ? msg.sender : 'Менеджер';
-                    div.innerHTML = `
-                        <strong>${senderName}:</strong> ${msg.message}
-                        <div class="message-meta">${msg.created_at}</div>
-                    `;
-                    container.appendChild(div);
-                });
-                container.scrollTop = container.scrollHeight;
+                // Проверяем, появились ли новые сообщения
+                if (data.messages.length > lastMessageCount) {
+                    const newMessages = data.messages.slice(lastMessageCount);
+                    for (const msg of newMessages) {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message message-${msg.sender_role}`;
+                        const senderName = msg.sender_role === 'client' ? msg.sender : 'Вы (Менеджер)';
+                        messageDiv.innerHTML = `
+                            <strong>${senderName}:</strong> ${escapeHtml(msg.message)}
+                            <div class="message-meta">${msg.created_at}</div>
+                        `;
+                        container.appendChild(messageDiv);
+                    }
+                    container.scrollTop = container.scrollHeight;
+                }
+                lastMessageCount = data.messages.length;
             } else {
-                container.innerHTML = '<p style="text-align: center; color: #999;">Нет сообщений. Напишите что-нибудь клиенту!</p>';
+                if (container.children.length === 0 || container.innerHTML === '<div style="text-align: center; padding: 20px;">Загрузка сообщений...</div>') {
+                    container.innerHTML = '<div class="empty-messages">💬 Нет сообщений. Напишите что-нибудь клиенту!</div>';
+                }
             }
         } catch (error) {
-            container.innerHTML = '<p style="text-align: center; color: red;">Ошибка загрузки сообщений</p>';
+            container.innerHTML = '<div class="empty-messages" style="color: red;">❌ Ошибка загрузки сообщений</div>';
         }
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
     
     async function sendMessage() {
@@ -141,9 +219,10 @@
             });
             
             input.value = '';
+            lastMessageCount = 0;
             await loadMessages();
         } catch (error) {
-            alert('Ошибка при отправке');
+            alert('Ошибка при отправке сообщения');
         }
     }
     
@@ -163,5 +242,12 @@
     
     // Обновляем каждые 3 секунды
     setInterval(loadMessages, 3000);
+    
+    // Отправка по Enter
+    document.getElementById('message-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
 </script>
 {% endblock %}

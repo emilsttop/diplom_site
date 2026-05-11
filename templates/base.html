@@ -2,97 +2,197 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Рекламное агентство{% endblock %}</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+    <title>{% block title %}Телеком-Сервис{% endblock %}</title>
+ <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f5f5;
+    }
+    /* Фиксированная шапка */
+    .header {
+        background-color: #1a1a1a;
+        color: white;
+        padding: 15px 0;
+        border-bottom: 3px solid #dc3545;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .logo a {
+        color: white;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    .logo a:hover {
+        color: #dc3545;
+    }
+    .nav {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .nav a {
+        color: white;
+        text-decoration: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        transition: all 0.3s;
+    }
+    .nav a:hover {
+        background-color: #dc3545;
+        transform: translateY(-2px);
+    }
+    .main {
+        min-height: calc(100vh - 200px);
+        padding: 40px 0;
+    }
+    .footer {
+        background-color: #1a1a1a;
+        color: #999;
+        text-align: center;
+        padding: 20px 0;
+        margin-top: 40px;
+        border-top: 3px solid #dc3545;
+    }
+    /* Кнопки */
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .btn-primary {
+        background: #dc3545;
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #bb2d3b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    .btn-secondary {
+        background: #1a1a1a;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #333;
+        transform: translateY(-2px);
+    }
+    /* Карточки */
+    .card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    /* Hero-блок */
+    .hero {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        color: white;
+        padding: 60px 0;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+    .hero h1 {
+        font-size: 48px;
+        margin-bottom: 20px;
+    }
+    .hero p {
+        font-size: 20px;
+        margin-bottom: 30px;
+    }
+    /* Преимущества */
+    .features {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 50px;
+        flex-wrap: wrap;
+    }
+    .feature-item {
+        flex: 1;
+        text-align: center;
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        transition: all 0.3s;
+    }
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .feature-icon {
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    .feature-item h3 {
+        margin-bottom: 10px;
+        color: #1a1a1a;
+    }
+    /* Анимация цифр в аналитике */
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
         }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 15px 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .logo a {
-            color: white;
-            text-decoration: none;
-        }
-        .nav {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .nav a {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .nav a:hover {
-            background-color: #34495e;
-        }
-        .main {
-            min-height: calc(100vh - 200px);
-            padding: 40px 0;
-        }
-        .footer {
-            background-color: #2c3e50;
-            color: white;
-            text-align: center;
-            padding: 20px 0;
-            margin-top: 40px;
-        }
-    </style>
+    }
+    .stat-number {
+        animation: countUp 0.6s ease-out;
+    }
+</style>
 </head>
 <body>
     <div class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <a href="/">МебельРеклама</a>
+                    <a href="/">Телеком-Сервис</a>
                 </div>
                 <div class="nav">
-    <a href="/">Каталог</a>
+                    <a href="/">Каталог</a>
+                  {% if user.role != 'manager' and user.role != 'admin' %}
     <a href="/cart/">🛒 Корзина {% if cart_count %}({{ cart_count }}){% endif %}</a>
-    {% if user.is_authenticated %}
-       {% if user.role == 'manager' %}
-    <a href="/orders/manager/dashboard/" style="background: #28a745; border-radius: 5px; position: relative;">
-    👨‍💼 Заказы
-    {% if user.role == 'manager' or user.role == 'admin' %}
-        {% if unread_messages_count > 0 %}
-            <span style="background: red; color: white; border-radius: 50%; padding: 2px 8px; margin-left: 5px; font-size: 12px;">{{ unread_messages_count }}</span>
-        {% endif %}
-    {% endif %}
-</a>
-    <a href="/orders/manager/analytics/" style="background: #17a2b8; border-radius: 5px;">📊 Аналитика</a>
 {% endif %}
-        <a href="/accounts/profile/">👤 {{ user.username }}</a>
-        <a href="/accounts/logout/">Выйти</a>
-    {% else %}
-        <a href="/accounts/login/">Вход</a>
-        <a href="/accounts/register/">Регистрация</a>
-    {% endif %}
-</div>
+                    {% if user.is_authenticated %}
+                        <a href="/accounts/profile/">👤 {{ user.username }}</a>
+                        <a href="/accounts/logout/">Выйти</a>
+                    {% else %}
+                        <a href="/accounts/login/">Вход</a>
+                        <a href="/accounts/register/">Регистрация</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -106,32 +206,8 @@
 
     <div class="footer">
         <div class="container">
-            <p>© 2026 Рекламное агентство для мебельных компаний</p>
+            <p>Телеком-Сервис — профессиональные решения для вашего бизнеса</p>
         </div>
     </div>
-<script>
-    function updateUnreadCount() {
-        fetch('/chat/api/unread-count/')
-            .then(response => response.json())
-            .then(data => {
-                const badge = document.querySelector('a[href="/orders/manager/dashboard/"] span');
-                if (badge) {
-                    if (data.unread_count > 0) {
-                        badge.textContent = data.unread_count;
-                        badge.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-    }
-    
-    // Обновляем каждые 10 секунд
-    setInterval(updateUnreadCount, 10000);
-    
-    // При загрузке страницы
-    document.addEventListener('DOMContentLoaded', updateUnreadCount);
-</script>
 </body>
 </html>

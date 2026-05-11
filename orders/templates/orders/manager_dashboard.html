@@ -4,44 +4,8 @@
 
 {% block content %}
 <style>
-.btn-warning {
-    background: #ffc107;
-    color: black;
-    padding: 5px 10px;
-    text-decoration: none;
-    border-radius: 5px;
-    display: inline-block;
-}
-</style>
-
-<style>
-    .order-card {
-        transition: all 0.3s;
-    }
-    .order-card.has-unread {
-        background: #fff8f0;
-        border-left: 4px solid #dc3545;
-        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
-    }
-    .unread-badge {
-        background: #dc3545;
-        color: white;
-        border-radius: 50%;
-        padding: 2px 8px;
-        font-size: 12px;
-        margin-left: 10px;
-    }
-</style>
-
-<style>
-    .order-card.has-new-message {
-        border-left: 4px solid red;
-        background: #fff8f0;
-    }
-</style>
-<style>
     .dashboard-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
         color: white;
         padding: 20px;
         border-radius: 10px;
@@ -63,23 +27,39 @@
     .stat-number {
         font-size: 32px;
         font-weight: bold;
-        color: #667eea;
+        color: #dc3545;
     }
     .order-card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        background: white;
-        transition: box-shadow 0.3s;
-    }
-    .order-card:hover {
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #eee;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.order-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+.order-card.has-unread {
+    background: #fff8f0;
+    border-left: 4px solid #dc3545;
+}
+    .unread-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 8px;
+        font-size: 12px;
+        margin-left: 10px;
     }
     .status-select {
         padding: 5px 10px;
         border-radius: 5px;
-        border: 1px solid #ddd;
+        background: #1a1a1a;
+        color: white;
+        border: none;
         cursor: pointer;
     }
     .status-new { background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; }
@@ -100,15 +80,51 @@
         cursor: pointer;
     }
     .filter-btn.active {
-        background: #667eea;
+        background: #dc3545;
         color: white;
+    }
+    .filter-btn:hover {
+        background: #1a1a1a;
+        color: white;
+    }
+    .btn-contract {
+        background: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-contract:hover {
+        background: #bb2d3b;
+    }
+    .btn-chat {
+        background: #1a1a1a;
+        color: white;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 5px;
+        display: inline-block;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-chat:hover {
+        background: #333;
+    }
+    .action-buttons {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 </style>
 
 <div class="dashboard-header">
     <h1>👨‍💼 Панель менеджера</h1>
     <div style="margin-bottom: 20px;">
-        <a href="{% url 'manager_analytics' %}" style="background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">📊 Аналитика и отчёты</a>
+       <a href="{% url 'manager_analytics' %}" style="background: white; color: #1a1a1a; border: 2px solid #1a1a1a; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">📊 Аналитика и отчёты</a>
     </div>
     <p>Добро пожаловать, {{ user.username }}! Управляйте заказами, общайтесь с клиентами.</p>
 </div>
@@ -142,21 +158,20 @@
 <h2>📦 Заказы клиентов</h2>
 <div id="orders-list">
     {% for order in orders %}
- <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
-     {% if order.messages.filter.is_read == False %} style="border-left: 4px solid red; background: #fff8f0;"{% endif %}>
+    <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
         <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
             <div>
                 <h3>
-    Заказ №{{ order.id }}
-    {% if order.has_unread_messages %}
-        <span class="unread-badge">🔔 Новое сообщение</span>
-    {% endif %}
-</h3>
+                    Заказ №{{ order.id }}
+                    {% if order.has_unread_messages %}
+                        <span class="unread-badge">🔔 Новое сообщение</span>
+                    {% endif %}
+                </h3>
                 <p><strong>👤 Клиент:</strong> {{ order.client.username }} ({{ order.client.email }})</p>
                 <p><strong>📅 Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
                 <p><strong>💰 Сумма:</strong> {{ order.total_price }} ₽</p>
                 <details>
-                    <summary style="cursor: pointer; color: #007bff;">📦 Состав заказа</summary>
+                   <summary style="cursor: pointer; color: #dc3545 !important;">📦 Состав заказа</summary>
                     <ul style="margin-top: 10px;">
                         {% for item in order.items.all %}
                         <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
@@ -164,30 +179,32 @@
                     </ul>
                 </details>
             </div>
-           <div>
-    <form method="post" action="{% url 'manager_update_status' order.id %}" style="display: inline-block;">
-        {% csrf_token %}
-        <select name="status" class="status-select" onchange="this.form.submit()">
-            <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
-            <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
-            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
-            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
-        </select>
-    </form>
-    
-    <p style="margin-top: 10px;">
-        <span class="status-{{ order.status }}">
-            {% if order.status == 'new' %}🆕 Новый
-            {% elif order.status == 'processing' %}⚙️ В обработке
-            {% elif order.status == 'completed' %}✅ Выполнен
-            {% elif order.status == 'cancelled' %}❌ Отменён
-            {% endif %}
-        </span>
-    </p>
-    
-    <a href="{% url 'download_contract' order.id %}" style="background: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 5px; display: inline-block;">📥 Скачать договор</a>
-
-</div>
+            <div>
+                <form method="post" action="{% url 'manager_update_status' order.id %}" style="display: inline-block;">
+                    {% csrf_token %}
+                    <select name="status" class="status-select" onchange="this.form.submit()">
+                        <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
+                        <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
+                        <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
+                        <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
+                    </select>
+                </form>
+                
+                <p style="margin-top: 10px;">
+                    <span class="status-{{ order.status }}">
+                        {% if order.status == 'new' %}🆕 Новый
+                        {% elif order.status == 'processing' %}⚙️ В обработке
+                        {% elif order.status == 'completed' %}✅ Выполнен
+                        {% elif order.status == 'cancelled' %}❌ Отменён
+                        {% endif %}
+                    </span>
+                </p>
+                
+                <div class="action-buttons">
+                    <a href="{% url 'download_contract' order.id %}" class="btn-contract">📥 Скачать договор</a>
+                    <a href="{% url 'manager_chat' order.id %}" class="btn-chat">💬 Чат с клиентом</a>
+                </div>
+            </div>
         </div>
     </div>
     {% empty %}

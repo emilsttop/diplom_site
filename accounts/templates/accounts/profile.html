@@ -4,276 +4,569 @@
 
 {% block content %}
 <style>
-    .profile-tabs {
-        display: flex;
-        gap: 10px;
+    .profile-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        border-radius: 20px;
+        padding: 30px;
         margin-bottom: 30px;
-        border-bottom: 2px solid #ddd;
-        padding-bottom: 10px;
-        flex-wrap: wrap;
-    }
-    .tab-btn {
-        padding: 10px 20px;
-        background: #f0f0f0;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        transition: all 0.3s;
-        font-size: 16px;
-    }
-    .tab-btn:hover {
-        background: #ddd;
-    }
-    .tab-btn.active {
-        background: #007bff;
-        color: white;
-    }
-    .tab-content {
-        display: none;
-    }
-    .tab-content.active {
-        display: block;
-    }
-    .order-card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        background: white;
-    }
-    .contract-card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 10px;
-        background: white;
-    }
-    .status-new { color: #007bff; font-weight: bold; }
-    .status-processing { color: #ffc107; font-weight: bold; }
-    .status-completed { color: #28a745; font-weight: bold; }
-    .status-cancelled { color: #dc3545; font-weight: bold; }
-    .tracking-step {
         display: flex;
         align-items: center;
-        margin-bottom: 20px;
+        gap: 25px;
+        color: white;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
-    .step-circle {
-        width: 40px;
-        height: 40px;
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: rgba(255,255,255,0.2);
         border-radius: 50%;
-        background: #ddd;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        font-size: 48px;
+    }
+    .profile-info h1 {
+        margin: 0 0 5px 0;
+        font-size: 28px;
+    }
+    .profile-name {
+        font-size: 18px;
+        margin: 5px 0;
+        opacity: 0.9;
+    }
+    .profile-role {
+        background: rgba(255,255,255,0.2);
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-top: 8px;
+    }
+    .orders-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+        cursor: pointer;
+        border-bottom: 3px solid #1a1a1a;
+    }
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-bottom-color: #dc3545;
+    }
+    .order-card.expanded {
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.15);
+        border-left: 4px solid #dc3545;
+    }
+    .order-summary {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+    }
+    .order-info h3 {
+        margin: 0 0 5px 0;
+        color: #dc3545;
+    }
+    .order-info p {
+        margin: 5px 0;
+        color: #666;
+        font-size: 14px;
+    }
+    .order-status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: bold;
     }
-    .step-circle.completed {
-        background: #007bff;
+    .status-new { background: #007bff; color: white; }
+    .status-processing { background: #ffc107; color: black; }
+    .status-completed { background: #28a745; color: white; }
+    .status-cancelled { background: #dc3545; color: white; }
+    .order-price {
+        font-size: 22px;
+        font-weight: bold;
+        background: #dc3545;
         color: white;
+        padding: 8px 16px;
+        border-radius: 30px;
+        min-width: 120px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
     }
-    .message {
-        background: #f8f9fa;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
+    .expand-icon {
+        font-size: 24px;
+        color: #dc3545;
+        transition: transform 0.3s;
     }
-    .message-client {
-        background: #e3f2fd;
-        border-left: 3px solid #2196f3;
+    .order-card.expanded .expand-icon {
+        transform: rotate(180deg);
     }
-    .message-manager {
-        background: #f3e5f5;
-        border-left: 3px solid #9c27b0;
+    .order-details {
+        display: none;
+        padding: 0 20px 20px;
+        border-top: 1px solid #eee;
+        background: #fafafa;
     }
-    .chat-input {
-        margin-top: 20px;
+    .order-card.expanded .order-details {
+        display: block;
+    }
+    .detail-tabs {
         display: flex;
         gap: 10px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+    }
+    .detail-tab {
+        padding: 8px 16px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .detail-tab.active {
+        background: #dc3545;
+        color: white;
+    }
+    .detail-content {
+        display: none;
+    }
+    .detail-content.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .message {
+        background: white;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+    .message-client {
+        background: #fff0f0;
+        border-left: 3px solid #dc3545;
+    }
+    .message-manager {
+        background: #f0f0f0;
+        border-left: 3px solid #1a1a1a;
+    }
+    .chat-input {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
     }
     .chat-input input {
         flex: 1;
         padding: 10px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 8px;
     }
-    .btn-success {
-        background: #28a745;
+    .chat-input button {
+        padding: 10px 20px;
+        background: #dc3545;
         color: white;
-        padding: 5px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        display: inline-block;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
     }
+    /* Визуальная карта движения */
+    .tracking-container {
+        padding: 15px 10px;
+    }
+    .tracking-steps {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    .tracking-step-item {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        cursor: pointer;
+    }
+    .tracking-step-circle {
+        width: 40px;
+        height: 40px;
+        background: #ddd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #666;
+        transition: all 0.3s;
+        position: relative;
+        z-index: 2;
+    }
+    .tracking-step-item.active .tracking-step-circle {
+        background: #dc3545;
+        color: white;
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.3);
+    }
+    .tracking-step-label {
+        font-size: 11px;
+        margin-top: 8px;
+        color: #666;
+        text-align: center;
+    }
+    .tracking-step-item.active .tracking-step-label {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    .tracking-line {
+        flex: 1;
+        height: 3px;
+        background: #ddd;
+        margin: 0 -5px;
+        z-index: 1;
+    }
+    .tracking-line.filled {
+        background: #dc3545;
+    }
+    .tracking-step-tooltip {
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a1a;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+        z-index: 100;
+        pointer-events: none;
+    }
+    .tracking-step-tooltip:after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: #1a1a1a transparent transparent transparent;
+    }
+    .tracking-step-item:hover .tracking-step-tooltip {
+        opacity: 1;
+        visibility: visible;
+    }
+    @media (max-width: 600px) {
+        .tracking-step-tooltip {
+            white-space: normal;
+            min-width: 120px;
+            text-align: center;
+        }
+    }
+   
+/* Договор — три равные колонки */
+.contract-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+.contract-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+.contract-block {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.contract-icon {
+    font-size: 36px;
+}
+.contract-label {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.contract-value {
+    font-size: 14px;
+    color: #1a1a1a;
+    font-weight: 500;
+}
+.contract-value-large {
+    font-size: 20px;
+    font-weight: bold;
+    color: #dc3545;
+}
+.contract-center {
+    display: flex;
+    gap: 40px;
+    text-align: center;
+}
+.contract-btn {
+    display: inline-block;
+    background: #dc3545;
+    color: white;
+    padding: 10px 24px;
+    text-decoration: none;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 14px;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+.contract-btn:hover {
+    background: #bb2d3b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
 </style>
 
-<h1>👋 Личный кабинет: {{ user.username }}</h1>
-
-<div class="profile-tabs">
-    <button class="tab-btn active" onclick="showTab('orders')">📋 Мои заказы</button>
-    <button class="tab-btn" onclick="showTab('tracking')">🗺️ Карта движения</button>
-    <button class="tab-btn" onclick="showTab('chat')">💬 Чат с менеджером</button>
-    <button class="tab-btn" onclick="showTab('contracts')">📄 Договоры</button>
+<div class="profile-header">
+    <div class="profile-avatar">👤</div>
+    <div class="profile-info">
+        <h1>Личный кабинет</h1>
+        <p class="profile-name">{{ user.username }}</p>
+        <p class="profile-role">Клиент</p>
+    </div>
 </div>
 
-<!-- Вкладка: Мои заказы -->
-<div id="orders" class="tab-content active">
-    <h2>📋 Мои заказы</h2>
-    {% if orders %}
-        {% for order in orders %}
-        <div class="order-card" data-order-id="{{ order.id }}">
-            <h3>Заказ №{{ order.id }}</h3>
-            <p><strong>📅 Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-            <p><strong>📊 Статус:</strong> 
-                <span class="status-{{ order.status }}">
+<div class="orders-grid">
+    {% for order in orders %}
+    <div class="order-card" data-order-id="{{ order.id }}">
+        <div class="order-summary" onclick="toggleOrder({{ order.id }})">
+            <div class="order-info">
+                <h3>Заказ №{{ order.id }}</h3>
+                <p>📅 {{ order.created_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            <div>
+                <span class="order-status status-{{ order.status }}">
                     {% if order.status == 'new' %}🆕 Новый
                     {% elif order.status == 'processing' %}⚙️ В обработке
                     {% elif order.status == 'completed' %}✅ Выполнен
                     {% elif order.status == 'cancelled' %}❌ Отменён
                     {% endif %}
                 </span>
-            </p>
-            <p><strong>💰 Сумма:</strong> {{ order.total_price }} ₽</p>
-            <details>
-                <summary style="cursor: pointer; color: #007bff;">📦 Состав заказа</summary>
-                <ul>
+            </div>
+            <div class="order-price">{{ order.total_price|floatformat:0 }} ₽</div>
+            <div class="expand-icon">▼</div>
+        </div>
+        
+        <div class="order-details" id="details-{{ order.id }}">
+            <div class="detail-tabs">
+                <button class="detail-tab active" onclick="switchTab({{ order.id }}, 'tracking')">🗺️ Карта движения</button>
+                <button class="detail-tab" onclick="switchTab({{ order.id }}, 'chat')">💬 Чат с менеджером</button>
+                <button class="detail-tab" onclick="switchTab({{ order.id }}, 'contract')">📄 Договор</button>
+                <button class="detail-tab" onclick="switchTab({{ order.id }}, 'composition')">📦 Состав заказа</button>
+            </div>
+            
+            <!-- Карта движения -->
+            <div class="detail-content active" id="tracking-{{ order.id }}">
+                <div class="tracking-container">
+                    <div class="tracking-steps">
+                        <div class="tracking-step-item {% if order.status != 'cancelled' %}active{% endif %}" data-step="1">
+                            <div class="tracking-step-circle">1</div>
+                            <div class="tracking-step-label">Новый</div>
+                            <div class="tracking-step-tooltip">
+                                <strong>🆕 Новый заказ</strong><br>
+                                Заказ создан, ожидает обработки
+                            </div>
+                        </div>
+                        <div class="tracking-line {% if order.status == 'processing' or order.status == 'completed' %}filled{% endif %}"></div>
+                        
+                        <div class="tracking-step-item {% if order.status == 'processing' or order.status == 'completed' %}active{% endif %}" data-step="2">
+                            <div class="tracking-step-circle">2</div>
+                            <div class="tracking-step-label">В обработке</div>
+                            <div class="tracking-step-tooltip">
+                                <strong>⚙️ В обработке</strong><br>
+                                Менеджер работает над заказом
+                            </div>
+                        </div>
+                        <div class="tracking-line {% if order.status == 'completed' %}filled{% endif %}"></div>
+                        
+                        <div class="tracking-step-item {% if order.status == 'completed' %}active{% endif %}" data-step="3">
+                            <div class="tracking-step-circle">3</div>
+                            <div class="tracking-step-label">Выполнен</div>
+                            <div class="tracking-step-tooltip">
+                                <strong>✅ Выполнен</strong><br>
+                                Заказ выполнен, договор подписан
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Чат -->
+            <div class="detail-content" id="chat-{{ order.id }}">
+                <div id="chat-messages-{{ order.id }}" style="height: 250px; overflow-y: auto; background: white; border-radius: 10px; padding: 10px;">
+                    <div style="text-align: center; padding: 20px;">Загрузка...</div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-input-{{ order.id }}" placeholder="Введите сообщение...">
+                    <button onclick="sendMessage({{ order.id }})">📤 Отправить</button>
+                </div>
+            </div>
+            
+        <!-- Договор -->
+<div class="detail-content" id="contract-{{ order.id }}">
+    <div class="contract-wrapper">
+        <div class="contract-block">
+            <div class="contract-icon">📄</div>
+            <div>
+                <div class="contract-label">Дата</div>
+                <div class="contract-value">{{ order.created_at|date:"d.m.Y" }}</div>
+            </div>
+        </div>
+        
+        <div class="contract-center">
+            <div>
+                <div class="contract-label">Сумма</div>
+                <div class="contract-value-large">{{ order.total_price|floatformat:0 }} ₽</div>
+            </div>
+            <div>
+                <div class="contract-label">Менеджер</div>
+                <div class="contract-value">Анна Иванова</div>
+            </div>
+        </div>
+        
+        <div>
+            <a href="{% url 'download_contract' order.id %}" class="contract-btn">📥 Скачать</a>
+        </div>
+    </div>
+</div>
+            
+            <!-- Состав заказа -->
+            <div class="detail-content" id="composition-{{ order.id }}">
+                <ul style="margin: 0; padding-left: 20px;">
                     {% for item in order.items.all %}
                     <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
                     {% endfor %}
                 </ul>
-            </details>
+            </div>
         </div>
-        {% endfor %}
-    {% else %}
+    </div>
+    {% empty %}
+    <div class="order-card" style="text-align: center; padding: 40px;">
         <p>😕 У вас пока нет заказов</p>
-        <a href="{% url 'catalog' %}" class="btn-success">Перейти в каталог</a>
-    {% endif %}
+        <a href="{% url 'catalog' %}" class="btn-download-compact" style="display: inline-block;">Перейти в каталог</a>
+    </div>
+    {% endfor %}
 </div>
 
-<!-- Вкладка: Карта движения -->
-<div id="tracking" class="tab-content">
-    <h2>🗺️ Карта движения заказов</h2>
-    {% if orders %}
-        {% for order in orders %}
-        <div class="order-card">
-            <h3>Заказ №{{ order.id }}</h3>
-            <div class="tracking-step">
-                <div class="step-circle {% if order.status != 'cancelled' %}completed{% endif %}">1</div>
-                <div class="step-text"><strong>🆕 Новый заказ</strong><br>Заказ создан</div>
-            </div>
-            <div class="tracking-step">
-                <div class="step-circle {% if order.status == 'processing' or order.status == 'completed' %}completed{% endif %}">2</div>
-                <div class="step-text"><strong>⚙️ В обработке</strong><br>Менеджер работает</div>
-            </div>
-            <div class="tracking-step">
-                <div class="step-circle {% if order.status == 'completed' %}completed{% endif %}">3</div>
-                <div class="step-text"><strong>✅ Выполнен</strong><br>Заказ готов</div>
-            </div>
-        </div>
-        {% endfor %}
-    {% else %}
-        <p>😕 Нет заказов</p>
-    {% endif %}
-</div>
-
-<!-- Вкладка: Чат -->
-<div id="chat" class="tab-content">
-    <h2>💬 Чат с менеджером</h2>
-    {% if orders %}
-        <select id="chat-order-select" onchange="loadChat()" style="width: 100%; padding: 10px; margin-bottom: 20px;">
-            <option value="">-- Выберите заказ --</option>
-            {% for order in orders %}
-            <option value="{{ order.id }}">Заказ №{{ order.id }}</option>
-            {% endfor %}
-        </select>
-        <div id="chat-messages" style="border:1px solid #ddd; border-radius:10px; padding:15px; min-height:300px; overflow-y:auto;"></div>
-        <div class="chat-input">
-            <input type="text" id="chat-message-input" placeholder="Введите сообщение...">
-            <button onclick="sendMessage()">📤 Отправить</button>
-        </div>
-    {% else %}
-        <p>😕 У вас пока нет заказов</p>
-    {% endif %}
-</div>
-
-<!-- Вкладка: Договоры -->
-<div id="contracts" class="tab-content">
-    <h2>📄 Договоры</h2>
-    {% if orders %}
-        {% for order in orders %}
-        <div class="contract-card">
-            <h3>Договор к заказу №{{ order.id }}</h3>
-            <p><strong>📅 Дата создания:</strong> {{ order.created_at|date:"d.m.Y" }}</p>
-            <p><strong>💰 Сумма договора:</strong> {{ order.total_price }} ₽</p>
-            <a href="{% url 'download_contract' order.id %}" class="btn-success" style="background: #007bff;">📥 Скачать договор (PDF)</a>
-        </div>
-        {% endfor %}
-    {% else %}
-        <p>😕 У вас пока нет договоров</p>
-    {% endif %}
-</div>
 <script>
-    let currentOrderId = null;
-
-    function showTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        event.target.classList.add('active');
-        if (tabId === 'chat') loadChat();
+    let chatIntervals = {};
+    
+    function toggleOrder(orderId) {
+        const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+        card.classList.toggle('expanded');
+        if (card.classList.contains('expanded')) {
+            loadChatMessages(orderId);
+            if (!chatIntervals[orderId]) {
+                chatIntervals[orderId] = setInterval(() => loadChatMessages(orderId), 5000);
+            }
+        } else {
+            if (chatIntervals[orderId]) {
+                clearInterval(chatIntervals[orderId]);
+                delete chatIntervals[orderId];
+            }
+        }
     }
-
-    async function loadChat() {
-        const orderId = document.getElementById('chat-order-select').value;
-        if (!orderId) return;
-        currentOrderId = orderId;
-        const container = document.getElementById('chat-messages');
-        container.innerHTML = 'Загрузка...';
+    
+    function switchTab(orderId, tab) {
+        const btns = document.querySelectorAll(`#details-${orderId} .detail-tab`);
+        const contents = document.querySelectorAll(`#details-${orderId} .detail-content`);
+        
+        btns.forEach(btn => btn.classList.remove('active'));
+        contents.forEach(content => content.classList.remove('active'));
+        
+        event.target.classList.add('active');
+        document.getElementById(`${tab}-${orderId}`).classList.add('active');
+        
+        if (tab === 'chat') {
+            loadChatMessages(orderId);
+        }
+    }
+    
+    async function loadChatMessages(orderId) {
+        const container = document.getElementById(`chat-messages-${orderId}`);
+        if (!container) return;
+        
         try {
-            const res = await fetch(`/chat/api/messages/${orderId}/`);
-            const data = await res.json();
-            if (data.messages?.length) {
+            const response = await fetch(`/chat/api/messages/${orderId}/`);
+            const data = await response.json();
+            
+            if (data.messages && data.messages.length > 0) {
                 container.innerHTML = data.messages.map(msg => `
                     <div class="message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}">
                         <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${msg.message}<br>
-                        <small>${msg.created_at}</small>
+                        <small style="color:#999;">${msg.created_at}</small>
                     </div>
                 `).join('');
+                container.scrollTop = container.scrollHeight;
             } else {
-                container.innerHTML = '<p>Нет сообщений</p>';
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color:#999;">Нет сообщений. Напишите менеджеру!</div>';
             }
         } catch(e) {
-            container.innerHTML = '<p>Ошибка</p>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Ошибка загрузки</div>';
         }
     }
-
-    async function sendMessage() {
-        const msg = document.getElementById('chat-message-input').value.trim();
-        if (!msg || !currentOrderId) return;
-        const formData = new FormData();
-        formData.append('message', msg);
-        await fetch(`/chat/api/send/${currentOrderId}/`, {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRFToken': getCookie('csrftoken') }
-        });
-        document.getElementById('chat-message-input').value = '';
-        await loadChat();
+    
+    async function sendMessage(orderId) {
+        const input = document.getElementById(`chat-input-${orderId}`);
+        const message = input.value.trim();
+        if (!message) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('message', message);
+            
+            await fetch(`/chat/api/send/${orderId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            });
+            input.value = '';
+            await loadChatMessages(orderId);
+        } catch(e) {
+            alert('Ошибка при отправке');
+        }
     }
-
+    
     function getCookie(name) {
-        let v = null;
+        let value = null;
         if (document.cookie) {
-            document.cookie.split(';').forEach(c => {
-                let [k,val] = c.trim().split('=');
-                if (k === name) v = decodeURIComponent(val);
+            document.cookie.split(';').forEach(cookie => {
+                let [key, val] = cookie.trim().split('=');
+                if (key === name) value = decodeURIComponent(val);
             });
         }
-        return v;
+        return value;
     }
-
-    setInterval(() => {
-        if (document.getElementById('chat').classList.contains('active') && currentOrderId) loadChat();
-    }, 5000);
 </script>
 {% endblock %}

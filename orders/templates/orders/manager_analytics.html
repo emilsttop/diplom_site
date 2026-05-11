@@ -12,20 +12,36 @@
     }
     .analytics-card {
         background: white;
-        border-radius: 10px;
+        border-radius: 15px;
         padding: 20px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        animation: fadeInUp 0.5s ease-out;
+    }
+    .analytics-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     .analytics-card h3 {
         margin-top: 0;
-        color: #333;
-        border-bottom: 2px solid #667eea;
+        color: #1a1a1a;
+        border-bottom: 2px solid #dc3545;
         padding-bottom: 10px;
     }
     .big-number {
         font-size: 36px;
         font-weight: bold;
-        color: #667eea;
+        color: #dc3545;
         text-align: center;
         margin: 20px 0;
     }
@@ -37,40 +53,46 @@
     }
     .stat-label {
         font-weight: bold;
+        color: #1a1a1a;
     }
     .stat-value {
         color: #666;
-    }
-    .debt-item {
-        background: #fff3cd;
-        border-left: 4px solid #ffc107;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .chart-bar {
-        background: #28a745;
-        height: 30px;
-        border-radius: 5px;
-        margin: 5px 0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding-right: 10px;
-        color: white;
-        font-weight: bold;
     }
     .status-new { background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; }
     .status-processing { background: #ffc107; color: black; padding: 3px 8px; border-radius: 3px; }
     .status-completed { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; }
     .status-cancelled { background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; }
     .btn-analytics {
-        background: #667eea;
+        background: #dc3545;
         color: white;
         padding: 10px 20px;
         text-decoration: none;
-        border-radius: 5px;
+        border-radius: 8px;
         display: inline-block;
         margin: 10px 5px;
+        transition: all 0.3s;
+    }
+    .btn-analytics:hover {
+        background: #bb2d3b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    .chart-container {
+        margin: 20px 0;
+        padding: 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    .chart-container:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    canvas {
+        max-height: 400px;
+        width: 100%;
     }
 </style>
 
@@ -115,7 +137,7 @@
             <span class="stat-label">Средний чек:</span>
             <span class="stat-value">
                 {% if total_orders > 0 %}
-                    {{ total_revenue|floatformat:0|divisibleby:total_orders }} ₽
+                    {{ total_revenue|floatformat:0 }} ₽
                 {% else %}
                     0 ₽
                 {% endif %}
@@ -124,80 +146,127 @@
     </div>
 
     <div class="analytics-card">
-        <h3>⚠️ Задолженности</h3>
-        <div class="big-number" style="color: #dc3545;">{{ debt_total|floatformat:0 }} ₽</div>
-        <div class="stat-item">
-            <span class="stat-label">Клиентов с долгами:</span>
-            <span class="stat-value">{{ debts.count }}</span>
-        </div>
-    </div>
-</div>
-
-<!-- Динамика заказов -->
-<div class="analytics-card" style="margin-bottom: 30px;">
-    <h3>📈 Динамика заказов (последние 7 дней)</h3>
-    {% for day in orders_by_day %}
-    <div class="stat-item">
-        <span class="stat-label">{{ day.date }}:</span>
-        <span class="stat-value">{{ day.count }} заказов на {{ day.total|floatformat:0 }} ₽</span>
-    </div>
-    <div class="chart-bar" style="width: {% widthratio day.count total_orders 100 %}%; max-width: 100%;">
-        {{ day.count }}
-    </div>
-    {% empty %}
-        <p>Нет данных за последние 7 дней</p>
-    {% endfor %}
-</div>
-
-<!-- Дебиторская задолженность -->
-<div class="analytics-card" style="margin-bottom: 30px;">
-    <h3>⚠️ Дебиторская задолженность (заказы в работе)</h3>
-    {% if debts %}
-        {% for debt in debts %}
-        <div class="debt-item">
-            <strong>Заказ №{{ debt.id }}</strong><br>
-            Клиент: {{ debt.client.username }}<br>
-            Сумма: {{ debt.total_price }} ₽<br>
-            Статус: <span class="status-processing">В обработке</span><br>
-            Дата создания: {{ debt.created_at|date:"d.m.Y" }}
-        </div>
-        {% endfor %}
-    {% else %}
-        <p>✅ Нет задолженностей</p>
-    {% endif %}
-</div>
-
-<!-- Топ клиентов -->
-<div class="analytics-grid">
-    <div class="analytics-card">
-        <h3>🏆 Топ-5 клиентов по сумме заказов</h3>
+        <h3>🏆 Топ-5 клиентов</h3>
         {% for client in top_clients %}
         <div class="stat-item">
             <span class="stat-label">{{ forloop.counter }}. {{ client.client__username }}</span>
             <span class="stat-value">{{ client.total_spent|floatformat:0 }} ₽ ({{ client.orders_count }} заказов)</span>
         </div>
         {% empty %}
-            <p>Нет данных о клиентах</p>
-        {% endfor %}
-    </div>
-
-    <div class="analytics-card">
-        <h3>🔥 Самые популярные услуги</h3>
-        {% for service in popular_services %}
-        <div class="stat-item">
-            <span class="stat-label">{{ service.name }}</span>
-            <span class="stat-value">{{ service.orders_count }} заказов</span>
-        </div>
-        {% empty %}
-            <p>Нет данных об услугах</p>
+            <p style="color: #999;">Нет данных о клиентах</p>
         {% endfor %}
     </div>
 </div>
 
-<!-- Цитата дня для менеджера -->
-<div class="analytics-card" style="margin-top: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-    <h3 style="color: white;">💡 Совет дня</h3>
-    <p>Больше всего заказов в обработке — {{ status_stats.processing }} шт. Обратите на них внимание!</p>
-    <p>Активных заказов сейчас: {{ status_stats.new|add:status_stats.processing }} шт.</p>
+<!-- График динамики заказов за месяц -->
+<div class="chart-container">
+    <h3>📈 Динамика заказов (последние 30 дней)</h3>
+    <canvas id="ordersChart" width="800" height="300"></canvas>
 </div>
+
+<!-- Популярные услуги -->
+<div class="analytics-card" style="margin-top: 20px;">
+    <h3>🔥 Самые популярные услуги</h3>
+    {% for service in popular_services %}
+    <div class="stat-item">
+        <span class="stat-label">{{ service.name }}</span>
+        <span class="stat-value">{{ service.orders_count }} заказов</span>
+    </div>
+    {% empty %}
+        <p style="color: #999;">Нет данных об услугах</p>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Анимация цифр (опционально)
+    document.addEventListener('DOMContentLoaded', function() {
+    const numbers = document.querySelectorAll('.big-number');
+    numbers.forEach(el => {
+        let finalText = el.innerText;
+        let isCurrency = finalText.includes('₽');
+        let final = parseFloat(finalText.replace(/[^\d.-]/g, ''));
+        
+        if (!isNaN(final)) {
+            let current = 0;
+            const duration = 500; // 0.8 секунды
+            const steps = 25;      // 40 шагов
+            const stepValue = final / steps;
+            let step = 0;
+            
+            const timer = setInterval(() => {
+                step++;
+                current = Math.min(step * stepValue, final);
+                
+                if (isCurrency) {
+                    el.innerText = Math.floor(current) + ' ₽';
+                } else {
+                    el.innerText = Math.floor(current);
+                }
+                
+                if (step >= steps) {
+                    el.innerText = finalText;
+                    clearInterval(timer);
+                }
+            }, duration / steps);
+        }
+    });
+});
+
+    const chartData = {
+        labels: [{% for day in orders_by_month %}'{{ day.date }}',{% endfor %}],
+        datasets: [{
+            label: 'Количество заказов',
+            data: [{% for day in orders_by_month %}{{ day.count }},{% endfor %}],
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#dc3545',
+            pointBorderColor: '#fff',
+            pointRadius: 5,
+            pointHoverRadius: 7
+        }]
+    };
+
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `Заказов: ${context.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    },
+                    title: {
+                        display: true,
+                        text: 'Количество заказов'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Дата'
+                    }
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

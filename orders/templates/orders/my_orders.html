@@ -3,24 +3,64 @@
 {% block title %}Мои заказы{% endblock %}
 
 {% block content %}
+<style>
+    .order-card {
+        border: 1px solid #eee;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        background: white;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .order-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .status-new { background: #007bff; color: white; padding: 3px 8px; border-radius: 3px; }
+    .status-processing { background: #ffc107; color: black; padding: 3px 8px; border-radius: 3px; }
+    .status-completed { background: #28a745; color: white; padding: 3px 8px; border-radius: 3px; }
+    .status-cancelled { background: #dc3545; color: white; padding: 3px 8px; border-radius: 3px; }
+    .btn-primary {
+        background: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        text-decoration: none;
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.3s;
+    }
+    .btn-primary:hover {
+        background: #bb2d3b;
+        transform: translateY(-2px);
+    }
+    summary {
+        color: #dc3545;
+        cursor: pointer;
+        font-weight: bold;
+    }
+</style>
+
 <h1>📋 Мои заказы</h1>
 
 {% if orders %}
     {% for order in orders %}
-    <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 10px; background: white;">
-        <h3>Заказ №{{ order.id }}</h3>
-        <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-        <p><strong>Статус:</strong> 
-            {% if order.status == 'new' %}🆕 Новый
-            {% elif order.status == 'processing' %}⚙️ В обработке
-            {% elif order.status == 'completed' %}✅ Выполнен
-            {% elif order.status == 'cancelled' %}❌ Отменён
-            {% endif %}
+    <div class="order-card">
+        <h3 style="color: #dc3545;">Заказ №{{ order.id }}</h3>
+        <p><strong>📅 Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+        <p><strong>📊 Статус:</strong> 
+            <span class="status-{{ order.status }}">
+                {% if order.status == 'new' %}🆕 Новый
+                {% elif order.status == 'processing' %}⚙️ В обработке
+                {% elif order.status == 'completed' %}✅ Выполнен
+                {% elif order.status == 'cancelled' %}❌ Отменён
+                {% endif %}
+            </span>
         </p>
-        <p><strong>Сумма:</strong> {{ order.total_price }} ₽</p>
+        <p><strong>💰 Сумма:</strong> {{ order.total_price }} ₽</p>
         
         <details>
-            <summary style="cursor: pointer; color: #007bff;">📦 Состав заказа</summary>
+            <summary>📦 Состав заказа</summary>
             <ul style="margin-top: 10px;">
                 {% for item in order.items.all %}
                 <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
@@ -30,7 +70,9 @@
     </div>
     {% endfor %}
 {% else %}
-    <p>😕 У вас пока нет заказов</p>
-    <a href="{% url 'catalog' %}" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px;">Перейти в каталог</a>
+    <div class="order-card" style="text-align: center;">
+        <p>😕 У вас пока нет заказов</p>
+        <a href="{% url 'catalog' %}" class="btn-primary">Перейти в каталог</a>
+    </div>
 {% endif %}
 {% endblock %}
