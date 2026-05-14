@@ -11,7 +11,7 @@ class Order(models.Model):
     )
     
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name='Клиент')
-    packages = models.ManyToManyField(ServicePackage, through='OrderItem', verbose_name='Пакеты услуг')
+    packages = models.ManyToManyField('services.ServicePackage', through='OrderItem', verbose_name='Пакеты услуг', related_name='order_items')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new', verbose_name='Статус')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Итого')

@@ -1,61 +1,28 @@
 {% extends 'base.html' %}
-{% load custom_filters %}
 
 {% block title %}Каталог услуг{% endblock %}
 
 {% block content %}
 <style>
-    .hero {
-        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
-        color: white;
-        padding: 60px 0;
-        border-radius: 20px;
+    .catalog-header {
         margin-bottom: 40px;
         text-align: center;
     }
-    .hero h1 {
-        font-size: 48px;
-        margin-bottom: 20px;
-    }
-    .hero p {
-        font-size: 20px;
-        margin-bottom: 0;
-    }
-    .features {
-        display: flex;
-        gap: 30px;
-        margin-bottom: 50px;
-        flex-wrap: wrap;
-    }
-    .feature-item {
-        flex: 1;
-        text-align: center;
-        padding: 20px;
-        background: white;
-        border-radius: 15px;
-        transition: all 0.3s;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    .feature-item:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    }
-    .feature-icon {
-        font-size: 48px;
-        margin-bottom: 15px;
-    }
-    .feature-item h3 {
+    .catalog-header h1 {
+        font-size: 36px;
+        color: #1a1a1a;
         margin-bottom: 10px;
-        color: #1a1a1a;
     }
-    .catalog-title {
-        text-align: center;
-        margin-bottom: 40px;
-        font-size: 32px;
-        color: #1a1a1a;
-        position: relative;
+    body.dark .catalog-header h1 {
+        color: #e0e0e0;
     }
-    .catalog-title:after {
+    .catalog-header p {
+        color: #666;
+    }
+    body.dark .catalog-header p {
+        color: #aaa;
+    }
+    .catalog-header:after {
         content: '';
         display: block;
         width: 60px;
@@ -80,6 +47,9 @@
         display: flex;
         flex-direction: column;
     }
+    body.dark .package-card {
+        background: #1e1e2e;
+    }
     .package-card:hover {
         transform: translateY(-8px);
         box-shadow: 0 15px 35px rgba(220, 53, 69, 0.2);
@@ -101,6 +71,10 @@
         text-align: center;
         border-bottom: 1px solid #eee;
     }
+    body.dark .package-description {
+        color: #e0e0e0;
+        border-bottom-color: #333;
+    }
     .package-description p {
         margin: 0;
     }
@@ -110,11 +84,17 @@
         border-bottom: 1px solid #eee;
         flex: 1;
     }
+    body.dark .package-services {
+        background: #2a2a3a;
+    }
     .package-services strong {
         color: #1a1a1a;
         display: block;
         margin-bottom: 12px;
         font-size: 14px;
+    }
+    body.dark .package-services strong {
+        color: #e0e0e0;
     }
     .services-list {
         list-style: none;
@@ -129,6 +109,9 @@
         align-items: center;
         gap: 8px;
     }
+    body.dark .services-list li {
+        color: #e0e0e0;
+    }
     .services-list li:before {
         content: "✓";
         color: #dc3545;
@@ -140,6 +123,9 @@
         text-align: center;
         background: #fff0f0;
         border-bottom: 1px solid #eee;
+    }
+    body.dark .package-price {
+        background: #2a2a3a;
     }
     .package-price .price {
         font-size: 32px;
@@ -154,6 +140,9 @@
         padding: 20px;
         text-align: center;
         background: white;
+    }
+    body.dark .package-footer {
+        background: #1e1e2e;
     }
     .btn-card {
         display: block;
@@ -190,36 +179,16 @@
     }
 </style>
 
-<div class="hero">
-    <h1>📡 Телеком-Сервис</h1>
-    <p>Профессиональные решения для вашего бизнеса</p>
+<div class="catalog-header">
+    <h1>📦 Пакеты услуг</h1>
+    <p>Выберите подходящее решение для вашего бизнеса</p>
 </div>
-
-<div class="features">
-    <div class="feature-item">
-        <div class="feature-icon">🚀</div>
-        <h3>Быстро</h3>
-        <p>Запуск рекламных кампаний в кратчайшие сроки</p>
-    </div>
-    <div class="feature-item">
-        <div class="feature-icon">📊</div>
-        <h3>Эффективно</h3>
-        <p>Достигаем высоких результатов</p>
-    </div>
-    <div class="feature-item">
-        <div class="feature-icon">💬</div>
-        <h3>Поддержка</h3>
-        <p>Круглосуточная поддержка клиентов</p>
-    </div>
-</div>
-
-<h2 class="catalog-title">📦 Пакеты услуг</h2>
 
 <div class="packages-grid">
     {% for package in packages %}
     <div class="package-card">
         <div class="package-header">
-            <h2>{{ package.name }}</h2>
+            <h2>{{ package.icon }} {{ package.name }}</h2>
         </div>
         <div class="package-description">
             <p>{{ package.description }}</p>
@@ -227,76 +196,24 @@
         <div class="package-services">
             <strong>📋 Что входит в пакет:</strong>
             <ul class="services-list">
-                {% for service in package.services_list|split:"," %}
-                <li>{{ service|strip }}</li>
+                {% for service in package.available_services.all|slice:":8" %}
+                <li>{{ service.name }} — {{ service.price|floatformat:0 }} ₽</li>
                 {% endfor %}
+                {% if package.available_services.count > 8 %}
+                <li>+ ещё {{ package.available_services.count|add:"-8" }} услуг</li>
+                {% endif %}
             </ul>
         </div>
-        <div class="package-price">
-            <span class="price">{{ package.price|floatformat:0 }}</span><span class="currency"> ₽</span>
-        </div>
         <div class="package-footer">
-            {% if user.role != 'manager' and user.role != 'admin' %}
-                <button onclick="addToCart({{ package.id }})" class="btn-card">🛒 Добавить в корзину</button>
-            {% else %}
-                <span class="btn-card-disabled">🔒 Только для клиентов</span>
-            {% endif %}
+            <a href="{% url 'package_detail' package.id %}" class="btn-card">🎯 Выбрать услуги</a>
         </div>
     </div>
     {% endfor %}
 </div>
 
 <script>
-    async function addToCart(packageId) {
-        try {
-            const formData = new FormData();
-            formData.append('package_id', packageId);
-            
-            const response = await fetch(`/cart/add/${packageId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Обновляем счётчик корзины в шапке
-                const cartLink = document.querySelector('a[href="/cart/"]');
-                if (cartLink) {
-                    const match = cartLink.innerHTML.match(/\((\d+)\)/);
-                    if (match) {
-                        cartLink.innerHTML = cartLink.innerHTML.replace(/\(\d+\)/, `(${data.cart_count})`);
-                    } else {
-                        cartLink.innerHTML = `🛒 Корзина (${data.cart_count})`;
-                    }
-                }
-                // Визуальный эффект на кнопке
-                const btn = event.target;
-                btn.style.transform = 'scale(0.95)';
-                setTimeout(() => { btn.style.transform = ''; }, 200);
-            }
-        } catch(e) {
-            console.error('Ошибка:', e);
-        }
-    }
-    
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
+    function selectPackage(packageId) {
+        window.location.href = `/catalog/${packageId}/`;
     }
 </script>
 {% endblock %}

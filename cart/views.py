@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from services.models import ServicePackage
@@ -6,22 +7,24 @@ from decimal import Decimal
 from orders.utils import assign_manager_to_order
 from django.http import JsonResponse
 
+
 @login_required
 def cart_view(request):
-    """Просмотр корзины"""
     cart = request.session.get('cart', {})
     cart_items = []
     total = 0
     
-    for package_id, quantity in cart.items():
-        package = get_object_or_404(ServicePackage, id=package_id)
-        subtotal = package.price * quantity
-        total += subtotal
-        cart_items.append({
-            'package': package,
-            'quantity': quantity,
-            'subtotal': subtotal,
-        })
+    for key, item in cart.items():
+        if key.startswith('package_'):
+            # Новый формат: пакет с выбранными услугами
+            cart_items.append({
+                'type': 'package',
+                'package_name': item.get('package_name'),
+                'service_names': item.get('service_names', []),
+                'total_price': item.get('total_price', 0),
+                'key': key,
+            })
+            total += item.get('total_price', 0)
     
     return render(request, 'cart/cart.html', {
         'cart_items': cart_items,
@@ -53,14 +56,10 @@ def add_to_cart(request, package_id):
     return redirect('catalog')
 
 @login_required
-def remove_from_cart(request, package_id):
-    """Удаление пакета из корзины"""
+def remove_from_cart(request, item_key):
     cart = request.session.get('cart', {})
-    package_id_str = str(package_id)
-    
-    if package_id_str in cart:
-        del cart[package_id_str]
-    
+    if item_key in cart:
+        del cart[item_key]
     request.session['cart'] = cart
     return redirect('cart')
 
@@ -79,7 +78,71 @@ def update_cart(request, package_id):
         
         request.session['cart'] = cart
     
-    return redirect('cart')
+    return redirect('cart')@login_required
+@login_required
+def add_with_services(request):
+    if request.method == 'POST':
+        package_id = request.POST.get('package_id')
+        service_ids = json.loads(request.POST.get('service_ids', '[]'))
+        
+        if not service_ids:
+            return JsonResponse({'error': 'Не выбрано ни одной услуги'}, status=400)
+        
+        package = get_object_or_404(ServicePackage, id=package_id)
+        services = Service.objects.filter(id__in=service_ids)
+        
+        if services.count() < package.min_services:
+            return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
+        
+        total_price = sum(s.price for s in services)
+        
+        cart = request.session.get('cart', {})
+        package_key = f"package_{package_id}"
+        
+        cart[package_key] = {
+            'package_name': package.name,
+            'service_ids': service_ids,
+            'service_names': [s.name for s in services],
+            'total_price': float(total_price),
+        }
+        request.session['cart'] = cart
+        
+        return JsonResponse({'success': True, 'total_price': float(total_price)})
+    
+    return JsonResponse({'error': 'Метод не разрешён'}, status=405)
+
+@login_required
+def add_with_services(request):
+    if request.method == 'POST':
+        package_id = request.POST.get('package_id')
+        service_ids = json.loads(request.POST.get('service_ids', '[]'))
+        
+        if not service_ids:
+            return JsonResponse({'error': 'Не выбрано ни одной услуги'}, status=400)
+        
+        from services.models import ServicePackage, Service
+        package = get_object_or_404(ServicePackage, id=package_id)
+        services = Service.objects.filter(id__in=service_ids)
+        
+        if services.count() < package.min_services:
+            return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
+        
+        total_price = sum(s.price for s in services)
+        
+        cart = request.session.get('cart', {})
+        package_key = f"package_{package_id}"
+        
+        cart[package_key] = {
+            'package_name': package.name,
+            'service_ids': service_ids,
+            'service_names': [s.name for s in services],
+            'total_price': float(total_price),
+        }
+        request.session['cart'] = cart
+        
+        return JsonResponse({'success': True, 'total_price': float(total_price)})
+    
+    return JsonResponse({'error': 'Метод не разрешён'}, status=405)
 
 @login_required
 def checkout(request):

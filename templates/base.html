@@ -355,28 +355,28 @@
     }
 </style>
 </head>
-<body class="light">
+<body>
     <div class="header">
         <div class="container">
             <div class="header-content">
                 <div class="logo">
-                    <span class="logo-icon">📡</span>
-                    <a href="/">Телеком-Сервис</a>
-                </div>
-                <div class="nav">
-                    <a href="/">Каталог</a>
-                    {% if user.role != 'manager' and user.role != 'admin' %}
-                        <a href="/cart/">🛒 Корзина {% if cart_count %}<span class="notification-badge">{{ cart_count }}</span>{% endif %}</a>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                        <a href="/accounts/profile/">👤 {{ user.username }}</a>
-                        <a href="/accounts/logout/">🚪 Выйти</a>
-                    {% else %}
-                        <a href="/accounts/login/">🔐 Вход</a>
-                        <a href="/accounts/register/">📝 Регистрация</a>
-                    {% endif %}
-                    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
-                </div>
+    <span class="logo-icon">📡</span>
+    <a href="/">Телеком-Сервис</a>
+</div>
+<div class="nav">
+    <a href="/catalog/">Каталог</a>
+    {% if user.role != 'manager' and user.role != 'admin' %}
+        <a href="/cart/">🛒 Корзина {% if cart_count %}<span class="notification-badge">{{ cart_count }}</span>{% endif %}</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+        <a href="/accounts/profile/">👤 {{ user.username }}</a>
+        <a href="/accounts/logout/">🚪 Выйти</a>
+    {% else %}
+        <a href="/accounts/login/">🔐 Вход</a>
+        <a href="/accounts/register/">📝 Регистрация</a>
+    {% endif %}
+   <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+</div>
             </div>
         </div>
     </div>
@@ -395,30 +395,56 @@
     </div>
 
     <script>
-        function toggleTheme() {
-            const body = document.body;
-            const themeBtn = document.getElementById('themeBtn');
-            
-            if (body.classList.contains('light')) {
-                body.classList.remove('light');
-                body.classList.add('dark');
-                themeBtn.innerHTML = '☀️';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark');
-                body.classList.add('light');
-                themeBtn.innerHTML = '🌙';
-                localStorage.setItem('theme', 'light');
-            }
+    function toggleTheme() {
+        const body = document.body;
+        const themeBtn = document.getElementById('themeBtn');
+        
+        console.log('Переключение темы, текущие классы:', body.className);
+        
+        if (body.classList.contains('light')) {
+            body.classList.remove('light');
+            body.classList.add('dark');
+            themeBtn.innerHTML = '☀️';
+            localStorage.setItem('theme', 'dark');
+            console.log('Установлена тёмная тема');
+        } else {
+            body.classList.remove('dark');
+            body.classList.add('light');
+            themeBtn.innerHTML = '🌙';
+            localStorage.setItem('theme', 'light');
+            console.log('Установлена светлая тема');
+        }
+    }
+    
+    // Загрузка сохранённой темы
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedTheme = localStorage.getItem('theme');
+        const body = document.body;
+        const themeBtn = document.getElementById('themeBtn');
+        
+        console.log('Загруженная тема из localStorage:', savedTheme);
+        console.log('Текущие классы body до применения:', body.className);
+        
+        // Сначала убираем все классы темы
+        body.classList.remove('light', 'dark');
+        
+        if (savedTheme === 'dark') {
+            body.classList.add('dark');
+            if (themeBtn) themeBtn.innerHTML = '☀️';
+            console.log('Применена тёмная тема из localStorage');
+        } else if (savedTheme === 'light') {
+            body.classList.add('light');
+            if (themeBtn) themeBtn.innerHTML = '🌙';
+            console.log('Применена светлая тема из localStorage');
+        } else {
+            // Если тема не сохранена, по умолчанию светлая
+            body.classList.add('light');
+            localStorage.setItem('theme', 'light');
+            console.log('Тема не сохранена, установлена светлая по умолчанию');
         }
         
-        // Загрузка сохранённой темы
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.classList.remove('light');
-            document.body.classList.add('dark');
-            document.getElementById('themeBtn').innerHTML = '☀️';
-        }
-    </script>
+        console.log('Классы body после применения:', body.className);
+    });
+</script>
 </body>
 </html>

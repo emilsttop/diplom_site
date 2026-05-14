@@ -4,56 +4,73 @@
 
 {% block content %}
 <style>
-    .cart-table {
-        width: 100%;
-        border-collapse: collapse;
+    .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+    .cart-item {
         background: white;
         border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .cart-table th {
-        background: #1a1a1a;
-        color: white;
-        padding: 15px;
-        text-align: left;
-    }
-    .cart-table td {
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-    }
-    .cart-table tr:hover {
-        background: #f9f9f9;
-    }
-    .quantity-input {
-        width: 60px;
-        padding: 5px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        text-align: center;
-    }
-    .btn-update {
-        background: #1a1a1a;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         transition: all 0.3s;
     }
-    .btn-update:hover {
-        background: #dc3545;
+    body.dark .cart-item {
+        background: #1e1e2e;
+        color: #e0e0e0;
+    }
+    .cart-item:hover {
         transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .cart-item-info {
+        flex: 1;
+    }
+    .cart-item-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #dc3545;
+    }
+    .cart-item-services {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .cart-item-services li {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+    body.dark .cart-item-services li {
+        color: #aaa;
+    }
+    .cart-item-price {
+        font-size: 20px;
+        font-weight: bold;
+        color: #dc3545;
+        min-width: 120px;
+        text-align: right;
     }
     .btn-remove {
+        background: none;
+        border: none;
         color: #dc3545;
-        text-decoration: none;
-        font-weight: bold;
+        font-size: 20px;
+        cursor: pointer;
         transition: all 0.3s;
+        padding: 8px;
     }
     .btn-remove:hover {
+        transform: scale(1.1);
         color: #bb2d3b;
-        text-decoration: underline;
     }
     .cart-summary {
         background: white;
@@ -62,6 +79,9 @@
         margin-top: 20px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         text-align: right;
+    }
+    body.dark .cart-summary {
+        background: #1e1e2e;
     }
     .cart-summary h3 {
         font-size: 24px;
@@ -81,49 +101,66 @@
         border-radius: 15px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
+    body.dark .empty-cart {
+        background: #1e1e2e;
+    }
     .empty-cart p {
         font-size: 18px;
         margin-bottom: 20px;
         color: #666;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+        color: white;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220,53,69,0.3);
+    }
+    .btn-secondary {
+        background: #1a1a1a;
+        color: white;
+    }
+    .btn-secondary:hover {
+        background: #333;
+        transform: translateY(-2px);
     }
 </style>
 
 <h1>🛒 Корзина</h1>
 
 {% if cart_items %}
-    <table class="cart-table">
-        <thead>
-            <tr>
-                <th>Услуга</th>
-                <th>Цена</th>
-                <th>Количество</th>
-                <th>Сумма</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in cart_items %}
-            <tr>
-                <td><strong>{{ item.package.name }}</strong></td>
-                <td>{{ item.package.price }} ₽</td>
-                <td>
-                    <form method="post" action="{% url 'update_cart' item.package.id %}" style="display: flex; gap: 5px; align-items: center;">
-                        {% csrf_token %}
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="0" class="quantity-input">
-                        <button type="submit" class="btn-update">Обновить</button>
-                    </form>
-                </td>
-                <td><strong>{{ item.subtotal }} ₽</strong></td>
-                <td>
-                    <a href="{% url 'remove_from_cart' item.package.id %}" class="btn-remove">❌ Удалить</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="cart-items">
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <div class="cart-item-title">{{ item.package_name }}</div>
+                <ul class="cart-item-services">
+                    {% for service in item.service_names %}
+                    <li>✓ {{ service }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="cart-item-price">{{ item.total_price|floatformat:0 }} ₽</div>
+            <div>
+                <a href="{% url 'remove_from_cart' item.key %}" class="btn-remove" title="Удалить">❌</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
     
     <div class="cart-summary">
-        <h3>Итого: {{ total }} ₽</h3>
+        <h3>Итого: {{ total|floatformat:0 }} ₽</h3>
         <div class="action-buttons">
             <a href="{% url 'catalog' %}" class="btn btn-secondary">Продолжить покупки</a>
             <a href="{% url 'checkout' %}" class="btn btn-primary">✅ Оформить заказ</a>
