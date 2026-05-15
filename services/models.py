@@ -6,6 +6,7 @@ class ServicePackage(models.Model):
     description = models.TextField(verbose_name="Описание")
     icon = models.CharField(max_length=10, default="📦", verbose_name="Иконка")
     
+    
     # Услуги, которые можно выбрать в этом пакете
     available_services = models.ManyToManyField('Service', blank=True, verbose_name="Доступные услуги на выбор")
     
@@ -14,7 +15,8 @@ class ServicePackage(models.Model):
     
     is_active = models.BooleanField(default=True, verbose_name="Активен")
     sort_order = models.IntegerField(default=0, verbose_name="Порядок")
-    
+
+         
     def __str__(self):
         return self.name
     
@@ -28,6 +30,9 @@ class Service(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название услуги")
     description = models.TextField(blank=True, verbose_name="Описание")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
+    programmer_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы программиста")
+    marketer_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы маркетолога")
+    smm_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы SMM")
     
     def __str__(self):
         return f"{self.name} - {self.price} ₽"

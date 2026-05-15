@@ -197,6 +197,11 @@ def checkout(request):
                     price=price
                 )
                 
+                # Суммируем часы специалистов
+                order.programmer_hours += Decimal(str(package.programmer_hours)) * quantity
+                order.marketer_hours += Decimal(str(package.marketer_hours)) * quantity
+                order.smm_hours += Decimal(str(package.smm_hours)) * quantity
+                
                 services_items.append({
                     'type': 'package',
                     'package_id': package.id,

@@ -40,3 +40,16 @@ def profile(request):
     # Для клиента показываем личный кабинет
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
     return render(request, 'accounts/profile.html', {'orders': orders})
+
+@login_required
+def specialist_dashboard(request):
+    if request.user.role not in ['programmer', 'marketer', 'smm']:
+        return redirect('catalog')
+    
+    role_field = f'{request.user.role}_hours'
+    orders = Order.objects.filter(**{role_field + '__gt': 0})
+    
+    return render(request, 'accounts/specialist_dashboard.html', {
+        'orders': orders,
+        'role': request.user.role,
+    })

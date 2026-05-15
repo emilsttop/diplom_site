@@ -3,10 +3,13 @@ from django.db import models
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('admin', 'Администратор'),
-        ('manager', 'Менеджер'),
-        ('client', 'Клиент'),
-    )
+    ('admin', 'Администратор'),
+    ('manager', 'Менеджер'),
+    ('client', 'Клиент'),
+    ('programmer', 'Программист'),
+    ('marketer', 'Маркетолог'),
+    ('smm', 'SMM-менеджер'),
+)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
     
     def __str__(self):

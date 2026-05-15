@@ -27,6 +27,10 @@ class Order(models.Model):
         verbose_name='Ответственный менеджер',
         limit_choices_to={'role': 'manager'}
     )
+        # Загрузка специалистов в часах
+    programmer_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы программиста")
+    marketer_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы маркетолога")
+    smm_hours = models.DecimalField(max_digits=5, decimal_places=1, default=0, verbose_name="Часы SMM")
     
     def __str__(self):
         return f"Заказ #{self.id} - {self.client.username}"
