@@ -98,9 +98,15 @@ def update_cart(request, package_id):
     return redirect('cart')
 
 
-@login_required
 def add_with_services(request):
     """Добавление пакета с выбранными услугами"""
+    
+    # Проверяем авторизацию вручную
+    if not request.user.is_authenticated:
+        request.session['pending_package_id'] = request.POST.get('package_id')
+        request.session['pending_service_ids'] = request.POST.get('service_ids')
+        return redirect('register')
+    
     if request.method == 'POST':
         package_id = request.POST.get('package_id')
         service_ids = json.loads(request.POST.get('service_ids', '[]'))
@@ -120,6 +126,7 @@ def add_with_services(request):
         smm_hours = sum(s.smm_hours for s in services)
         
         # Проверяем доступность специалистов
+        from orders.utils import is_specialist_available
         if not is_specialist_available('programmer', programmer_hours):
             return JsonResponse({'error': 'Нет свободных программистов'}, status=400)
         if not is_specialist_available('marketer', marketer_hours):

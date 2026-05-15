@@ -11,6 +11,41 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
+            print("=== USER REGISTER SUCCESS ===")
+            print("Session keys:", request.session.keys())
+            print("pending_package_id:", request.session.get('pending_package_id'))
+            print("pending_service_ids:", request.session.get('pending_service_ids'))
+            
+            # Восстанавливаем отложенные услуги
+            pending_package_id = request.session.pop('pending_package_id', None)
+            pending_service_ids = request.session.pop('pending_service_ids', None)
+            
+            if pending_package_id and pending_service_ids:
+                # Добавляем в корзину
+                cart = request.session.get('cart', {})
+                package_key = f"package_{pending_package_id}"
+                
+                # Здесь нужно получить услуги по их ID
+                service_ids_list = json.loads(pending_service_ids)
+                services = Service.objects.filter(id__in=service_ids_list)
+                
+                if services.exists():
+                    total_price = sum(s.price for s in services)
+                    cart[package_key] = {
+                        'package_name': ServicePackage.objects.get(id=pending_package_id).name,
+                        'service_ids': service_ids_list,
+                        'service_names': [s.name for s in services],
+                        'services': [{
+                            'name': s.name,
+                            'price': float(s.price),
+                            'programmer_hours': float(s.programmer_hours),
+                            'marketer_hours': float(s.marketer_hours),
+                            'smm_hours': float(s.smm_hours),
+                        } for s in services],
+                        'total_price': float(total_price),
+                    }
+                    request.session['cart'] = cart
+            
             return redirect('catalog')
     else:
         form = RegistrationForm()
@@ -23,6 +58,43 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            print("=== USER LOGIN SUCCESS ===")
+            print("Session keys:", request.session.keys())
+            print("pending_package_id:", request.session.get('pending_package_id'))
+            print("pending_service_ids:", request.session.get('pending_service_ids'))
+            
+            # Восстанавливаем отложенные услуги (если есть)
+            pending_package_id = request.session.pop('pending_package_id', None)
+            pending_service_ids = request.session.pop('pending_service_ids', None)
+            
+            if pending_package_id and pending_service_ids:
+                import json
+                from services.models import Service, ServicePackage
+                
+                cart = request.session.get('cart', {})
+                package_key = f"package_{pending_package_id}"
+                
+                service_ids_list = json.loads(pending_service_ids)
+                services = Service.objects.filter(id__in=service_ids_list)
+                
+                if services.exists():
+                    total_price = sum(s.price for s in services)
+                    cart[package_key] = {
+                        'package_name': ServicePackage.objects.get(id=pending_package_id).name,
+                        'service_ids': service_ids_list,
+                        'service_names': [s.name for s in services],
+                        'services': [{
+                            'name': s.name,
+                            'price': float(s.price),
+                            'programmer_hours': float(s.programmer_hours),
+                            'marketer_hours': float(s.marketer_hours),
+                            'smm_hours': float(s.smm_hours),
+                        } for s in services],
+                        'total_price': float(total_price),
+                    }
+                    request.session['cart'] = cart
+                    print(f"✅ Восстановлена корзина после входа: {cart}")
+            
             return redirect('catalog')
         else:
             return render(request, 'accounts/login.html', {'error': 'Неверный логин или пароль'})

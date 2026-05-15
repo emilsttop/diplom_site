@@ -124,3 +124,6 @@ STATIC_URL = 'static/'
 
 # Добавляем русский язык в админку
 from django.utils.translation import gettext_lazy as _
+
+# Куда перенаправлять неавторизованных пользователей
+LOGIN_URL = '/accounts/register/'

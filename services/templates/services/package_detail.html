@@ -227,13 +227,18 @@
             body: formData
         });
         
+        // Если пользователь не авторизован, Django вернёт редирект (статус 302)
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+        
         const data = await response.json();
         
         if (data.success) {
-            // Просто перенаправляем в корзину без уведомления
             window.location.href = '/cart/';
         } else {
-            alert('❌ Ошибка при добавлении: ' + (data.error || 'Неизвестная ошибка'));
+            alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
         }
     } catch(e) {
         alert('❌ Ошибка при добавлении');
