@@ -102,7 +102,9 @@
 <div class="hero">
     <h1>📡 Телеком-Сервис</h1>
     <p>Профессиональные решения для развития вашего бизнеса</p>
-    <a href="{% url 'catalog' %}" class="btn">Перейти в каталог →</a>
+    {% if user.role != 'programmer' and user.role != 'marketer' and user.role != 'smm' %}
+    <a href="{% url 'catalog' %}" class="btn">Перейти в каталог</a>
+{% endif %}
 </div>
 
 <div class="features">

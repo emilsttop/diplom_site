@@ -34,9 +34,13 @@ def user_logout(request):
 
 @login_required
 def profile(request):
-    # Если пользователь менеджер или админ — отправляем в его панель
+    # Если пользователь менеджер или админ — отправляем в панель менеджера
     if request.user.role in ['manager', 'admin']:
         return redirect('manager_dashboard')
+    
+    # Если пользователь специалист (программист, маркетолог, SMM) — отправляем в его панель
+    if request.user.role in ['programmer', 'marketer', 'smm']:
+        return redirect('specialist_dashboard')
     
     # Для клиента показываем личный кабинет
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
@@ -47,8 +51,18 @@ def specialist_dashboard(request):
     if request.user.role not in ['programmer', 'marketer', 'smm']:
         return redirect('catalog')
     
-    role_field = f'{request.user.role}_hours'
-    orders = Order.objects.filter(**{f'{role_field}__gt': 0}).order_by('-created_at')
+    role = request.user.role
+    role_field = f'{role}_hours'
+    
+    # Фильтруем заказы по назначенному специалисту
+    if role == 'programmer':
+        orders = Order.objects.filter(assigned_programmer=request.user).order_by('-created_at')
+    elif role == 'marketer':
+        orders = Order.objects.filter(assigned_marketer=request.user).order_by('-created_at')
+    elif role == 'smm':
+        orders = Order.objects.filter(assigned_smm=request.user).order_by('-created_at')
+    else:
+        orders = Order.objects.none()
     
     total_hours = sum(getattr(order, role_field, 0) for order in orders)
     
@@ -56,12 +70,12 @@ def specialist_dashboard(request):
         'programmer': 'Программист',
         'marketer': 'Маркетолог',
         'smm': 'SMM-менеджер',
-    }.get(request.user.role, request.user.role)
+    }.get(role, role)
     
     return render(request, 'accounts/specialist_dashboard.html', {
         'orders': orders,
-        'role': request.user.role,
-        'role_field': role_field,           # ← ДОБАВИТЬ
+        'role': role,
+        'role_field': role_field,
         'role_display': role_display,
         'total_hours': total_hours,
     })

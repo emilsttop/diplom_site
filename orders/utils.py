@@ -119,26 +119,34 @@ def get_manager_name(manager):
         return manager.get_full_name() or manager.username
     return "Не назначен"
 
-def assign_specialist(role, hours):
-    """Назначает специалиста с наименьшей текущей загрузкой"""
-    if hours == 0:
+def assign_specialist(role, new_hours, current_order_id=None):
+    """Назначает специалиста с наименьшей текущей загрузкой (без учёта текущего заказа)"""
+    if new_hours == 0:
         return None
     
     specialists = User.objects.filter(role=role, is_active=True)
     if not specialists:
         return None
     
-    # Считаем текущую загрузку каждого специалиста
     specialist_load = []
     for specialist in specialists:
         if role == 'programmer':
-            total = Order.objects.filter(assigned_programmer=specialist).aggregate(Sum('programmer_hours'))['programmer_hours__sum'] or 0
+            total = Order.objects.filter(assigned_programmer=specialist).exclude(id=current_order_id).aggregate(
+                total=Sum('programmer_hours')
+            )['total'] or 0
         elif role == 'marketer':
-            total = Order.objects.filter(assigned_marketer=specialist).aggregate(Sum('marketer_hours'))['marketer_hours__sum'] or 0
+            total = Order.objects.filter(assigned_marketer=specialist).exclude(id=current_order_id).aggregate(
+                total=Sum('marketer_hours')
+            )['total'] or 0
         else:  # smm
-            total = Order.objects.filter(assigned_smm=specialist).aggregate(Sum('smm_hours'))['smm_hours__sum'] or 0
+            total = Order.objects.filter(assigned_smm=specialist).exclude(id=current_order_id).aggregate(
+                total=Sum('smm_hours')
+            )['total'] or 0
+        
         specialist_load.append((specialist, total))
+        print(f"Специалист {specialist.username}: загрузка {total} ч")
     
-    # Сортируем по загрузке и выбираем самого свободного
     specialist_load.sort(key=lambda x: x[1])
-    return specialist_load[0][0]
+    best = specialist_load[0][0]
+    print(f"✅ Выбран {best.username} с загрузкой {specialist_load[0][1]} ч")
+    return best

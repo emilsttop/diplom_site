@@ -364,17 +364,16 @@
     <a href="/">Телеком-Сервис</a>
 </div>
 <div class="nav">
+    {% if user.role != 'programmer' and user.role != 'marketer' and user.role != 'smm' %}
     <a href="/catalog/">Каталог</a>
     {% if user.role != 'manager' and user.role != 'admin' %}
-        <a href="/cart/">🛒 Корзина {% if cart_count %}<span class="notification-badge">{{ cart_count }}</span>{% endif %}</a>
+        <a href="/cart/">🛒 Корзина</a>
     {% endif %}
+{% endif %}
     {% if user.is_authenticated %}
         {% if user.role == 'manager' or user.role == 'admin' %}
             <a href="/orders/manager/dashboard/">👨‍💼 Заказы</a>
             <a href="/orders/manager/analytics/">📊 Аналитика</a>
-        {% endif %}
-        {% if user.role == 'programmer' or user.role == 'marketer' or user.role == 'smm' %}
-            <a href="{% url 'specialist_dashboard' %}">👨‍💻 Моя загрузка</a>
         {% endif %}
         <a href="/accounts/profile/">👤 {{ user.username }}</a>
         <a href="/accounts/logout/">🚪 Выйти</a>

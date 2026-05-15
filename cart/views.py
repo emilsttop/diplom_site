@@ -249,14 +249,14 @@ def checkout(request):
     
     # Назначаем специалистов
     from orders.utils import assign_specialist
-    
+
     if order.programmer_hours > 0:
-        order.assigned_programmer = assign_specialist('programmer', order.programmer_hours)
+        order.assigned_programmer = assign_specialist('programmer', order.programmer_hours, order.id)
     if order.marketer_hours > 0:
-        order.assigned_marketer = assign_specialist('marketer', order.marketer_hours)
+        order.assigned_marketer = assign_specialist('marketer', order.marketer_hours, order.id)
     if order.smm_hours > 0:
-        order.assigned_smm = assign_specialist('smm', order.smm_hours)
-    order.save()
+        order.assigned_smm = assign_specialist('smm', order.smm_hours, order.id)
+    order.save()  # ← ЭТО ВАЖНО! Сохраняем назначенных специалистов
     
     # Назначаем менеджера
     from orders.utils import assign_manager_to_order
