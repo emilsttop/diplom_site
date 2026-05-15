@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from .forms import RegistrationForm
 from orders.models import Order
+from users.models import User
 
 def register(request):
     if request.method == 'POST':
@@ -47,9 +48,20 @@ def specialist_dashboard(request):
         return redirect('catalog')
     
     role_field = f'{request.user.role}_hours'
-    orders = Order.objects.filter(**{role_field + '__gt': 0})
+    orders = Order.objects.filter(**{f'{role_field}__gt': 0}).order_by('-created_at')
+    
+    total_hours = sum(getattr(order, role_field, 0) for order in orders)
+    
+    role_display = {
+        'programmer': 'Программист',
+        'marketer': 'Маркетолог',
+        'smm': 'SMM-менеджер',
+    }.get(request.user.role, request.user.role)
     
     return render(request, 'accounts/specialist_dashboard.html', {
         'orders': orders,
         'role': request.user.role,
+        'role_field': role_field,           # ← ДОБАВИТЬ
+        'role_display': role_display,
+        'total_hours': total_hours,
     })

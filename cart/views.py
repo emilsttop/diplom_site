@@ -122,7 +122,13 @@ def add_with_services(request):
     'package_name': package.name,
     'service_ids': service_ids,
     'service_names': [s.name for s in services],
-    'services': [{'name': s.name, 'price': float(s.price)} for s in services],  # ← добавляем цены
+    'services': [{
+        'name': s.name,
+        'price': float(s.price),
+        'programmer_hours': float(s.programmer_hours),
+        'marketer_hours': float(s.marketer_hours),
+        'smm_hours': float(s.smm_hours),
+    } for s in services],
     'total_price': float(total_price),
 }
         request.session['cart'] = cart
@@ -156,10 +162,17 @@ def checkout(request):
         print(f"Обработка ключа: {key}, тип: {type(key)}")
         print(f"Значение: {item}")
         
-         # Формат 1: ключ начинается с 'package_' (кастомный пакет)
+        # Формат 1: ключ начинается с 'package_' (кастомный пакет)
         if key.startswith('package_') and isinstance(item, dict):
             item_total = Decimal(str(item.get('total_price', 0)))
             total += item_total
+            
+            # Суммируем часы специалистов из каждой услуги
+            for service in item.get('services', []):
+                order.programmer_hours += Decimal(str(service.get('programmer_hours', 0)))
+                order.marketer_hours += Decimal(str(service.get('marketer_hours', 0)))
+                order.smm_hours += Decimal(str(service.get('smm_hours', 0)))
+            
             services_items.append({
                 'type': 'custom',
                 'package_name': item.get('package_name', 'Конструктор'),
@@ -172,6 +185,13 @@ def checkout(request):
         elif isinstance(item, dict) and 'services' in item:
             item_total = Decimal(str(item.get('total_price', 0)))
             total += item_total
+            
+            # Суммируем часы специалистов
+            for service in item.get('services', []):
+                order.programmer_hours += Decimal(str(service.get('programmer_hours', 0)))
+                order.marketer_hours += Decimal(str(service.get('marketer_hours', 0)))
+                order.smm_hours += Decimal(str(service.get('smm_hours', 0)))
+            
             services_items.append({
                 'type': 'custom',
                 'package_name': item.get('package_name', 'Конструктор'),
@@ -225,6 +245,18 @@ def checkout(request):
     
     print(f"Итого: {total} ₽")
     print(f"services_data: {order.services_data}")
+    print(f"Часы: П={order.programmer_hours}, М={order.marketer_hours}, SMM={order.smm_hours}")
+    
+    # Назначаем специалистов
+    from orders.utils import assign_specialist
+    
+    if order.programmer_hours > 0:
+        order.assigned_programmer = assign_specialist('programmer', order.programmer_hours)
+    if order.marketer_hours > 0:
+        order.assigned_marketer = assign_specialist('marketer', order.marketer_hours)
+    if order.smm_hours > 0:
+        order.assigned_smm = assign_specialist('smm', order.smm_hours)
+    order.save()
     
     # Назначаем менеджера
     from orders.utils import assign_manager_to_order

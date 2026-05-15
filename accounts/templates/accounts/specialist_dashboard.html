@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Панель специалиста{% endblock %}
+
+{% block content %}
+<style>
+    .specialist-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+    }
+    .stats {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        flex: 1;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    body.dark .stat-card {
+        background: #1e1e2e;
+        color: #e0e0e0;
+    }
+    .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 4px solid #dc3545;
+    }
+    body.dark .order-card {
+        background: #1e1e2e;
+        color: #e0e0e0;
+    }
+    .hours-badge {
+        background: #dc3545;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        display: inline-block;
+        font-size: 14px;
+    }
+</style>
+
+<div class="specialist-header">
+    <h1>👩‍💻 Панель {{ role_display }}</h1>
+    <p>Ваша загрузка по заказам</p>
+</div>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_hours|floatformat:0 }}</div>
+        <div>Всего часов</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ orders.count }}</div>
+        <div>Заказов в работе</div>
+    </div>
+</div>
+
+<h2>📋 Заказы с вашей загрузкой</h2>
+{% for order in orders %}
+<div class="order-card">
+    <h3>Заказ №{{ order.id }}</h3>
+    <p><strong>Клиент:</strong> {{ order.client.username }}</p>
+    <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    <p><strong>Статус:</strong> 
+        {% if order.status == 'new' %}🆕 Новый
+        {% elif order.status == 'processing' %}⚙️ В обработке
+        {% elif order.status == 'completed' %}✅ Выполнен
+        {% elif order.status == 'cancelled' %}❌ Отменён
+        {% endif %}
+    <p><strong>Ваши часы:</strong> 
+    <span class="hours-badge">
+        {% if role == 'programmer' %}{{ order.programmer_hours|floatformat:0 }}
+        {% elif role == 'marketer' %}{{ order.marketer_hours|floatformat:0 }}
+        {% elif role == 'smm' %}{{ order.smm_hours|floatformat:0 }}
+        {% endif %} ч
+    </span>
+</p>
+</div>
+{% empty %}
+<p>😕 Нет заказов с вашей загрузкой</p>
+{% endfor %}
+{% endblock %}

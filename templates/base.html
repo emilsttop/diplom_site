@@ -369,13 +369,20 @@
         <a href="/cart/">🛒 Корзина {% if cart_count %}<span class="notification-badge">{{ cart_count }}</span>{% endif %}</a>
     {% endif %}
     {% if user.is_authenticated %}
+        {% if user.role == 'manager' or user.role == 'admin' %}
+            <a href="/orders/manager/dashboard/">👨‍💼 Заказы</a>
+            <a href="/orders/manager/analytics/">📊 Аналитика</a>
+        {% endif %}
+        {% if user.role == 'programmer' or user.role == 'marketer' or user.role == 'smm' %}
+            <a href="{% url 'specialist_dashboard' %}">👨‍💻 Моя загрузка</a>
+        {% endif %}
         <a href="/accounts/profile/">👤 {{ user.username }}</a>
         <a href="/accounts/logout/">🚪 Выйти</a>
     {% else %}
         <a href="/accounts/login/">🔐 Вход</a>
         <a href="/accounts/register/">📝 Регистрация</a>
     {% endif %}
-   <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
 </div>
             </div>
         </div>

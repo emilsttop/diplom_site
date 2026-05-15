@@ -16,6 +16,23 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Итого')
     services_data = models.JSONField(default=dict, blank=True, verbose_name="Данные услуг (для кастомных)")
+
+        # Назначенные специалисты
+    assigned_programmer = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='programmer_tasks', limit_choices_to={'role': 'programmer'},
+        verbose_name='Программист'
+    )
+    assigned_marketer = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='marketer_tasks', limit_choices_to={'role': 'marketer'},
+        verbose_name='Маркетолог'
+    )
+    assigned_smm = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='smm_tasks', limit_choices_to={'role': 'smm'},
+        verbose_name='SMM-менеджер'
+    )
     
     # Ответственный менеджер
     assigned_manager = models.ForeignKey(
