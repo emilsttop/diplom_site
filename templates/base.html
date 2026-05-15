@@ -371,10 +371,6 @@
     {% endif %}
 {% endif %}
     {% if user.is_authenticated %}
-        {% if user.role == 'manager' or user.role == 'admin' %}
-            <a href="/orders/manager/dashboard/">👨‍💼 Заказы</a>
-            <a href="/orders/manager/analytics/">📊 Аналитика</a>
-        {% endif %}
         <a href="/accounts/profile/">👤 {{ user.username }}</a>
         <a href="/accounts/logout/">🚪 Выйти</a>
     {% else %}

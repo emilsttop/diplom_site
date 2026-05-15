@@ -54,13 +54,13 @@ def specialist_dashboard(request):
     role = request.user.role
     role_field = f'{role}_hours'
     
-    # Фильтруем заказы по назначенному специалисту
+    # Фильтруем заказы по назначенному специалисту, исключая выполненные
     if role == 'programmer':
-        orders = Order.objects.filter(assigned_programmer=request.user).order_by('-created_at')
+        orders = Order.objects.filter(assigned_programmer=request.user).exclude(status='completed').order_by('-created_at')
     elif role == 'marketer':
-        orders = Order.objects.filter(assigned_marketer=request.user).order_by('-created_at')
+        orders = Order.objects.filter(assigned_marketer=request.user).exclude(status='completed').order_by('-created_at')
     elif role == 'smm':
-        orders = Order.objects.filter(assigned_smm=request.user).order_by('-created_at')
+        orders = Order.objects.filter(assigned_smm=request.user).exclude(status='completed').order_by('-created_at')
     else:
         orders = Order.objects.none()
     

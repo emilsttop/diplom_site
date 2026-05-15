@@ -254,6 +254,18 @@
         font-size: 11px;
         margin-left: 8px;
     }
+
+    .order-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+.status-new { background: #007bff; color: white; }
+.status-processing { background: #ffc107; color: black; }
+.status-completed { background: #28a745; color: white; }
+.status-cancelled { background: #dc3545; color: white; }
+
 </style>
 
 <div class="dashboard-header">
@@ -298,6 +310,13 @@
                 <span class="order-id">Заказ №{{ order.id }}</span>
                 <span class="order-client">{{ order.client.username }}</span>
                 <span class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+<span class="order-status status-{{ order.status }}">
+    {% if order.status == 'new' %}🆕 Новый
+    {% elif order.status == 'processing' %}⚙️ В обработке
+    {% elif order.status == 'completed' %}✅ Выполнен
+    {% elif order.status == 'cancelled' %}❌ Отменён
+    {% endif %}
+</span>
                 {% if order.has_unread_messages %}
                     <span class="unread-badge">📩 Новое сообщение</span>
                 {% endif %}
@@ -316,13 +335,25 @@
                     <div style="font-size: 12px; color: #888; margin-top: 5px;">{{ order.client.email }}</div>
                 </div>
                 <div class="detail-card">
-                    <div class="detail-label">📦 Состав заказа</div>
-                    <div class="detail-value">
-                        {% for item in order.items.all %}
-                            {{ item.package.name }} x{{ item.quantity }}{% if not forloop.last %}<br>{% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
+    <div class="detail-label">📦 Состав заказа</div>
+    <div class="detail-value" style="max-height: 150px; overflow-y: auto;">
+        {% for item in order.items.all %}
+            <div>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
+        {% endfor %}
+        {% if order.services_data.items %}
+            {% for service_item in order.services_data.items %}
+                {% if service_item.type == 'custom' %}
+                    <div><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
+                    {% for s in service_item.services %}
+                        <div style="margin-left: 15px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
+                    {% endfor %}
+                {% elif service_item.type == 'package' %}
+                    <div>{{ service_item.package_name }} x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
                 <div class="detail-card">
                     <div class="detail-label">💰 Сумма</div>
                     <div class="detail-value-large">{{ order.total_price|floatformat:0 }} ₽</div>

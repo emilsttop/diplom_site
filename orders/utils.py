@@ -120,7 +120,7 @@ def get_manager_name(manager):
     return "Не назначен"
 
 def assign_specialist(role, new_hours, current_order_id=None):
-    """Назначает специалиста с наименьшей текущей загрузкой (без учёта текущего заказа)"""
+    """Назначает специалиста с наименьшей текущей загрузкой (без учёта выполненных заказов)"""
     if new_hours == 0:
         return None
     
@@ -130,16 +130,23 @@ def assign_specialist(role, new_hours, current_order_id=None):
     
     specialist_load = []
     for specialist in specialists:
+        # Исключаем выполненные заказы и текущий заказ
         if role == 'programmer':
-            total = Order.objects.filter(assigned_programmer=specialist).exclude(id=current_order_id).aggregate(
+            total = Order.objects.filter(
+                assigned_programmer=specialist
+            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
                 total=Sum('programmer_hours')
             )['total'] or 0
         elif role == 'marketer':
-            total = Order.objects.filter(assigned_marketer=specialist).exclude(id=current_order_id).aggregate(
+            total = Order.objects.filter(
+                assigned_marketer=specialist
+            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
                 total=Sum('marketer_hours')
             )['total'] or 0
         else:  # smm
-            total = Order.objects.filter(assigned_smm=specialist).exclude(id=current_order_id).aggregate(
+            total = Order.objects.filter(
+                assigned_smm=specialist
+            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
                 total=Sum('smm_hours')
             )['total'] or 0
         
