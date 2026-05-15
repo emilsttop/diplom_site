@@ -11,6 +11,7 @@ class User(AbstractUser):
     ('smm', 'SMM-менеджер'),
 )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='client')
+    max_hours = models.PositiveIntegerField(default=45, verbose_name="Максимальная загрузка (часы)")
     
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"

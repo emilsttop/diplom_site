@@ -157,3 +157,34 @@ def assign_specialist(role, new_hours, current_order_id=None):
     best = specialist_load[0][0]
     print(f"✅ Выбран {best.username} с загрузкой {specialist_load[0][1]} ч")
     return best
+
+def is_specialist_available(role, required_hours):
+    """Проверяет, есть ли свободный специалист для выполнения заказа"""
+    specialists = User.objects.filter(role=role, is_active=True)
+    if not specialists:
+        return False
+    
+    for specialist in specialists:
+        # Текущая загрузка (активные заказы)
+        if role == 'programmer':
+            current_load = Order.objects.filter(
+                assigned_programmer=specialist
+            ).exclude(status='completed').aggregate(
+                total=Sum('programmer_hours')
+            )['total'] or 0
+        elif role == 'marketer':
+            current_load = Order.objects.filter(
+                assigned_marketer=specialist
+            ).exclude(status='completed').aggregate(
+                total=Sum('marketer_hours')
+            )['total'] or 0
+        else:
+            current_load = Order.objects.filter(
+                assigned_smm=specialist
+            ).exclude(status='completed').aggregate(
+                total=Sum('smm_hours')
+            )['total'] or 0
+        
+        if current_load + required_hours <= specialist.max_hours:
+            return True
+    return False

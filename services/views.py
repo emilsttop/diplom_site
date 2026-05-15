@@ -8,8 +8,29 @@ def home(request):
     """Главная страница"""
     return render(request, 'services/home.html')
 
+from orders.utils import is_specialist_available
+
+from orders.utils import is_specialist_available
+
 def catalog(request):
     packages = ServicePackage.objects.all()
+    
+    # Для каждого пакета проверяем доступность специалистов на основе услуг
+    for package in packages:
+        # Суммируем часы по всем услугам пакета
+        programmer_hours = sum(s.programmer_hours for s in package.available_services.all())
+        marketer_hours = sum(s.marketer_hours for s in package.available_services.all())
+        smm_hours = sum(s.smm_hours for s in package.available_services.all())
+        
+        package.programmer_available = is_specialist_available('programmer', programmer_hours)
+        package.marketer_available = is_specialist_available('marketer', marketer_hours)
+        package.smm_available = is_specialist_available('smm', smm_hours)
+        package.available = (
+            package.programmer_available and
+            package.marketer_available and
+            package.smm_available
+        )
+    
     return render(request, 'services/catalog.html', {'packages': packages})
 
 def package_detail(request, package_id):

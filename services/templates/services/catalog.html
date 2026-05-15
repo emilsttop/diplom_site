@@ -177,7 +177,7 @@
         cursor: not-allowed;
         box-sizing: border-box;
     }
-    
+
     .constructor-card {
     border: 2px solid #dc3545;
     box-shadow: 0 5px 20px rgba(220, 53, 69, 0.2);
@@ -235,7 +235,11 @@
             </ul>
         </div>
         <div class="package-footer">
-            <a href="{% url 'package_detail' package.id %}" class="btn-card">🎯 Выбрать услуги</a>
+           {% if package.available %}
+    <a href="{% url 'package_detail' package.id %}" class="btn-card">🎯 Выбрать услуги</a>
+{% else %}
+    <span class="btn-card-disabled" title="Нет свободных специалистов">🔒 Недоступно</span>
+{% endif %}
         </div>
     </div>
     {% endif %}

@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from services.models import ServicePackage, Service
 from orders.models import Order, OrderItem
 from orders.utils import assign_manager_to_order
+from orders.utils import is_specialist_available
 
 
 @login_required
@@ -113,24 +114,37 @@ def add_with_services(request):
         if services.count() < package.min_services:
             return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
         
+        # Считаем часы для выбранных услуг
+        programmer_hours = sum(s.programmer_hours for s in services)
+        marketer_hours = sum(s.marketer_hours for s in services)
+        smm_hours = sum(s.smm_hours for s in services)
+        
+        # Проверяем доступность специалистов
+        if not is_specialist_available('programmer', programmer_hours):
+            return JsonResponse({'error': 'Нет свободных программистов'}, status=400)
+        if not is_specialist_available('marketer', marketer_hours):
+            return JsonResponse({'error': 'Нет свободных маркетологов'}, status=400)
+        if not is_specialist_available('smm', smm_hours):
+            return JsonResponse({'error': 'Нет свободных SMM-менеджеров'}, status=400)
+        
         total_price = sum(s.price for s in services)
         
         cart = request.session.get('cart', {})
         package_key = f"package_{package_id}"
         
         cart[package_key] = {
-    'package_name': package.name,
-    'service_ids': service_ids,
-    'service_names': [s.name for s in services],
-    'services': [{
-        'name': s.name,
-        'price': float(s.price),
-        'programmer_hours': float(s.programmer_hours),
-        'marketer_hours': float(s.marketer_hours),
-        'smm_hours': float(s.smm_hours),
-    } for s in services],
-    'total_price': float(total_price),
-}
+            'package_name': package.name,
+            'service_ids': service_ids,
+            'service_names': [s.name for s in services],
+            'services': [{
+                'name': s.name,
+                'price': float(s.price),
+                'programmer_hours': float(s.programmer_hours),
+                'marketer_hours': float(s.marketer_hours),
+                'smm_hours': float(s.smm_hours),
+            } for s in services],
+            'total_price': float(total_price),
+        }
         request.session['cart'] = cart
         
         return JsonResponse({'success': True, 'total_price': float(total_price)})
