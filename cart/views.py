@@ -1,22 +1,23 @@
 import json
+from decimal import Decimal
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from services.models import ServicePackage
+from services.models import ServicePackage, Service
 from orders.models import Order, OrderItem
-from decimal import Decimal
 from orders.utils import assign_manager_to_order
-from django.http import JsonResponse
 
 
 @login_required
 def cart_view(request):
+    """Просмотр корзины"""
     cart = request.session.get('cart', {})
     cart_items = []
     total = 0
     
     for key, item in cart.items():
-        if key.startswith('package_'):
-            # Новый формат: пакет с выбранными услугами
+        # Формат с выбранными услугами (package_...)
+        if isinstance(item, dict) and 'package_name' in item:
             cart_items.append({
                 'type': 'package',
                 'package_name': item.get('package_name'),
@@ -25,15 +26,30 @@ def cart_view(request):
                 'key': key,
             })
             total += item.get('total_price', 0)
+        # Старый формат (числовой ключ)
+        elif str(key).isdigit():
+            cart_items.append({
+                'type': 'simple',
+                'package_id': int(key),
+                'quantity': item,
+                'key': key,
+            })
+            # Нужно получить цену пакета из БД
+            try:
+                package = ServicePackage.objects.get(id=int(key))
+                total += package.price * item
+            except:
+                pass
     
     return render(request, 'cart/cart.html', {
         'cart_items': cart_items,
         'total': total,
     })
 
+
 @login_required
 def add_to_cart(request, package_id):
-    """Добавление пакета в корзину (поддерживает AJAX)"""
+    """Добавление пакета в корзину (старый формат)"""
     if request.method == 'POST':
         cart = request.session.get('cart', {})
         package_id_str = str(package_id)
@@ -45,27 +61,27 @@ def add_to_cart(request, package_id):
         
         request.session['cart'] = cart
         
-        # AJAX-запрос
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            from django.http import JsonResponse
             return JsonResponse({'success': True, 'cart_count': sum(cart.values())})
         
         return redirect('catalog')
     
-    # GET-запрос (перенаправление)
     return redirect('catalog')
+
 
 @login_required
 def remove_from_cart(request, item_key):
+    """Удаление элемента из корзины по ключу"""
     cart = request.session.get('cart', {})
     if item_key in cart:
         del cart[item_key]
     request.session['cart'] = cart
     return redirect('cart')
 
+
 @login_required
 def update_cart(request, package_id):
-    """Обновление количества в корзине"""
+    """Обновление количества в корзине (старый формат)"""
     if request.method == 'POST':
         quantity = int(request.POST.get('quantity', 0))
         cart = request.session.get('cart', {})
@@ -78,9 +94,12 @@ def update_cart(request, package_id):
         
         request.session['cart'] = cart
     
-    return redirect('cart')@login_required
+    return redirect('cart')
+
+
 @login_required
 def add_with_services(request):
+    """Добавление пакета с выбранными услугами"""
     if request.method == 'POST':
         package_id = request.POST.get('package_id')
         service_ids = json.loads(request.POST.get('service_ids', '[]'))
@@ -100,53 +119,26 @@ def add_with_services(request):
         package_key = f"package_{package_id}"
         
         cart[package_key] = {
-            'package_name': package.name,
-            'service_ids': service_ids,
-            'service_names': [s.name for s in services],
-            'total_price': float(total_price),
-        }
+    'package_name': package.name,
+    'service_ids': service_ids,
+    'service_names': [s.name for s in services],
+    'services': [{'name': s.name, 'price': float(s.price)} for s in services],  # ← добавляем цены
+    'total_price': float(total_price),
+}
         request.session['cart'] = cart
         
         return JsonResponse({'success': True, 'total_price': float(total_price)})
     
     return JsonResponse({'error': 'Метод не разрешён'}, status=405)
 
-@login_required
-def add_with_services(request):
-    if request.method == 'POST':
-        package_id = request.POST.get('package_id')
-        service_ids = json.loads(request.POST.get('service_ids', '[]'))
-        
-        if not service_ids:
-            return JsonResponse({'error': 'Не выбрано ни одной услуги'}, status=400)
-        
-        from services.models import ServicePackage, Service
-        package = get_object_or_404(ServicePackage, id=package_id)
-        services = Service.objects.filter(id__in=service_ids)
-        
-        if services.count() < package.min_services:
-            return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
-        
-        total_price = sum(s.price for s in services)
-        
-        cart = request.session.get('cart', {})
-        package_key = f"package_{package_id}"
-        
-        cart[package_key] = {
-            'package_name': package.name,
-            'service_ids': service_ids,
-            'service_names': [s.name for s in services],
-            'total_price': float(total_price),
-        }
-        request.session['cart'] = cart
-        
-        return JsonResponse({'success': True, 'total_price': float(total_price)})
-    
-    return JsonResponse({'error': 'Метод не разрешён'}, status=405)
 
 @login_required
 def checkout(request):
     cart = request.session.get('cart', {})
+    
+    print("=== ОФОРМЛЕНИЕ ЗАКАЗА ===")
+    print("Корзина:", cart)
+    
     if not cart:
         return redirect('cart')
     
@@ -158,26 +150,92 @@ def checkout(request):
     )
     
     total = Decimal('0')
-    for package_id, quantity in cart.items():
-        package = ServicePackage.objects.get(id=package_id)
-        price = package.price
-        item_total = price * quantity
-        total += item_total
+    services_items = []
+    
+    for key, item in cart.items():
+        print(f"Обработка ключа: {key}, тип: {type(key)}")
+        print(f"Значение: {item}")
         
-        OrderItem.objects.create(
-            order=order,
-            package=package,
-            quantity=quantity,
-            price=price
-        )
+         # Формат 1: ключ начинается с 'package_' (кастомный пакет)
+        if key.startswith('package_') and isinstance(item, dict):
+            item_total = Decimal(str(item.get('total_price', 0)))
+            total += item_total
+            services_items.append({
+                'type': 'custom',
+                'package_name': item.get('package_name', 'Конструктор'),
+                'services': item.get('services', []),
+                'total_price': float(item_total)
+            })
+            print(f"  -> Кастомный пакет (package_), сумма: {item_total}")
+        
+        # Формат 2: словарь с ключом 'services' (альтернативный кастомный)
+        elif isinstance(item, dict) and 'services' in item:
+            item_total = Decimal(str(item.get('total_price', 0)))
+            total += item_total
+            services_items.append({
+                'type': 'custom',
+                'package_name': item.get('package_name', 'Конструктор'),
+                'services': item.get('services', []),
+                'total_price': float(item_total)
+            })
+            print(f"  -> Кастомный пакет (с services), сумма: {item_total}")
+        
+        # Формат 3: ключ — это число (ID пакета), значение — количество
+        elif str(key).isdigit():
+            try:
+                package_id = int(key)
+                quantity = int(item) if isinstance(item, (int, str)) else 1
+                package = ServicePackage.objects.get(id=package_id)
+                price = package.price
+                item_total = price * quantity
+                total += item_total
+                
+                OrderItem.objects.create(
+                    order=order,
+                    package=package,
+                    quantity=quantity,
+                    price=price
+                )
+                
+                services_items.append({
+                    'type': 'package',
+                    'package_id': package.id,
+                    'package_name': package.name,
+                    'quantity': quantity,
+                    'price': float(price),
+                    'total': float(item_total)
+                })
+                print(f"  -> Обычный пакет: {package.name} x{quantity} = {item_total}")
+            except ServicePackage.DoesNotExist:
+                print(f"  -> Ошибка: пакет {key} не найден")
+                continue
+        
+        # Формат 4: другое (неизвестно)
+        else:
+            print(f"  -> Неизвестный формат, пропускаем: {type(item)}")
     
     order.total_price = total
+    order.services_data = {'items': services_items}
     order.save()
     
-    # 🆕 Автоматически назначаем менеджера
+    print(f"Итого: {total} ₽")
+    print(f"services_data: {order.services_data}")
+    
+    # Назначаем менеджера
+    from orders.utils import assign_manager_to_order
     assign_manager_to_order(order)
     
     # Очищаем корзину
     request.session['cart'] = {}
     
     return redirect('profile')
+
+
+@login_required
+def clear_cart(request):
+    """Очищает корзину текущего пользователя"""
+    if request.method == 'POST':
+        request.session['cart'] = {}
+        request.session.modified = True
+        return JsonResponse({'success': True, 'message': 'Корзина очищена'})
+    return JsonResponse({'error': 'Метод не разрешён'}, status=405)

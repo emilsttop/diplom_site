@@ -177,6 +177,14 @@
         cursor: not-allowed;
         box-sizing: border-box;
     }
+    
+    .constructor-card {
+    border: 2px solid #dc3545;
+    box-shadow: 0 5px 20px rgba(220, 53, 69, 0.2);
+}
+.constructor-header {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
 </style>
 
 <div class="catalog-header">
@@ -186,6 +194,28 @@
 
 <div class="packages-grid">
     {% for package in packages %}
+    
+    {% if package.available_services.count == 0 %}
+    <!-- Пакет-конструктор (без услуг) -->
+    <div class="package-card constructor-card">
+        <div class="package-header constructor-header">
+            <h2>{{ package.icon }} {{ package.name }}</h2>
+        </div>
+        <div class="package-description">
+            <p>{{ package.description }}</p>
+        </div>
+        <div class="package-services">
+            <strong>📋 Что входит в пакет:</strong>
+            <p style="margin-top: 10px; color: #dc3545;">✨ Вы сами создаёте услуги!</p>
+            <p style="font-size: 12px;">От {{ package.min_services }} до {{ package.max_services }} услуг</p>
+        </div>
+        <div class="package-footer">
+            <a href="{% url 'custom_package_builder' package.id %}" class="btn-card">🛠️ Собрать свой пакет</a>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- Обычный пакет -->
     <div class="package-card">
         <div class="package-header">
             <h2>{{ package.icon }} {{ package.name }}</h2>
@@ -208,6 +238,8 @@
             <a href="{% url 'package_detail' package.id %}" class="btn-card">🎯 Выбрать услуги</a>
         </div>
     </div>
+    {% endif %}
+    
     {% endfor %}
 </div>
 

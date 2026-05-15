@@ -467,13 +467,28 @@
     </div>
 </div>            
             <!-- Состав заказа -->
-            <div class="detail-content" id="composition-{{ order.id }}">
-                <ul style="margin: 0; padding-left: 20px;">
-                    {% for item in order.items.all %}
-                    <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
-                    {% endfor %}
-                </ul>
-            </div>
+<div class="detail-content" id="composition-{{ order.id }}">
+    <ul style="margin: 0; padding-left: 20px;">
+        {% for item in order.items.all %}
+            <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
+        {% endfor %}
+        
+        {% if order.services_data.items %}
+            {% for service_item in order.services_data.items %}
+                {% if service_item.type == 'custom' %}
+                    <li><strong>{{ service_item.package_name }}</strong></li>
+                    <ul style="margin-left: 20px;">
+                        {% for s in service_item.services %}
+                            <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
+                        {% endfor %}
+                    </ul>
+                {% elif service_item.type == 'package' %}
+                    <li>{{ service_item.package_name }} x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+</div>
         </div>
     </div>
     {% empty %}

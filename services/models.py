@@ -7,7 +7,7 @@ class ServicePackage(models.Model):
     icon = models.CharField(max_length=10, default="📦", verbose_name="Иконка")
     
     # Услуги, которые можно выбрать в этом пакете
-    available_services = models.ManyToManyField('Service', verbose_name="Доступные услуги на выбор")
+    available_services = models.ManyToManyField('Service', blank=True, verbose_name="Доступные услуги на выбор")
     
     min_services = models.PositiveIntegerField(default=5, verbose_name="Минимальное количество услуг")
     max_services = models.PositiveIntegerField(default=10, verbose_name="Максимальное количество услуг")
@@ -35,3 +35,13 @@ class Service(models.Model):
     class Meta:
         verbose_name = "Услуга"
         verbose_name_plural = "Услуги"
+        
+class CustomService(models.Model):
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='custom_services')
+    package = models.ForeignKey(ServicePackage, on_delete=models.CASCADE, related_name='custom_services')
+    name = models.CharField(max_length=200, verbose_name='Название услуги')
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
