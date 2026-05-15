@@ -82,6 +82,35 @@
         margin-bottom: 20px;
         text-align: center;
     }
+
+    /* Тёмная тема — текст белый */
+body.dark .login-container h2,
+body.dark .login-container label,
+body.dark .login-container p,
+body.dark .login-container a,
+body.dark .login-container .register-link p,
+body.dark .login-container .register-link a {
+    color: #e0e0e0 !important;
+}
+
+/* Поля ввода в тёмной теме */
+body.dark .login-container input {
+    background: #2a2a3a;
+    color: #e0e0e0;
+    border-color: #dc3545;
+}
+
+body.dark .login-container input:focus {
+    border-color: #ff6666;
+    outline: none;
+}
+
+/* Сообщение об ошибке */
+body.dark .error-message {
+    background: #2a1a1a;
+    color: #ff9999;
+    border: 1px solid #dc3545;
+}
 </style>
 
 <div class="login-container">

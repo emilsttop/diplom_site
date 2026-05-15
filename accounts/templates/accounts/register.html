@@ -103,6 +103,41 @@
     .password-requirements li {
         margin: 3px 0;
     }
+
+    /* Тёмная тема — текст белый */
+body.dark .register-container h2,
+body.dark .register-container label,
+body.dark .register-container p,
+body.dark .register-container a,
+body.dark .register-container .login-link p,
+body.dark .register-container .login-link a,
+body.dark .register-container .helptext,
+body.dark .register-container .password-requirements,
+body.dark .register-container .password-requirements li {
+    color: #e0e0e0 !important;
+}
+
+/* Поля ввода в тёмной теме */
+body.dark .register-container input {
+    background: #2a2a3a;
+    color: #e0e0e0;
+    border-color: #dc3545;
+}
+
+body.dark .register-container input:focus {
+    border-color: #ff6666;
+    outline: none;
+}
+
+/* Список требований к паролю */
+body.dark .register-container .password-requirements ul {
+    color: #e0e0e0;
+}
+
+/* Сообщения об ошибках */
+body.dark .register-container .errorlist li {
+    color: #ff9999;
+}
 </style>
 
 <div class="register-container">

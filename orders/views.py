@@ -4,7 +4,7 @@ from django.db.models import Sum, Count
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Order, OrderItem
-from .utils import generate_contract, assign_manager_to_order
+from .utils import assign_manager_to_order
 from users.models import User
 
 @login_required
@@ -180,3 +180,18 @@ def reassign_order(request, order_id):
             )
     
     return redirect('manager_dashboard')
+
+from django.http import FileResponse
+import os
+from django.conf import settings
+
+@login_required
+def download_contract(request, order_id):
+    """Скачать готовый договор (DOCX)"""
+    # Путь к файлу договора
+    file_path = os.path.join(settings.BASE_DIR, 'static', 'docs', 'Договор на оказание рекламных услуг.docx')
+    
+    if not os.path.exists(file_path):
+        return HttpResponse("Файл договора не найден", status=404)
+    
+    return FileResponse(open(file_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
