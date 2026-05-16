@@ -119,14 +119,6 @@
         transition: all 0.3s;
         font-weight: 500;
     }
-    .btn-primary {
-        background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
-        color: white;
-    }
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(220,53,69,0.3);
-    }
     .btn-secondary {
         background: #1a1a1a;
         color: white;
@@ -134,6 +126,37 @@
     .btn-secondary:hover {
         background: #333;
         transform: translateY(-2px);
+    }
+    .btn-primary {
+        background: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-primary:hover {
+        background: #bb2d3b;
+    }
+    .region-wrapper {
+        margin-bottom: 15px;
+        text-align: left;
+    }
+    .region-wrapper label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    .region-wrapper input {
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        width: 250px;
+    }
+    body.dark .region-wrapper input {
+        background: #2a2a3a;
+        color: #e0e0e0;
+        border-color: #dc3545;
     }
 </style>
 
@@ -161,9 +184,104 @@
     
     <div class="cart-summary">
         <h3>Итого: {{ total|floatformat:0 }} ₽</h3>
+        <div class="region-wrapper">
+            <label for="regionInput">🌍 Регион:</label>
+            <input type="text" id="regionInput" list="regionList" placeholder="Начните вводить регион...">
+            <datalist id="regionList">
+                <option value="Москва">
+                <option value="Санкт-Петербург">
+                <option value="Адыгея">
+                <option value="Алтай">
+                <option value="Алтайский край">
+                <option value="Амурская область">
+                <option value="Архангельская область">
+                <option value="Астраханская область">
+                <option value="Башкортостан">
+                <option value="Белгородская область">
+                <option value="Брянская область">
+                <option value="Бурятия">
+                <option value="Владимирская область">
+                <option value="Волгоградская область">
+                <option value="Вологодская область">
+                <option value="Воронежская область">
+                <option value="Дагестан">
+                <option value="ДНР">
+                <option value="Еврейская АО">
+                <option value="Забайкальский край">
+                <option value="Запорожская область">
+                <option value="Ивановская область">
+                <option value="Ингушетия">
+                <option value="Иркутская область">
+                <option value="Кабардино-Балкария">
+                <option value="Калининградская область">
+                <option value="Калмыкия">
+                <option value="Калужская область">
+                <option value="Камчатский край">
+                <option value="Карачаево-Черкесия">
+                <option value="Карелия">
+                <option value="Кемеровская область">
+                <option value="Кировская область">
+                <option value="Коми">
+                <option value="Костромская область">
+                <option value="Краснодарский край">
+                <option value="Красноярский край">
+                <option value="Крым">
+                <option value="Курганская область">
+                <option value="Курская область">
+                <option value="Ленинградская область">
+                <option value="Липецкая область">
+                <option value="ЛНР">
+                <option value="Магаданская область">
+                <option value="Марий Эл">
+                <option value="Мордовия">
+                <option value="Московская область">
+                <option value="Мурманская область">
+                <option value="Ненецкий АО">
+                <option value="Нижегородская область">
+                <option value="Новгородская область">
+                <option value="Новосибирская область">
+                <option value="Омская область">
+                <option value="Орловская область">
+                <option value="Оренбургская область">
+                <option value="Пензенская область">
+                <option value="Пермский край">
+                <option value="Приморский край">
+                <option value="Псковская область">
+                <option value="Ростовская область">
+                <option value="Рязанская область">
+                <option value="Самарская область">
+                <option value="Саратовская область">
+                <option value="Сахалинская область">
+                <option value="Саха (Якутия)">
+                <option value="Свердловская область">
+                <option value="Севастополь">
+                <option value="Северная Осетия">
+                <option value="Смоленская область">
+                <option value="Ставропольский край">
+                <option value="Тамбовская область">
+                <option value="Татарстан">
+                <option value="Тверская область">
+                <option value="Томская область">
+                <option value="Тульская область">
+                <option value="Тыва">
+                <option value="Тюменская область">
+                <option value="Удмуртия">
+                <option value="Ульяновская область">
+                <option value="Хабаровский край">
+                <option value="Хакасия">
+                <option value="Ханты-Мансийский АО">
+                <option value="Херсонская область">
+                <option value="Челябинская область">
+                <option value="Чечня">
+                <option value="Чувашия">
+                <option value="Чукотский АО">
+                <option value="Ямало-Ненецкий АО">
+                <option value="Ярославская область">
+            </datalist>
+        </div>
         <div class="action-buttons">
             <a href="{% url 'catalog' %}" class="btn btn-secondary">Продолжить покупки</a>
-            <a href="{% url 'checkout' %}" class="btn btn-primary">✅ Оформить заказ</a>
+            <button id="checkoutBtn" class="btn-primary">✅ Оформить заказ</button>
         </div>
     </div>
 {% else %}
@@ -172,4 +290,16 @@
         <a href="{% url 'catalog' %}" class="btn btn-primary">Перейти в каталог</a>
     </div>
 {% endif %}
+
+<script>
+    document.getElementById('checkoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        const region = document.getElementById('regionInput').value;
+        if (!region) {
+            alert('Введите или выберите регион');
+            return;
+        }
+        window.location.href = "{% url 'checkout' %}?region=" + encodeURIComponent(region);
+    });
+</script>
 {% endblock %}

@@ -162,6 +162,9 @@ def add_with_services(request):
 @login_required
 def checkout(request):
     cart = request.session.get('cart', {})
+
+    # Получаем регион из GET-параметра
+    region = request.GET.get('region')
     
     print("=== ОФОРМЛЕНИЕ ЗАКАЗА ===")
     print("Корзина:", cart)
@@ -173,7 +176,8 @@ def checkout(request):
     order = Order.objects.create(
         client=request.user,
         total_price=0,
-        status='new'
+        status='new',
+        region=region,
     )
     
     total = Decimal('0')
