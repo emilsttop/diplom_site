@@ -136,10 +136,14 @@
         text-decoration: none;
         margin-bottom: 20px;
     }
+
+    td:nth-child(4) {
+    text-align: center;
+}
 </style>
 
 <div class="services-container">
-    <a href="{% url 'manager_analytics' %}" class="btn-back">← Назад к аналитике</a>
+    <a href="{% url 'manager_dashboard' %}" class="btn-back">← Назад к заказам</a>
     
     <div class="services-header">
         <h1>🔥 Самые популярные услуги</h1>

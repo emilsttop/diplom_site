@@ -249,3 +249,51 @@ def popular_services(request):
     }
     
     return render(request, 'orders/popular_services.html', context)
+
+@login_required
+def manager_rating(request):
+    """Рейтинг менеджеров с возможностью сортировки"""
+    if request.user.role not in ['manager', 'admin']:
+        return redirect('catalog')
+    
+    from users.models import User
+    from django.db.models import Sum, Count
+    
+    # Получаем параметр сортировки
+    sort_by = request.GET.get('sort', 'total_orders')
+    
+    managers = User.objects.filter(role='manager', is_active=True)
+    manager_stats = []
+    
+    for manager in managers:
+        orders = Order.objects.filter(assigned_manager=manager)
+        total_orders = orders.count()
+        completed_orders = orders.filter(status='completed').count()
+        total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
+        avg_check = total_revenue / completed_orders if completed_orders > 0 else 0
+        
+        manager_stats.append({
+            'name': manager.get_full_name() or manager.username,
+            'total_orders': total_orders,
+            'completed_orders': completed_orders,
+            'total_revenue': total_revenue,
+            'avg_check': avg_check,
+        })
+    
+    # Сортировка
+    reverse = True  # по убыванию
+    if sort_by == 'avg_check':
+        manager_stats.sort(key=lambda x: x['avg_check'], reverse=reverse)
+    elif sort_by == 'total_orders':
+        manager_stats.sort(key=lambda x: x['total_orders'], reverse=reverse)
+    elif sort_by == 'total_revenue':
+        manager_stats.sort(key=lambda x: x['total_revenue'], reverse=reverse)
+    elif sort_by == 'completed_orders':
+        manager_stats.sort(key=lambda x: x['completed_orders'], reverse=reverse)
+    else:
+        manager_stats.sort(key=lambda x: x['total_orders'], reverse=reverse)
+    
+    return render(request, 'orders/manager_rating.html', {
+        'managers': manager_stats,
+        'sort_by': sort_by,
+    })

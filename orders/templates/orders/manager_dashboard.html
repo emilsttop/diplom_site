@@ -265,16 +265,30 @@
 .status-processing { background: #ffc107; color: black; }
 .status-completed { background: #28a745; color: white; }
 .status-cancelled { background: #dc3545; color: white; }
+.btn-analytics {
+    background: #dc3545;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 8px;
+    display: inline-block;
+    transition: all 0.3s;
+}
+.btn-analytics:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
 
 </style>
 
 <div class="dashboard-header">
     <h1>👨‍💼 Панель менеджера</h1>
-    <p>Управляйте заказами, общайтесь с клиентами</p>
-    <div style="margin-top: 15px;">
-        <a href="{% url 'manager_analytics' %}" style="background: white; color: #1a1a1a; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-weight: bold;">📊 Аналитика</a>
-        <a href="{% url 'popular_services' %}" class="btn-sm btn-dark">🔥 Популярные услуги</a>
+    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="{% url 'manager_analytics' %}" class="btn-analytics">📊 Аналитика и отчёты</a>
+        <a href="{% url 'popular_services' %}" class="btn-analytics" style="background: #ffc107; color: black;">🔥 Популярные услуги</a>
+        <a href="{% url 'manager_rating' %}" class="btn-analytics" style="background: #17a2b8;">🏆 Рейтинг менеджеров</a>
     </div>
+    <p>Добро пожаловать, {{ user.username }}! Управляйте заказами, общайтесь с клиентами.</p>
 </div>
 
 <!-- Статистика -->

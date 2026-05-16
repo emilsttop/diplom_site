@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}Рейтинг менеджеров{% endblock %}
+
+{% block content %}
+<style>
+    .rating-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .rating-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .sort-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+    .sort-btn {
+        background: #f0f0f0;
+        color: #1a1a1a;
+        padding: 8px 16px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .sort-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    .sort-btn:hover {
+        background: #dc3545;
+        color: white;
+    }
+    body.dark .sort-btn {
+        background: #2a2a3a;
+        color: #e0e0e0;
+    }
+    body.dark .sort-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    .rating-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    body.dark .rating-table {
+        background: #1e1e2e;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    body.dark th, body.dark td {
+        border-bottom-color: #333;
+    }
+    th {
+        background: #f8f9fa;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    body.dark th {
+        background: #2a2a3a;
+    }
+    .rank-1 {
+        background: #fff8e0;
+        font-weight: bold;
+    }
+    body.dark .rank-1 {
+        background: #3a2a00;
+    }
+    .rank-1 .rank-number {
+        color: #ffc107;
+        font-size: 20px;
+    }
+    .rank-2 {
+        background: #f0f0f0;
+    }
+    body.dark .rank-2 {
+        background: #2a2a2a;
+    }
+    .rank-2 .rank-number {
+        color: #a0a0a0;
+        font-size: 18px;
+    }
+    .rank-3 {
+        background: #fdf4e6;
+    }
+    body.dark .rank-3 {
+        background: #3a281a;
+    }
+    .rank-3 .rank-number {
+        color: #cd7f32;
+        font-size: 18px;
+    }
+    .btn-back {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        text-decoration: none;
+        margin-bottom: 20px;
+    }
+</style>
+
+<div class="rating-container">
+    <a href="{% url 'manager_dashboard' %}" class="btn-back">← Назад к заказам</a>
+    
+    <div class="rating-header">
+        <h1>🏆 Рейтинг менеджеров</h1>
+        <p>По количеству заказов, выручке и среднему чеку</p>
+    </div>
+    
+    <div class="sort-buttons">
+        <a href="?sort=total_orders" class="sort-btn {% if sort_by == 'total_orders' %}active{% endif %}">📦 По заказам</a>
+        <a href="?sort=completed_orders" class="sort-btn {% if sort_by == 'completed_orders' %}active{% endif %}">✅ По выполненным</a>
+        <a href="?sort=total_revenue" class="sort-btn {% if sort_by == 'total_revenue' %}active{% endif %}">💰 По выручке</a>
+        <a href="?sort=avg_check" class="sort-btn {% if sort_by == 'avg_check' %}active{% endif %}">📊 По среднему чеку</a>
+    </div>
+    
+    <div class="rating-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Менеджер</th>
+                    <th>Всего заказов</th>
+                    <th>Выполнено</th>
+                    <th>Выручка</th>
+                    <th>Средний чек</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for manager in managers %}
+                <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
+                    <td><span class="rank-number">{{ forloop.counter }}</span></td>
+                    <td>{{ manager.name }}</td>
+                    <td>{{ manager.total_orders }}</td>
+                    <td>{{ manager.completed_orders }}</td>
+                    <td>{{ manager.total_revenue|floatformat:0 }} ₽</td>
+                    <td>{{ manager.avg_check|floatformat:0 }} ₽</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">😕 Нет данных о менеджерах</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
