@@ -1,59 +1,70 @@
 {% extends 'base.html' %}
 
-{% block title %}Аналитика{% endblock %}
+{% block title %}Аналитика менеджера{% endblock %}
 
 {% block content %}
 <style>
-    .analytics-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    .filters-panel {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
         margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    body.dark .filters-panel {
+        background: #1e1e2e;
+        color: #e0e0e0;
+    }
+    .filters-form {
+        display: flex;
         flex-wrap: wrap;
         gap: 15px;
+        align-items: flex-end;
     }
-   .tabs {
-    display: flex;
-    gap: 0;
-    margin-bottom: 30px;
-    width: 100%;
-}
-.tab-btn {
-    flex: 1;
-    padding: 15px 20px;
-    background: #1a1a1a;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    transition: all 0.3s;
-    text-align: center;
-}
-.tab-btn:first-child {
-    border-radius: 12px 0 0 12px;
-}
-.tab-btn:last-child {
-    border-radius: 0 12px 12px 0;
-}
-.tab-btn.active {
-    background: #dc3545;
-    color: white;
-}
-.tab-btn:hover:not(.active) {
-    background: white;
-    color: #1a1a1a;
-}
-    .tab-content {
-        display: none;
-        animation: fadeIn 0.4s ease;
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
     }
-    .tab-content.active {
-        display: block;
+    .filter-group label {
+        font-size: 12px;
+        font-weight: bold;
+        color: #666;
     }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    body.dark .filter-group label {
+        color: #aaa;
+    }
+    .filter-group input, .filter-group select {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background: white;
+    }
+    body.dark .filter-group input, body.dark .filter-group select {
+        background: #2a2a3a;
+        color: #e0e0e0;
+        border-color: #dc3545;
+    }
+    .filter-group button {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    .filter-group button:hover {
+        background: #bb2d3b;
+    }
+    .sort-bar {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+    }
+    .sort-bar select {
+        padding: 6px 12px;
+        border-radius: 8px;
+        margin-left: 10px;
     }
     .analytics-grid {
         display: grid;
@@ -68,18 +79,19 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         transition: all 0.3s;
     }
+    body.dark .analytics-card {
+        background: #1e1e2e;
+    }
     .analytics-card:hover {
         transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
     .analytics-card h3 {
         margin: 0 0 15px 0;
-        color: #1a1a1a;
         border-bottom: 2px solid #dc3545;
         padding-bottom: 8px;
     }
     .big-number {
-        font-size: 36px;
+        font-size: 32px;
         font-weight: bold;
         color: #dc3545;
         text-align: center;
@@ -91,13 +103,6 @@
         padding: 8px 0;
         border-bottom: 1px solid #eee;
     }
-    .stat-label {
-        font-weight: bold;
-        color: #1a1a1a;
-    }
-    .stat-value {
-        color: #666;
-    }
     .chart-container {
         margin: 20px 0;
         padding: 20px;
@@ -105,234 +110,175 @@
         border-radius: 15px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
+    body.dark .chart-container {
+        background: #1e1e2e;
+    }
     canvas {
         max-height: 400px;
         width: 100%;
     }
-    .btn-back {
-        background: #dc3545;
+    .btn-clear {
+        background: #6c757d;
         color: white;
-        padding: 10px 20px;
-        text-decoration: none;
+        padding: 8px 20px;
         border-radius: 8px;
-        display: inline-block;
-        transition: all 0.3s;
-    }
-    .btn-back:hover {
-        background: #bb2d3b;
-        transform: translateY(-2px);
+        text-decoration: none;
     }
 </style>
 
-<div class="analytics-header">
-    <h1>📊 Аналитика</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>📊 Аналитика менеджера</h1>
     <div>
-        <a href="{% url 'manager_dashboard' %}" class="btn-back">← Назад к заказам</a>
+        <a href="{% url 'manager_dashboard' %}" class="btn-analytics" style="background: #dc3545; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">← Назад к заказам</a>
     </div>
 </div>
 
-<!-- Вкладки -->
-<div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('personal')">👤 Моя аналитика</button>
-    <button class="tab-btn" onclick="switchTab('company')">🏢 Аналитика компании</button>
+<!-- Панель фильтров -->
+<div class="filters-panel">
+    <form method="get" class="filters-form">
+        <div class="filter-group">
+            <label>📅 Дата от</label>
+            <input type="date" name="date_from" value="{{ date_from }}">
+        </div>
+        <div class="filter-group">
+            <label>📅 Дата до</label>
+            <input type="date" name="date_to" value="{{ date_to }}">
+        </div>
+        <div class="filter-group">
+            <label>🌍 Регион</label>
+            <select name="region">
+                <option value="">Все регионы</option>
+                {% for r in regions %}
+                    <option value="{{ r }}" {% if region_filter == r %}selected{% endif %}>{{ r }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- Фильтр по статусу -->
+<div class="filter-group">
+    <label>📊 Статус</label>
+    <select name="status">
+        <option value="">Все статусы</option>
+        <option value="new" {% if status_filter == 'new' %}selected{% endif %}>🆕 Новый</option>
+        <option value="processing" {% if status_filter == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
+        <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>✅ Выполнен</option>
+        <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
+    </select>
+</div>
+        <div class="filter-group">
+            <label>💰 Сумма от</label>
+            <input type="number" name="price_from" value="{{ price_from }}" placeholder="мин.">
+        </div>
+        <div class="filter-group">
+            <label>💰 Сумма до</label>
+            <input type="number" name="price_to" value="{{ price_to }}" placeholder="макс.">
+        </div>
+        <div class="filter-group">
+            <button type="submit">🔍 Применить</button>
+        </div>
+        <div class="filter-group">
+            <a href="{% url 'manager_analytics' %}" class="btn-clear">✖️ Сбросить</a>
+        </div>
+    </form>
 </div>
 
-<!-- ========== ВКЛАДКА 1: ЛИЧНАЯ АНАЛИТИКА ========== -->
-<div id="tab-personal" class="tab-content active">
-    <div class="analytics-grid">
-        <div class="analytics-card">
-            <h3>📦 Мои заказы</h3>
-            <div class="big-number">{{ personal_stats.total_orders }}</div>
-            <div class="stat-item">
-                <span class="stat-label">Новых:</span>
-                <span class="stat-value">{{ personal_stats.new }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">В обработке:</span>
-                <span class="stat-value">{{ personal_stats.processing }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Выполнено:</span>
-                <span class="stat-value">{{ personal_stats.completed }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Отменено:</span>
-                <span class="stat-value">{{ personal_stats.cancelled }}</span>
-            </div>
-        </div>
-
-        <div class="analytics-card">
-            <h3>💰 Мои финансы</h3>
-            <div class="big-number">{{ personal_stats.total_revenue|floatformat:0 }} ₽</div>
-            <div class="stat-item">
-                <span class="stat-label">Общая выручка:</span>
-                <span class="stat-value">{{ personal_stats.total_revenue|floatformat:0 }} ₽</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Средний чек:</span>
-                <span class="stat-value">
-                    {% if personal_stats.total_orders > 0 %}
-                        {{ personal_stats.total_revenue|floatformat:0|divisibleby:personal_stats.total_orders }} ₽
-                    {% else %}
-                        0 ₽
-                    {% endif %}
-                </span>
-            </div>
-        </div>
-
-        <div class="analytics-card">
-            <h3>🏆 Мои лучшие клиенты</h3>
-            {% for client in personal_top_clients %}
-            <div class="stat-item">
-                <span class="stat-label">{{ forloop.counter }}. {{ client.client__username }}</span>
-                <span class="stat-value">{{ client.total_spent|floatformat:0 }} ₽ ({{ client.orders_count }} заказов)</span>
-            </div>
-            {% empty %}
-                <p>Нет данных</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <h3>📈 Моя динамика заказов (последние 30 дней)</h3>
-        <canvas id="personalChart" width="800" height="300"></canvas>
-    </div>
+<!-- Сортировка -->
+<div class="sort-bar">
+    <label>📋 Сортировать по:</label>
+    <select id="sortSelect" onchange="location.href=updateSort(this.value)">
+        <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Новые сверху</option>
+        <option value="created_at" {% if sort_by == 'created_at' %}selected{% endif %}>Старые сверху</option>
+        <option value="-total_price" {% if sort_by == '-total_price' %}selected{% endif %}>Сначала дорогие</option>
+        <option value="total_price" {% if sort_by == 'total_price' %}selected{% endif %}>Сначала дешёвые</option>
+    </select>
 </div>
 
-<!-- ========== ВКЛАДКА 2: ОБЩАЯ АНАЛИТИКА ========== -->
-<div id="tab-company" class="tab-content">
-    <div class="analytics-grid">
-        <div class="analytics-card">
-            <h3>📦 Всего заказов в компании</h3>
-            <div class="big-number">{{ company_stats.total_orders }}</div>
-            <div class="stat-item">
-                <span class="stat-label">Новых:</span>
-                <span class="stat-value">{{ company_stats.new }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">В обработке:</span>
-                <span class="stat-value">{{ company_stats.processing }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Выполнено:</span>
-                <span class="stat-value">{{ company_stats.completed }}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Отменено:</span>
-                <span class="stat-value">{{ company_stats.cancelled }}</span>
-            </div>
-        </div>
-
-        <div class="analytics-card">
-            <h3>💰 Выручка компании</h3>
-            <div class="big-number">{{ company_stats.total_revenue|floatformat:0 }} ₽</div>
-        </div>
-
-        <div class="analytics-card">
-            <h3>🏆 Топ-5 клиентов компании</h3>
-            {% for client in company_top_clients %}
-            <div class="stat-item">
-                <span class="stat-label">{{ forloop.counter }}. {{ client.client__username }}</span>
-                <span class="stat-value">{{ client.total_spent|floatformat:0 }} ₽ ({{ client.orders_count }} заказов)</span>
-            </div>
-            {% empty %}
-                <p>Нет данных</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <h3>📈 Общая динамика заказов компании (последние 30 дней)</h3>
-        <canvas id="companyChart" width="800" height="300"></canvas>
-    </div>
-
+<!-- Статистика -->
+<div class="analytics-grid">
     <div class="analytics-card">
-        <h3>🔥 Самые популярные услуги</h3>
-        {% for service in popular_services %}
-        <div class="stat-item">
-            <span class="stat-label">{{ service.name }}</span>
-            <span class="stat-value">{{ service.orders_count }} заказов</span>
-        </div>
-        {% empty %}
-            <p>Нет данных</p>
-        {% endfor %}
+        <h3>📦 Заказы</h3>
+        <div class="big-number">{{ total_orders }}</div>
+        <div class="stat-item"><span class="stat-label">Новых:</span> <span>{{ status_stats.new }}</span></div>
+        <div class="stat-item"><span class="stat-label">В обработке:</span> <span>{{ status_stats.processing }}</span></div>
+        <div class="stat-item"><span class="stat-label">Выполнено:</span> <span>{{ status_stats.completed }}</span></div>
+        <div class="stat-item"><span class="stat-label">Отменено:</span> <span>{{ status_stats.cancelled }}</span></div>
     </div>
+    <div class="analytics-card">
+        <h3>💰 Финансы</h3>
+        <div class="big-number">{{ total_revenue|floatformat:0 }} ₽</div>
+    </div>
+    <div class="analytics-card">
+        <h3>🏆 Топ-5 клиентов</h3>
+        {% for client in top_clients %}
+        <div class="stat-item"><span>{{ forloop.counter }}. {{ client.client__username }}</span> <span>{{ client.total_spent|floatformat:0 }} ₽</span></div>
+        {% empty %}<p>Нет данных</p>{% endfor %}
+    </div>
+</div>
 
-    <div class="analytics-card" style="margin-top: 20px;">
-        <h3>🥇 Рейтинг менеджеров</h3>
-        {% for manager in managers_stats %}
-        <div class="stat-item">
-            <span class="stat-label">{{ forloop.counter }}. {{ manager.name }}</span>
-            <span class="stat-value">{{ manager.orders_count }} заказов / {{ manager.revenue|floatformat:0 }} ₽</span>
-        </div>
-        {% empty %}
-            <p>Нет данных</p>
-        {% endfor %}
-    </div>
+<!-- График -->
+<div class="chart-container">
+    <h3>📈 Динамика заказов (последние 30 дней)</h3>
+    <canvas id="ordersChart" width="800" height="300"></canvas>
+</div>
+
+<!-- Список заказов -->
+<div class="analytics-card" style="margin-top: 20px;">
+    <h3>📋 Список заказов по фильтру</h3>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th style="text-align: left; padding: 8px;">№</th>
+                <th style="text-align: left; padding: 8px;">Дата</th>
+                <th style="text-align: left; padding: 8px;">Клиент</th>
+                <th style="text-align: left; padding: 8px;">Регион</th>
+                <th style="text-align: left; padding: 8px;">Сумма</th>
+                <th style="text-align: left; padding: 8px;">Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders_list %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 8px;">#{{ order.id }}</td>
+                <td style="padding: 8px;">{{ order.created_at|date:"d.m.Y" }}</td>
+                <td style="padding: 8px;">{{ order.client.username }}</td>
+                <td style="padding: 8px;">{{ order.region|default:"—" }}</td>
+                <td style="padding: 8px;">{{ order.total_price|floatformat:0 }} ₽</td>
+                <td style="padding: 8px;">
+                    {% if order.status == 'new' %}🆕 Новый
+                    {% elif order.status == 'processing' %}⚙️ В обработке
+                    {% elif order.status == 'completed' %}✅ Выполнен
+                    {% elif order.status == 'cancelled' %}❌ Отменён
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="padding: 20px; text-align: center;">😕 Нет заказов по выбранным фильтрам</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Переключение вкладок
-    function switchTab(tab) {
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.getElementById(`tab-${tab}`).classList.add('active');
-        event.target.classList.add('active');
+    const chartData = {
+        labels: [{% for day in orders_by_day %}'{{ day.date }}',{% endfor %}],
+        datasets: [{
+            label: 'Количество заказов',
+            data: [{% for day in orders_by_day %}{{ day.count }},{% endfor %}],
+            borderColor: '#dc3545',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointBackgroundColor: '#dc3545',
+            pointBorderColor: '#fff',
+            pointRadius: 5
+        }]
+    };
+    new Chart(document.getElementById('ordersChart').getContext('2d'), { type: 'line', data: chartData, options: { responsive: true } });
+    
+    function updateSort(value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', value);
+        return url.toString();
     }
-
-    // График 1: Личная динамика
-    const personalCtx = document.getElementById('personalChart').getContext('2d');
-    new Chart(personalCtx, {
-        type: 'line',
-        data: {
-            labels: [{% for day in personal_orders_by_month %}'{{ day.date }}',{% endfor %}],
-            datasets: [{
-                label: 'Мои заказы',
-                data: [{% for day in personal_orders_by_month %}{{ day.count }},{% endfor %}],
-                borderColor: '#dc3545',
-                backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                fill: true,
-                tension: 0.3,
-                pointBackgroundColor: '#dc3545',
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Количество заказов' } } }
-        }
-    });
-
-    // График 2: Общая динамика
-    const companyCtx = document.getElementById('companyChart').getContext('2d');
-    new Chart(companyCtx, {
-        type: 'line',
-        data: {
-            labels: [{% for day in company_orders_by_month %}'{{ day.date }}',{% endfor %}],
-            datasets: [{
-                label: 'Заказы компании',
-                data: [{% for day in company_orders_by_month %}{{ day.count }},{% endfor %}],
-                borderColor: '#1a1a1a',
-                backgroundColor: 'rgba(26, 26, 26, 0.1)',
-                fill: true,
-                tension: 0.3,
-                pointBackgroundColor: '#1a1a1a',
-                pointBorderColor: '#fff',
-                pointRadius: 5,
-                pointHoverRadius: 7
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, title: { display: true, text: 'Количество заказов' } } }
-        }
-    });
 </script>
 {% endblock %}

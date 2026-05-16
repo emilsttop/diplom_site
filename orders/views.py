@@ -1,16 +1,21 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
+from django.http import FileResponse, HttpResponse
+from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Order, OrderItem
 from .utils import assign_manager_to_order
 from users.models import User
+import os
+
 
 @login_required
 def my_orders(request):
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
     return render(request, 'orders/my_orders.html', {'orders': orders})
+
 
 @login_required
 def manager_dashboard(request):
@@ -22,7 +27,6 @@ def manager_dashboard(request):
     else:
         orders = Order.objects.filter(assigned_manager=request.user).order_by('-created_at')
     
-    # Получаем всех менеджеров для передачи заказов
     managers = User.objects.filter(role='manager', is_active=True)
     
     for order in orders:
@@ -38,6 +42,7 @@ def manager_dashboard(request):
         'managers': managers,
     })
 
+
 @login_required
 def manager_update_order_status(request, order_id):
     if request.user.role not in ['manager', 'admin']:
@@ -50,6 +55,7 @@ def manager_update_order_status(request, order_id):
             order.save()
     return redirect('manager_dashboard')
 
+
 @login_required
 def manager_chat(request, order_id):
     if request.user.role not in ['manager', 'admin']:
@@ -57,101 +63,85 @@ def manager_chat(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'orders/manager_chat.html', {'order': order})
 
+
 @login_required
 def manager_analytics(request):
-    """Аналитика с вкладками: личная и общая"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
-    # Личная аналитика
-    personal_orders = Order.objects.filter(assigned_manager=request.user)
+    orders = Order.objects.all()
     
-    personal_stats = {
-        'total_orders': personal_orders.count(),
-        'total_revenue': personal_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
-        'new': personal_orders.filter(status='new').count(),
-        'processing': personal_orders.filter(status='processing').count(),
-        'completed': personal_orders.filter(status='completed').count(),
-        'cancelled': personal_orders.filter(status='cancelled').count(),
+    # === ФИЛЬТРЫ ===
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    if date_from:
+        orders = orders.filter(created_at__date__gte=date_from)
+    if date_to:
+        orders = orders.filter(created_at__date__lte=date_to)
+    
+    region = request.GET.get('region')
+    if region:
+        orders = orders.filter(region=region)
+    
+    status = request.GET.get('status')
+    if status:
+        orders = orders.filter(status=status)
+    
+    price_from = request.GET.get('price_from')
+    price_to = request.GET.get('price_to')
+    if price_from:
+        orders = orders.filter(total_price__gte=price_from)
+    if price_to:
+        orders = orders.filter(total_price__lte=price_to)
+    
+    # === СОРТИРОВКА ===
+    sort_by = request.GET.get('sort', '-created_at')
+    orders = orders.order_by(sort_by)
+    
+    # === СТАТИСТИКА ===
+    total_orders = orders.count()
+    total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    
+    status_stats = {
+        'new': orders.filter(status='new').count(),
+        'processing': orders.filter(status='processing').count(),
+        'completed': orders.filter(status='completed').count(),
+        'cancelled': orders.filter(status='cancelled').count(),
     }
     
     today = timezone.now().date()
-    personal_orders_by_month = []
+    orders_by_day = []
     for i in range(29, -1, -1):
         day = today - timedelta(days=i)
-        day_start = datetime.combine(day, datetime.min.time())
-        day_end = datetime.combine(day, datetime.max.time())
-        count = personal_orders.filter(created_at__range=(day_start, day_end)).count()
-        personal_orders_by_month.append({'date': day.strftime('%d.%m'), 'count': count})
+        count = orders.filter(created_at__date=day).count()
+        orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
     
-    personal_top_clients = personal_orders.filter(status='completed').values('client__username').annotate(
+    top_clients = orders.filter(status='completed').values('client__username').annotate(
         total_spent=Sum('total_price'),
         orders_count=Count('id')
     ).order_by('-total_spent')[:5]
     
-    # Общая аналитика
-    all_orders = Order.objects.all()
-    
-    company_stats = {
-        'total_orders': all_orders.count(),
-        'total_revenue': all_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
-        'new': all_orders.filter(status='new').count(),
-        'processing': all_orders.filter(status='processing').count(),
-        'completed': all_orders.filter(status='completed').count(),
-        'cancelled': all_orders.filter(status='cancelled').count(),
-    }
-    
-    company_orders_by_month = []
-    for i in range(29, -1, -1):
-        day = today - timedelta(days=i)
-        day_start = datetime.combine(day, datetime.min.time())
-        day_end = datetime.combine(day, datetime.max.time())
-        count = all_orders.filter(created_at__range=(day_start, day_end)).count()
-        company_orders_by_month.append({'date': day.strftime('%d.%m'), 'count': count})
-    
-    company_top_clients = all_orders.filter(status='completed').values('client__username').annotate(
-        total_spent=Sum('total_price'),
-        orders_count=Count('id')
-    ).order_by('-total_spent')[:5]
-    
-    from services.models import ServicePackage
-    popular_services = []
-    for package in ServicePackage.objects.all():
-        order_count = all_orders.filter(items__package=package).count()
-        popular_services.append({'name': package.name, 'orders_count': order_count})
-    popular_services = sorted(popular_services, key=lambda x: x['orders_count'], reverse=True)[:5]
-    
-    managers_stats = []
-    for manager in User.objects.filter(role='manager', is_active=True):
-        manager_orders = Order.objects.filter(assigned_manager=manager)
-        managers_stats.append({
-            'name': manager.get_full_name() or manager.username,
-            'orders_count': manager_orders.count(),
-            'revenue': manager_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0,
-        })
-    managers_stats.sort(key=lambda x: x['revenue'], reverse=True)
+    regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
     
     context = {
-        'personal_stats': personal_stats,
-        'personal_orders_by_month': personal_orders_by_month,
-        'personal_top_clients': personal_top_clients,
-        'company_stats': company_stats,
-        'company_orders_by_month': company_orders_by_month,
-        'company_top_clients': company_top_clients,
-        'popular_services': popular_services,
-        'managers_stats': managers_stats,
+        'orders_list': orders,
+        'total_orders': total_orders,
+        'total_revenue': total_revenue,
+        'status_stats': status_stats,
+        'orders_by_day': orders_by_day,
+        'top_clients': top_clients,
+        'regions': regions,
+        'date_from': date_from,
+        'date_to': date_to,
+        'region_filter': region,
+        'status_filter': status,
+        'price_from': price_from,
+        'price_to': price_to,
+        'sort_by': sort_by,
     }
     
     return render(request, 'orders/manager_analytics.html', context)
 
-@login_required
-def download_contract(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    if request.user.role == 'client' and order.client != request.user:
-        return redirect('catalog')
-    if request.user.role not in ['manager', 'admin', 'client']:
-        return redirect('catalog')
-    return generate_contract(order)
 
 @login_required
 def reassign_order(request, order_id):
@@ -181,14 +171,10 @@ def reassign_order(request, order_id):
     
     return redirect('manager_dashboard')
 
-from django.http import FileResponse
-import os
-from django.conf import settings
 
 @login_required
 def download_contract(request, order_id):
     """Скачать готовый договор (DOCX)"""
-    # Путь к файлу договора
     file_path = os.path.join(settings.BASE_DIR, 'static', 'docs', 'Договор на оказание рекламных услуг.docx')
     
     if not os.path.exists(file_path):
