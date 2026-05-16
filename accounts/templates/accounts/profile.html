@@ -394,6 +394,50 @@ body.dark .detail-tab:not(.active) {
     background: #e0e0e0 !important;
     color: #1a1a1a !important;
 }
+.order-summary {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+}
+.order-info {
+    flex: 2;
+    min-width: 150px;
+}
+.order-status-wrapper {
+    flex: 1;
+    text-align: center;
+    min-width: 120px;
+}
+.order-price {
+    flex: 1;
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    background: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    min-width: 120px;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+.expand-icon {
+    font-size: 24px;
+    color: #dc3545;
+    transition: transform 0.3s;
+    width: 40px;
+    text-align: center;
+}
+.order-status {
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: bold;
+    display: inline-block;
+
 </style>
 
 <div class="profile-header">
@@ -409,22 +453,22 @@ body.dark .detail-tab:not(.active) {
     {% for order in orders %}
     <div class="order-card" data-order-id="{{ order.id }}">
         <div class="order-summary" onclick="toggleOrder({{ order.id }})">
-            <div class="order-info">
-                <h3>Заказ №{{ order.id }}</h3>
-                <p>📅 {{ order.created_at|date:"d.m.Y H:i" }}</p>
-            </div>
-            <div>
-                <span class="order-status status-{{ order.status }}">
-                    {% if order.status == 'new' %}🆕 Новый
-                    {% elif order.status == 'processing' %}⚙️ В обработке
-                    {% elif order.status == 'completed' %}✅ Выполнен
-                    {% elif order.status == 'cancelled' %}❌ Отменён
-                    {% endif %}
-                </span>
-            </div>
-            <div class="order-price">{{ order.total_price|floatformat:0 }} ₽</div>
-            <div class="expand-icon">▼</div>
-        </div>
+    <div class="order-info">
+        <h3>Заказ №{{ order.id }}</h3>
+        <p>📅 {{ order.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+    <div class="order-status-wrapper">
+        <span class="order-status status-{{ order.status }}">
+            {% if order.status == 'new' %}🆕 Новый
+            {% elif order.status == 'processing' %}⚙️ В обработке
+            {% elif order.status == 'completed' %}✅ Выполнен
+            {% elif order.status == 'cancelled' %}❌ Отменён
+            {% endif %}
+        </span>
+    </div>
+    <div class="order-price">{{ order.total_price|floatformat:0 }} ₽</div>
+    <div class="expand-icon">▼</div>
+</div>
         
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-tabs">
