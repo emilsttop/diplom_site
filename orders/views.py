@@ -9,6 +9,7 @@ from .models import Order, OrderItem
 from .utils import assign_manager_to_order
 from users.models import User
 import os
+from datetime import datetime, timedelta
 
 
 @login_required
@@ -120,13 +121,27 @@ def manager_analytics(request):
         'cancelled': orders.filter(status='cancelled').count(),
     }
     
-    # Динамика по дням
-    today = timezone.now().date()
+            # Динамика по дням (с учётом фильтров)
     orders_by_day = []
-    for i in range(29, -1, -1):
-        day = today - timedelta(days=i)
-        count = orders.filter(created_at__date=day).count()
-        orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
+    
+    # Если выбран период фильтра, показываем график по дням в этом периоде
+    if date_from and date_to:
+        start = datetime.strptime(date_from, '%Y-%m-%d').date()
+        end = datetime.strptime(date_to, '%Y-%m-%d').date()
+        delta = (end - start).days + 1
+        
+        for i in range(delta):
+            day = start + timedelta(days=i)
+            count = orders.filter(created_at__date=day).count()
+            orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
+    
+    # Если фильтр по дате не выбран — показываем последние 30 дней
+    else:
+        today = timezone.now().date()
+        for i in range(29, -1, -1):
+            day = today - timedelta(days=i)
+            count = orders.filter(created_at__date=day).count()
+            orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
     
     # Топ клиентов
     top_clients = orders.filter(status='completed').values('client__username').annotate(
@@ -268,12 +283,24 @@ def popular_services(request):
 
 @login_required
 def manager_rating(request):
-    """Рейтинг менеджеров с возможностью сортировки"""
+    """Рейтинг менеджеров с фильтром по дате"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
     from users.models import User
     from django.db.models import Sum, Count
+    from datetime import datetime
+    
+    # Получаем параметры фильтрации
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    # Базовый queryset заказов
+    orders = Order.objects.all()
+    if date_from:
+        orders = orders.filter(created_at__date__gte=date_from)
+    if date_to:
+        orders = orders.filter(created_at__date__lte=date_to)
     
     # Получаем параметр сортировки
     sort_by = request.GET.get('sort', 'total_orders')
@@ -282,10 +309,10 @@ def manager_rating(request):
     manager_stats = []
     
     for manager in managers:
-        orders = Order.objects.filter(assigned_manager=manager)
-        total_orders = orders.count()
-        completed_orders = orders.filter(status='completed').count()
-        total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
+        manager_orders = orders.filter(assigned_manager=manager)
+        total_orders = manager_orders.count()
+        completed_orders = manager_orders.filter(status='completed').count()
+        total_revenue = manager_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
         avg_check = total_revenue / completed_orders if completed_orders > 0 else 0
         
         manager_stats.append({
@@ -297,7 +324,7 @@ def manager_rating(request):
         })
     
     # Сортировка
-    reverse = True  # по убыванию
+    reverse = True
     if sort_by == 'avg_check':
         manager_stats.sort(key=lambda x: x['avg_check'], reverse=reverse)
     elif sort_by == 'total_orders':
@@ -312,4 +339,6 @@ def manager_rating(request):
     return render(request, 'orders/manager_rating.html', {
         'managers': manager_stats,
         'sort_by': sort_by,
+        'date_from': date_from,
+        'date_to': date_to,
     })
