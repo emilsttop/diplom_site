@@ -9,4 +9,5 @@ urlpatterns = [
     path('manager/chat/<int:order_id>/', views.manager_chat, name='manager_chat'),
     path('contract/download/<int:order_id>/', views.download_contract, name='download_contract'),
     path('reassign/<int:order_id>/', views.reassign_order, name='reassign_order'),
+    path('popular-services/', views.popular_services, name='popular_services'),
 ]

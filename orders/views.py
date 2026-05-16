@@ -181,3 +181,71 @@ def download_contract(request, order_id):
         return HttpResponse("Файл договора не найден", status=404)
     
     return FileResponse(open(file_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+
+@login_required
+def popular_services(request):
+    """Страница с самыми популярными услугами с фильтром по дате"""
+    if request.user.role not in ['manager', 'admin']:
+        return redirect('catalog')
+    
+    from services.models import Service
+    from .models import Order
+    from datetime import datetime
+    
+    # Получаем параметры фильтрации
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    # Базовый queryset заказов
+    orders = Order.objects.all()
+    if date_from:
+        orders = orders.filter(created_at__date__gte=date_from)
+    if date_to:
+        orders = orders.filter(created_at__date__lte=date_to)
+    
+    # Словарь для сбора статистики
+    services_stats = {}
+    
+    # 1. Считаем услуги из обычных заказов
+    for order in orders:
+        for item in order.items.all():
+            for service in item.package.available_services.all():
+                if service.name not in services_stats:
+                    services_stats[service.name] = {'count': 0, 'revenue': 0, 'price': service.price}
+                services_stats[service.name]['count'] += item.quantity
+                services_stats[service.name]['revenue'] += float(service.price) * item.quantity
+    
+    # 2. Считаем услуги из кастомных заказов
+    for order in orders:
+        if order.services_data and 'items' in order.services_data:
+            for service_item in order.services_data['items']:
+                if service_item.get('type') == 'custom':
+                    for service in service_item.get('services', []):
+                        name = service.get('name')
+                        price = service.get('price', 0)
+                        if name:
+                            if name not in services_stats:
+                                services_stats[name] = {'count': 0, 'revenue': 0, 'price': price}
+                            services_stats[name]['count'] += 1
+                            services_stats[name]['revenue'] += price
+    
+    # Преобразуем в список и сортируем
+    popular_list = []
+    for name, data in services_stats.items():
+        popular_list.append({
+            'name': name,
+            'price': data['price'],
+            'orders_count': data['count'],
+            'total_revenue': data['revenue'],
+        })
+    
+    popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
+    top_services = popular_list[:10]
+    
+    context = {
+        'top_services': top_services,
+        'date_from': date_from,
+        'date_to': date_to,
+    }
+    
+    return render(request, 'orders/popular_services.html', context)
