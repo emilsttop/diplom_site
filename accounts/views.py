@@ -11,21 +11,18 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            print("=== USER REGISTER SUCCESS ===")
-            print("Session keys:", request.session.keys())
-            print("pending_package_id:", request.session.get('pending_package_id'))
-            print("pending_service_ids:", request.session.get('pending_service_ids'))
             
             # Восстанавливаем отложенные услуги
             pending_package_id = request.session.pop('pending_package_id', None)
             pending_service_ids = request.session.pop('pending_service_ids', None)
             
             if pending_package_id and pending_service_ids:
-                # Добавляем в корзину
+                import json
+                from services.models import Service, ServicePackage
+                
                 cart = request.session.get('cart', {})
                 package_key = f"package_{pending_package_id}"
                 
-                # Здесь нужно получить услуги по их ID
                 service_ids_list = json.loads(pending_service_ids)
                 services = Service.objects.filter(id__in=service_ids_list)
                 
@@ -46,7 +43,13 @@ def register(request):
                     }
                     request.session['cart'] = cart
             
-            return redirect('catalog')
+            # Редирект в зависимости от роли
+            if user.role in ['manager', 'admin']:
+                return redirect('manager_dashboard')
+            elif user.role in ['programmer', 'marketer', 'smm']:
+                return redirect('specialist_dashboard')
+            else:
+                return redirect('catalog')
     else:
         form = RegistrationForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -58,10 +61,6 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            print("=== USER LOGIN SUCCESS ===")
-            print("Session keys:", request.session.keys())
-            print("pending_package_id:", request.session.get('pending_package_id'))
-            print("pending_service_ids:", request.session.get('pending_service_ids'))
             
             # Восстанавливаем отложенные услуги (если есть)
             pending_package_id = request.session.pop('pending_package_id', None)
@@ -93,9 +92,14 @@ def user_login(request):
                         'total_price': float(total_price),
                     }
                     request.session['cart'] = cart
-                    print(f"✅ Восстановлена корзина после входа: {cart}")
             
-            return redirect('catalog')
+            # Редирект в зависимости от роли
+            if user.role in ['manager', 'admin']:
+                return redirect('manager_dashboard')
+            elif user.role in ['programmer', 'marketer', 'smm']:
+                return redirect('specialist_dashboard')
+            else:
+                return redirect('catalog')
         else:
             return render(request, 'accounts/login.html', {'error': 'Неверный логин или пароль'})
     return render(request, 'accounts/login.html')

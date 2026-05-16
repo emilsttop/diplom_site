@@ -66,10 +66,20 @@ def manager_chat(request, order_id):
 
 @login_required
 def manager_analytics(request):
+    """Аналитика с вкладками: по компании и по менеджеру"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
-    orders = Order.objects.all()
+    # Определяем, какую аналитику показывать
+    view_type = request.GET.get('view', 'company')  # company или personal
+    
+    # Базовый queryset
+    if view_type == 'personal':
+        orders = Order.objects.filter(assigned_manager=request.user)
+        title = "Моя аналитика"
+    else:
+        orders = Order.objects.all()
+        title = "Аналитика компании"
     
     # === ФИЛЬТРЫ ===
     date_from = request.GET.get('date_from')
@@ -102,6 +112,7 @@ def manager_analytics(request):
     total_orders = orders.count()
     total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
     
+    # Статусы
     status_stats = {
         'new': orders.filter(status='new').count(),
         'processing': orders.filter(status='processing').count(),
@@ -109,6 +120,7 @@ def manager_analytics(request):
         'cancelled': orders.filter(status='cancelled').count(),
     }
     
+    # Динамика по дням
     today = timezone.now().date()
     orders_by_day = []
     for i in range(29, -1, -1):
@@ -116,11 +128,13 @@ def manager_analytics(request):
         count = orders.filter(created_at__date=day).count()
         orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
     
+    # Топ клиентов
     top_clients = orders.filter(status='completed').values('client__username').annotate(
         total_spent=Sum('total_price'),
         orders_count=Count('id')
     ).order_by('-total_spent')[:5]
     
+    # Список регионов для фильтра
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
     
     context = {
@@ -138,6 +152,8 @@ def manager_analytics(request):
         'price_from': price_from,
         'price_to': price_to,
         'sort_by': sort_by,
+        'view_type': view_type,
+        'title': title,
     }
     
     return render(request, 'orders/manager_analytics.html', context)

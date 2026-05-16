@@ -131,7 +131,52 @@
     }
     body.dark th {
         background: #2a2a3a;
-    }
+    }.analytics-tabs .tab-btn {
+    padding: 10px 24px;
+    background: #f0f0f0;
+    border-radius: 30px;
+    text-decoration: none;
+    color: #1a1a1a;
+    transition: all 0.3s;
+}
+.analytics-tabs .tab-btn.active {
+    background: #dc3545;
+    color: white;
+}
+.analytics-tabs .tab-btn:hover:not(.active) {
+    background: #ddd;
+}
+body.dark .analytics-tabs .tab-btn {
+    background: #2a2a3a;
+    color: #e0e0e0;
+}
+body.dark .analytics-tabs .tab-btn.active {
+    background: #dc3545;
+    color: white;
+}
+.analytics-tabs .tab-btn {
+    padding: 10px 24px;
+    background: #f0f0f0;
+    border-radius: 30px;
+    text-decoration: none;
+    color: #1a1a1a;
+    transition: all 0.3s;
+}
+.analytics-tabs .tab-btn.active {
+    background: #dc3545;
+    color: white;
+}
+.analytics-tabs .tab-btn:hover:not(.active) {
+    background: #ddd;
+}
+body.dark .analytics-tabs .tab-btn {
+    background: #2a2a3a;
+    color: #e0e0e0;
+}
+body.dark .analytics-tabs .tab-btn.active {
+    background: #dc3545;
+    color: white;
+}
 </style>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -139,6 +184,14 @@
     <div>
         <a href="{% url 'manager_dashboard' %}" class="btn-analytics" style="background: #dc3545; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">← Назад к заказам</a>
     </div>
+</div>
+
+<!-- Вкладки выбора аналитики -->
+<div class="analytics-tabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+    <a href="?view=company{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if region_filter %}&region={{ region_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if price_from %}&price_from={{ price_from }}{% endif %}{% if price_to %}&price_to={{ price_to }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+       class="tab-btn {% if view_type == 'company' %}active{% endif %}">🏢 Аналитика компании</a>
+    <a href="?view=personal{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if region_filter %}&region={{ region_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if price_from %}&price_from={{ price_from }}{% endif %}{% if price_to %}&price_to={{ price_to }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}" 
+       class="tab-btn {% if view_type == 'personal' %}active{% endif %}">👤 Моя аналитика</a>
 </div>
 
 <!-- Панель фильтров -->
