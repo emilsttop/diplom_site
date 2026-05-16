@@ -3,10 +3,10 @@ from decimal import Decimal
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from services.models import ServicePackage, Service
 from orders.models import Order, OrderItem
-from orders.utils import assign_manager_to_order
-from orders.utils import is_specialist_available
+from orders.utils import assign_manager_to_order, assign_specialist, is_specialist_available
 
 
 @login_required
@@ -35,7 +35,6 @@ def cart_view(request):
                 'quantity': item,
                 'key': key,
             })
-            # Нужно получить цену пакета из БД
             try:
                 package = ServicePackage.objects.get(id=int(key))
                 total += package.price * item
@@ -126,7 +125,6 @@ def add_with_services(request):
         smm_hours = sum(s.smm_hours for s in services)
         
         # Проверяем доступность специалистов
-        from orders.utils import is_specialist_available
         if not is_specialist_available('programmer', programmer_hours):
             return JsonResponse({'error': 'Нет свободных программистов'}, status=400)
         if not is_specialist_available('marketer', marketer_hours):
@@ -178,6 +176,7 @@ def checkout(request):
         total_price=0,
         status='new',
         region=region,
+        created_at=timezone.now(),  # ← добавляем текущую дату
     )
     
     total = Decimal('0')
@@ -273,18 +272,15 @@ def checkout(request):
     print(f"Часы: П={order.programmer_hours}, М={order.marketer_hours}, SMM={order.smm_hours}")
     
     # Назначаем специалистов
-    from orders.utils import assign_specialist
-
     if order.programmer_hours > 0:
         order.assigned_programmer = assign_specialist('programmer', order.programmer_hours, order.id)
     if order.marketer_hours > 0:
         order.assigned_marketer = assign_specialist('marketer', order.marketer_hours, order.id)
     if order.smm_hours > 0:
         order.assigned_smm = assign_specialist('smm', order.smm_hours, order.id)
-    order.save()  # ← ЭТО ВАЖНО! Сохраняем назначенных специалистов
+    order.save()
     
     # Назначаем менеджера
-    from orders.utils import assign_manager_to_order
     assign_manager_to_order(order)
     
     # Очищаем корзину
