@@ -242,6 +242,7 @@ def manager_analytics(request):
     # --- 3. Данные для вкладки "Услуги" (из popular_services) ---
     date_from_serv = request.GET.get('date_from_serv')
     date_to_serv = request.GET.get('date_to_serv')
+    sort_services = request.GET.get('sort_services', '-orders_count')
     
     orders_for_services = Order.objects.all()
     if date_from_serv:
@@ -271,7 +272,7 @@ def manager_analytics(request):
                             services_stats[name]['count'] += 1
                             services_stats[name]['revenue'] += price
 
-    popular_list = []
+        popular_list = []
     for name, data in services_stats.items():
         popular_list.append({
             'name': name,
@@ -279,7 +280,23 @@ def manager_analytics(request):
             'orders_count': data['count'],
             'total_revenue': data['revenue'],
         })
-    popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
+
+    # Применяем сортировку
+    if sort_services == 'orders_count':
+        popular_list.sort(key=lambda x: x['orders_count'], reverse=False)
+    elif sort_services == '-orders_count':
+        popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
+    elif sort_services == 'total_revenue':
+        popular_list.sort(key=lambda x: x['total_revenue'], reverse=False)
+    elif sort_services == '-total_revenue':
+        popular_list.sort(key=lambda x: x['total_revenue'], reverse=True)
+    elif sort_services == 'price':
+        popular_list.sort(key=lambda x: x['price'], reverse=False)
+    elif sort_services == '-price':
+        popular_list.sort(key=lambda x: x['price'], reverse=True)
+    else:
+        popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
+
     top_services = popular_list[:10]
 
     # Получаем активную вкладку
@@ -314,6 +331,7 @@ def manager_analytics(request):
         'top_services': top_services,
         'date_from_serv': date_from_serv,
         'date_to_serv': date_to_serv,
+        'sort_services': sort_services,
     }
 
     return render(request, 'orders/manager_analytics.html', context)

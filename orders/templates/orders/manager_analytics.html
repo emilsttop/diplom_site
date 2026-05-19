@@ -477,45 +477,53 @@
             </div>
         </div>
 
-        <!-- СПИСОК ЗАКАЗОВ -->
-        <div class="analytics-card">
-            <div class="card-title">📋 Список заказов</div>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><a href="?sort=id&view={{ view_type }}&active_tab=orders" style="color: var(--red); text-decoration: none;">№</a></th>
-                            <th><a href="?sort=-created_at&view={{ view_type }}&active_tab=orders" style="color: var(--red); text-decoration: none;">Дата</a></th>
-                            <th>Клиент</th>
-                            <th>Регион</th>
-                            <th><a href="?sort=-total_price&view={{ view_type }}&active_tab=orders" style="color: var(--red); text-decoration: none;">Сумма</a></th>
-                            <th>Статус</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders_list %}
-                        <tr>
-                            <td>#{{ order.id }}</td>
-                            <td>{{ order.created_at|date:"d.m.Y" }}</td>
-                            <td>{{ order.client.username }}</td>
-                            <td>{{ order.region|default:"—" }}</td>
-                            <td>{{ order.total_price|floatformat:0 }} ₽</td>
-                            <td>
-                                {% if order.status == 'new' %}🆕 Новый
-                                {% elif order.status == 'processing' %}⚙️ В обработке
-                                {% elif order.status == 'completed' %}✅ Выполнен
-                                {% elif order.status == 'cancelled' %}❌ Отменён
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="6" style="text-align: center;">😕 Нет заказов по выбранным фильтрам</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
+        <!-- СПИСОК ЗАКАЗОВ С ПОЛЗУНКОМ ПРОКРУТКИ -->
+<div class="analytics-card">
+    <div class="card-title">📋 Список заказов</div>
+    
+    <!-- Таблица с фиксированной высотой и прокруткой -->
+    <div style="overflow-x: auto; max-height: 500px; overflow-y: auto; border-radius: 12px;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="position: sticky; top: 0; background: var(--gray); z-index: 10;">
+                <tr>
+                    <th style="text-align: center;">№</th>
+                    <th style="text-align: center;">Дата</th>
+                    <th style="text-align: left;">Клиент</th>
+                    <th style="text-align: center;">Регион</th>
+                    <th style="text-align: center;">Сумма</th>
+                    <th style="text-align: center;">Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders_list %}
+                <tr>
+                    <td style="text-align: center;">#{{ order.id }}</td>
+                    <td style="text-align: center;">{{ order.created_at|date:"d.m.Y" }}</td>
+                    <td style="text-align: left;">{{ order.client.username }}</td>
+                    <td style="text-align: center;">{{ order.region|default:"—" }}</td>
+                    <td style="text-align: center;">{{ order.total_price|floatformat:0 }} ₽</td>
+                    <td style="text-align: center;">
+                        {% if order.status == 'new' %}🆕 Новый
+                        {% elif order.status == 'processing' %}⚙️ В обработке
+                        {% elif order.status == 'completed' %}✅ Выполнен
+                        {% elif order.status == 'cancelled' %}❌ Отменён
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">😕 Нет заказов</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Информация о количестве заказов -->
+    <div style="margin-top: 15px; text-align: center; font-size: 13px; color: var(--gray-dark);">
+        Всего заказов: <strong>{{ orders_list|length }}</strong>
+    </div>
+</div>
         <!-- ГРАФИК ДИНАМИКИ -->
         <div class="chart-container">
             <div class="card-title">📈 Динамика заказов (последние 30 дней)</div>
@@ -599,57 +607,72 @@
     </div>
 
     <!-- ==================== ВКЛАДКА 3: УСЛУГИ ==================== -->
-    <div class="tab-content {% if active_tab == 'services' %}active{% endif %}" id="tab-services">
-        <div class="filters-panel">
-            <div class="filters-title">⭐ Фильтры услуг</div>
-            <form method="get" class="filters-form">
-                <input type="hidden" name="view" value="{{ view_type }}">
-                <input type="hidden" name="active_tab" value="services">
-                <div class="filter-group">
-                    <label>📅 Дата от</label>
-                    <input type="date" name="date_from_serv" value="{{ date_from_serv }}">
-                </div>
-                <div class="filter-group">
-                    <label>📅 Дата до</label>
-                    <input type="date" name="date_to_serv" value="{{ date_to_serv }}">
-                </div>
-                <div class="filter-group">
-                    <button type="submit">🔍 Применить</button>
-                </div>
-                <div class="filter-group">
-                    <a href="?view={{ view_type }}&active_tab=services" class="btn-clear">✖️ Сбросить</a>
-                </div>
-            </form>
-        </div>
-
-        <div class="analytics-card">
-            <div class="card-title">🔥 Самые популярные услуги</div>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Название услуги</th>
-                            <th>Цена</th>
-                            <th>Кол-во заказов</th>
-                            <th>Общая выручка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for service in top_services %}
-                        <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
-                            <td><span class="rank-number">{{ forloop.counter }}</span></td>
-                            <td>{{ service.name }}</td>
-                            <td>{{ service.price|floatformat:0 }} ₽</td>
-                            <td>{{ service.orders_count }}</td>
-                            <td>{{ service.total_revenue|floatformat:0 }} ₽</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="5" style="text-align: center;">😕 Нет данных за выбранный период</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="tab-content {% if active_tab == 'services' %}active{% endif %}" id="tab-services">
+    <div class="filters-panel">
+        <div class="filters-title">⭐ Фильтры и сортировка услуг</div>
+        <form method="get" class="filters-form">
+            <input type="hidden" name="view" value="{{ view_type }}">
+            <input type="hidden" name="active_tab" value="services">
+            <div class="filter-group">
+                <label>📅 Дата от</label>
+                <input type="date" name="date_from_serv" value="{{ date_from_serv }}">
             </div>
+            <div class="filter-group">
+                <label>📅 Дата до</label>
+                <input type="date" name="date_to_serv" value="{{ date_to_serv }}">
+            </div>
+            <div class="filter-group">
+                <label>📊 Сортировать по</label>
+                <select name="sort_services">
+                    <option value="-orders_count" {% if sort_services == '-orders_count' %}selected{% endif %}>По популярности ↓</option>
+                    <option value="orders_count" {% if sort_services == 'orders_count' %}selected{% endif %}>По популярности ↑</option>
+                    <option value="-total_revenue" {% if sort_services == '-total_revenue' %}selected{% endif %}>По выручке ↓</option>
+                    <option value="total_revenue" {% if sort_services == 'total_revenue' %}selected{% endif %}>По выручке ↑</option>
+                    <option value="-price" {% if sort_services == '-price' %}selected{% endif %}>По цене ↓</option>
+                    <option value="price" {% if sort_services == 'price' %}selected{% endif %}>По цене ↑</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit">🔍 Применить</button>
+            </div>
+            <div class="filter-group">
+                <a href="?view={{ view_type }}&active_tab=services" class="btn-clear">✖️ Сбросить</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="analytics-card">
+        <div class="card-title">🔥 Топ услуг</div>
+        <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
+            <table style="width: 100%;">
+                <thead style="position: sticky; top: 0; background: var(--gray); z-index: 10;">
+                    <tr>
+                        <th style="text-align: center;">#</th>
+                        <th style="text-align: left;">Название услуги</th>
+                        <th style="text-align: center;">Цена</th>
+                        <th style="text-align: center;">Кол-во заказов</th>
+                        <th style="text-align: center;">Общая выручка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in top_services %}
+                    <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}" style="border-bottom: 1px solid #eee;">
+                        <td style="text-align: center; padding: 12px;"><span class="rank-number">{{ forloop.counter }}</span></td>
+                        <td style="text-align: left; padding: 12px;">{{ service.name }}</td>
+                        <td style="text-align: center; padding: 12px;">{{ service.price|floatformat:0 }} ₽</td>
+                        <td style="text-align: center; padding: 12px;">{{ service.orders_count }}</td>
+                        <td style="text-align: center; padding: 12px;">{{ service.total_revenue|floatformat:0 }} ₽</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px;">😕 Нет данных за выбранный период</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top: 15px; text-align: center; font-size: 13px; color: var(--gray-dark);">
+            Всего услуг: <strong>{{ top_services|length }}</strong>
         </div>
     </div>
 </div>

@@ -347,14 +347,17 @@
     }
 </style>
 
-<div class="dashboard-header">
-    <h1>👨‍💼 Панель менеджера</h1>
-    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="{% url 'manager_analytics' %}" class="btn-analytics">📊 Аналитика и отчёты</a>
-        <a href="{% url 'popular_services' %}" class="btn-analytics" style="background: #ffc107; color: black;">🔥 Популярные услуги</a>
-        <a href="{% url 'specialists_rating' %}" class="btn-analytics" style="background: #17a2b8;">🏆 Рейтинг специалистов</a>
+<div class="dashboard-header" style="background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%); border-radius: 20px; padding: 25px 30px; position: relative; min-height: 110px;">
+    <!-- Текст слева -->
+    <div>
+        <h1 style="margin: 0 0 10px 0; font-size: 28px; color: white;">👨💼 Панель менеджера</h1>
+        <p style="margin: 0; font-size: 15px; color: rgba(255,255,255,0.9);">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</p>
     </div>
-    <p>Добро пожаловать, {{ user.username }}!</p>
+    
+    <!-- Кнопка по центру красного прямоугольника (по вертикали) -->
+    <a href="{% url 'manager_analytics' %}" style="position: absolute; top: 50%; right: 30px; transform: translateY(-50%); background: #1a1a1a; color: white; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; border: none;">
+        📊 Аналитика
+    </a>
 </div>
 
 <div class="stats">
