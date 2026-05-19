@@ -17,6 +17,9 @@ def cart_view(request):
     total = 0
     
     for key, item in cart.items():
+        if not key:
+            continue
+            
         # Формат с выбранными услугами (package_...)
         if isinstance(item, dict) and 'package_name' in item:
             cart_items.append({
@@ -25,21 +28,27 @@ def cart_view(request):
                 'service_names': item.get('service_names', []),
                 'total_price': item.get('total_price', 0),
                 'key': key,
+                'warning': item.get('warning', []),
             })
             total += item.get('total_price', 0)
+            
         # Старый формат (числовой ключ)
         elif str(key).isdigit():
-            cart_items.append({
-                'type': 'simple',
-                'package_id': int(key),
-                'quantity': item,
-                'key': key,
-            })
             try:
                 package = ServicePackage.objects.get(id=int(key))
-                total += package.price * item
-            except:
-                pass
+                price = package.price
+                quantity = item
+                cart_items.append({
+                    'type': 'simple',
+                    'package_name': package.name,
+                    'quantity': quantity,
+                    'total_price': price * quantity,
+                    'key': key,
+                    'warning': [],
+                })
+                total += price * quantity
+            except ServicePackage.DoesNotExist:
+                continue
     
     return render(request, 'cart/cart.html', {
         'cart_items': cart_items,
@@ -138,15 +147,15 @@ def add_with_services(request):
         marketer_hours = sum(float(s.marketer_hours) for s in services)
         smm_hours = sum(float(s.smm_hours) for s in services)
         
-        # Предупреждение о загрузке (не блокировка)
+        # Предупреждение о загрузке (список перегруженных специалистов)
         from orders.utils import is_specialist_available
-        warning = False
+        warning_list = []
         if not is_specialist_available('programmer', programmer_hours):
-            warning = True
+            warning_list.append('программисты')
         if not is_specialist_available('marketer', marketer_hours):
-            warning = True
+            warning_list.append('маркетологи')
         if not is_specialist_available('smm', smm_hours):
-            warning = True
+            warning_list.append('SMM-менеджеры')
         
         total_price = sum(s.price for s in services)
         
@@ -165,7 +174,7 @@ def add_with_services(request):
             } for s in services],
             'total_price': float(total_price),
             'comment': comment,
-            'warning': warning,
+            'warning': warning_list,
         }
         request.session['cart'] = cart
         

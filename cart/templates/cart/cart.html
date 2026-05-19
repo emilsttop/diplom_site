@@ -168,6 +168,11 @@
         <div class="cart-item">
             <div class="cart-item-info">
                 <div class="cart-item-title">{{ item.package_name }}</div>
+                {% if item.warning and item.warning|length > 0 %}
+                <div class="warning-message" style="background: #fff3cd; color: #856404; padding: 8px; border-radius: 8px; margin-bottom: 10px;">
+                    ⚠️ Внимание: высокая загрузка специалистов ({{ item.warning|join:", " }}). Время выполнения заказа может быть увеличено.
+                </div>
+                {% endif %}
                 <ul class="cart-item-services">
                     {% for service in item.service_names %}
                     <li>✓ {{ service }}</li>
@@ -176,7 +181,11 @@
             </div>
             <div class="cart-item-price">{{ item.total_price|floatformat:0 }} ₽</div>
             <div>
+                {% if item.key %}
                 <a href="{% url 'remove_from_cart' item.key %}" class="btn-remove" title="Удалить">❌</a>
+                {% else %}
+                <span class="btn-remove-disabled" style="color: #ccc; cursor: not-allowed;">❌</span>
+                {% endif %}
             </div>
         </div>
         {% endfor %}
