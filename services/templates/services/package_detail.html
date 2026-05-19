@@ -125,26 +125,58 @@
         margin-top: 10px;
     }
     .comment-group {
-        margin: 25px 0;
-        padding: 20px;
-        background: #f8f9fa;
-        border-radius: 20px;
-        border: 1px solid #eee;
-        transition: all 0.2s;
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    border-radius: 24px;
+    border: 1px solid #eee;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     body.dark .comment-group {
-        background: #2a2a3a;
+        background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2e 100%);
         border-color: #dc3545;
     }
-    .comment-input {
+    .comment-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+    .comment-icon {
+        font-size: 20px;
+    }
+    .comment-label {
+        font-weight: 600;
+        font-size: 15px;
+        color: #1a1a1a;
+    }
+    body.dark .comment-label {
+        color: #e0e0e0;
+    }
+    .comment-badge {
+        background: #e9ecef;
+        color: #6c757d;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+    body.dark .comment-badge {
+        background: #3a3a4a;
+        color: #aaa;
+    }
+        .comment-input {
         width: 100%;
         padding: 14px 16px;
         font-size: 14px;
         border: 1px solid #ddd;
-        border-radius: 16px;
+        border-radius: 20px;
         background: white;
-        resize: vertical;
-        transition: 0.2s;
+        resize: none;
+        transition: height 0.1s ease;
+        font-family: inherit;
+        overflow-y: hidden;
     }
     .comment-input:focus {
         outline: none;
@@ -156,13 +188,24 @@
         color: #e0e0e0;
         border-color: #dc3545;
     }
+    .comment-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
     .comment-hint {
-        margin-top: 8px;
         font-size: 12px;
         color: #6c757d;
     }
     body.dark .comment-hint {
         color: #aaa;
+    }
+    .comment-counter {
+        font-size: 11px;
+        color: #adb5bd;
     }
 </style>
 
@@ -196,11 +239,18 @@
 </div>
 
 {% if package.name == "Конструктор услуг" %}
-    <div class="form-group comment-group">
-        <label for="comment">📝 Комментарий к заказу</label>
-        <textarea name="comment" id="comment" rows="3" class="comment-input" placeholder="Напишите ваши пожелания, особенности или дополнительные требования..."></textarea>
-        <div class="comment-hint">💡 Например: «нужен отчёт по каждому этапу», «срочно», «бюджет ограничен»</div>
+    <div class="comment-group">
+    <div class="comment-header">
+        <span class="comment-icon">💬</span>
+        <label for="comment" class="comment-label">Комментарий к заказу</label>
+        <span class="comment-badge">необязательно</span>
     </div>
+    <textarea name="comment" id="comment" rows="3" class="comment-input" placeholder="Напишите ваши пожелания, особенности или дополнительные требования..."></textarea>
+    <div class="comment-footer">
+        <span class="comment-hint">💡 Например: «нужен отчёт по каждому этапу», «срочно», «бюджет ограничен»</span>
+        <span class="comment-counter"><span id="commentLength">0</span>/1000</span>
+    </div>
+</div>
 {% endif %}
 
 <div style="text-align: center; margin-top: 20px;">
@@ -214,7 +264,64 @@
         const maxServices = {{ package.max_services }};
         let selectedServices = new Set();
         
-        // Загрузка услуг из корзины и блокировка для конструктора
+                // Счётчик символов для комментария
+        const commentField = document.getElementById('comment');
+        const commentLengthSpan = document.getElementById('commentLength');
+
+        if (commentField && commentLengthSpan) {
+            // Функция обновления счётчика
+            function updateCommentLength() {
+                const length = commentField.value.length;
+                commentLengthSpan.innerText = length;
+                
+                // Визуальное предупреждение при приближении к лимиту
+                if (length > 900) {
+                    commentLengthSpan.style.color = '#dc3545';
+                } else if (length > 800) {
+                    commentLengthSpan.style.color = '#ffc107';
+                } else {
+                    commentLengthSpan.style.color = '#adb5bd';
+                }
+            }
+            
+            // Запускаем при загрузке
+            updateCommentLength();
+            
+            // Запускаем при вводе
+            commentField.addEventListener('input', updateCommentLength);
+            
+            // Ограничиваем длину (максимум 1000 символов)
+            commentField.addEventListener('keydown', function(e) {
+                if (this.value.length >= 1000 && e.key !== 'Backspace' && e.key !== 'Delete') {
+                    e.preventDefault();
+                }
+            });
+        }
+
+                // Авто-высота для textarea
+        function autoResize(textarea) {
+            if (!textarea) return;
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        const commentTextarea = document.getElementById('comment');
+        if (commentTextarea) {
+            // Первоначальная настройка
+            commentTextarea.style.overflow = 'hidden';
+            autoResize(commentTextarea);
+            
+            // При вводе
+            commentTextarea.addEventListener('input', function() {
+                autoResize(this);
+            });
+            
+            // При загрузке страницы (если есть сохранённое значение)
+            window.addEventListener('load', function() {
+                autoResize(commentTextarea);
+            });
+        }
+
         async function loadCartServices() {
             try {
                 const response = await fetch('/cart/api/cart-services/');
@@ -265,10 +372,8 @@
             }
         }
         
-        // Если конструктор — блокируем уже выбранные услуги
-        if ("{{ package.name }}" === "Конструктор услуг") {
-            blockSelectedServices();
-        }
+        // Запускаем блокировку для ВСЕХ пакетов
+        blockSelectedServices();
         
         function updateSelection() {
             const count = selectedServices.size;
@@ -307,7 +412,6 @@
             }
         }
         
-        // Обработчик клика по карточке
         document.querySelectorAll('.service-card').forEach(card => {
             const checkbox = card.querySelector('.service-checkbox');
             if (checkbox.disabled) return;

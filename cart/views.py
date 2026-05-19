@@ -324,12 +324,9 @@ def clear_cart(request):
 
 @login_required
 def get_cart_services(request):
-    """Возвращает список ID услуг, уже добавленных в корзину"""
     cart = request.session.get('cart', {})
     service_ids = set()
-    
     for key, item in cart.items():
         if key.startswith('package_') and isinstance(item, dict):
             service_ids.update(item.get('service_ids', []))
-    
     return JsonResponse({'service_ids': list(service_ids)})
