@@ -115,40 +115,38 @@ def add_with_services(request):
         if not service_ids:
             return JsonResponse({'error': 'Не выбрано ни одной услуги'}, status=400)
         
+        # ПАКЕТ ДОЛЖЕН БЫТЬ ОПРЕДЕЛЁН ЗДЕСЬ
         package = get_object_or_404(ServicePackage, id=package_id)
         services = Service.objects.filter(id__in=service_ids)
         
         if services.count() < package.min_services:
             return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
         
-        # ===== ПРОВЕРКА НА ДУБЛИРОВАНИЕ УСЛУГ С КОРЗИНОЙ =====
+        # Проверка на дублирование услуг с корзиной
         cart = request.session.get('cart', {})
         existing_service_ids = set()
-        
-        # Собираем все service_ids из уже существующих пакетов в корзине
         for key, item in cart.items():
             if key.startswith('package_') and isinstance(item, dict):
                 existing_service_ids.update(item.get('service_ids', []))
         
-        # Проверяем, нет ли уже выбранных услуг в корзине
         for service_id in service_ids:
             if int(service_id) in existing_service_ids:
-                return JsonResponse({'error': f'Услуга "{Service.objects.get(id=service_id).name}" уже добавлена из другого пакета'}, status=400)
-        # ====================================================
+                return JsonResponse({'error': f'Услуга уже добавлена из другого пакета'}, status=400)
         
-        # Считаем часы
+        # Часы специалистов
         programmer_hours = sum(float(s.programmer_hours) for s in services)
         marketer_hours = sum(float(s.marketer_hours) for s in services)
         smm_hours = sum(float(s.smm_hours) for s in services)
         
-        # Проверяем доступность специалистов
+        # Предупреждение о загрузке (не блокировка)
         from orders.utils import is_specialist_available
+        warning = False
         if not is_specialist_available('programmer', programmer_hours):
-            return JsonResponse({'error': 'Нет свободных программистов'}, status=400)
+            warning = True
         if not is_specialist_available('marketer', marketer_hours):
-            return JsonResponse({'error': 'Нет свободных маркетологов'}, status=400)
+            warning = True
         if not is_specialist_available('smm', smm_hours):
-            return JsonResponse({'error': 'Нет свободных SMM-менеджеров'}, status=400)
+            warning = True
         
         total_price = sum(s.price for s in services)
         
@@ -166,7 +164,8 @@ def add_with_services(request):
                 'smm_hours': float(s.smm_hours),
             } for s in services],
             'total_price': float(total_price),
-            'comment': comment,  # ← сохраняем комментарий
+            'comment': comment,
+            'warning': warning,
         }
         request.session['cart'] = cart
         
@@ -188,15 +187,21 @@ def checkout(request):
     if not cart:
         return redirect('cart')
     
-    # Создаём заказ
+    comment = ''
+    for key, item in cart.items():
+        if isinstance(item, dict) and 'comment' in item:
+            comment = item.get('comment', '')
+            break
+
     order = Order.objects.create(
         client=request.user,
         total_price=0,
         status='new',
         region=region,
         created_at=timezone.now(),
-        comment=request.POST.get('comment', '')  # ← добавляем текущую дату
+        comment=comment
     )
+
     
     total = Decimal('0')
     services_items = []
@@ -316,3 +321,15 @@ def clear_cart(request):
         request.session.modified = True
         return JsonResponse({'success': True, 'message': 'Корзина очищена'})
     return JsonResponse({'error': 'Метод не разрешён'}, status=405)
+
+@login_required
+def get_cart_services(request):
+    """Возвращает список ID услуг, уже добавленных в корзину"""
+    cart = request.session.get('cart', {})
+    service_ids = set()
+    
+    for key, item in cart.items():
+        if key.startswith('package_') and isinstance(item, dict):
+            service_ids.update(item.get('service_ids', []))
+    
+    return JsonResponse({'service_ids': list(service_ids)})

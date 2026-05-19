@@ -10,4 +10,5 @@ path('checkout/', views.checkout, name='checkout'),
 path('add-with-services/', views.add_with_services, name='add_with_services'),
 path('remove/<str:item_key>/', views.remove_from_cart, name='remove_from_cart'),
 path('clear/', views.clear_cart, name='clear_cart'),
+path('api/cart-services/', views.get_cart_services, name='cart_services'),
 ]

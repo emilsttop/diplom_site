@@ -44,6 +44,15 @@
     body.dark .service-card.selected {
         background: #2a1a1a;
     }
+    .service-card.disabled-service {
+        opacity: 0.5;
+        background-color: #e9ecef !important;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+    body.dark .service-card.disabled-service {
+        background-color: #2a2a3a !important;
+    }
     .service-checkbox {
         width: 24px;
         height: 24px;
@@ -115,6 +124,46 @@
         font-size: 14px;
         margin-top: 10px;
     }
+    .comment-group {
+        margin: 25px 0;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 20px;
+        border: 1px solid #eee;
+        transition: all 0.2s;
+    }
+    body.dark .comment-group {
+        background: #2a2a3a;
+        border-color: #dc3545;
+    }
+    .comment-input {
+        width: 100%;
+        padding: 14px 16px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        border-radius: 16px;
+        background: white;
+        resize: vertical;
+        transition: 0.2s;
+    }
+    .comment-input:focus {
+        outline: none;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 3px rgba(220,53,69,0.1);
+    }
+    body.dark .comment-input {
+        background: #1e1e2e;
+        color: #e0e0e0;
+        border-color: #dc3545;
+    }
+    .comment-hint {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+    body.dark .comment-hint {
+        color: #aaa;
+    }
 </style>
 
 <div class="package-header">
@@ -136,8 +185,8 @@
 
 <div class="services-grid" id="servicesGrid">
     {% for service in package.available_services.all %}
-    <div class="service-card" data-id="{{ service.id }}" data-price="{{ service.price }}" onclick="toggleService(this)">
-        <input type="checkbox" class="service-checkbox" value="{{ service.id }}" data-price="{{ service.price }}" onclick="event.stopPropagation(); toggleService(this.parentElement)">
+    <div class="service-card" data-id="{{ service.id }}" data-price="{{ service.price }}">
+        <input type="checkbox" class="service-checkbox" value="{{ service.id }}" data-price="{{ service.price }}">
         <div class="service-info">
             <div class="service-name">{{ service.name }}</div>
             <div class="service-price">{{ service.price|floatformat:0 }} ₽</div>
@@ -146,13 +195,16 @@
     {% endfor %}
 </div>
 
-<div class="form-group">
-    <label for="comment">📝 Комментарий к заказу</label>
-    <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Ваши пожелания..."></textarea>
-</div>
+{% if package.name == "Конструктор услуг" %}
+    <div class="form-group comment-group">
+        <label for="comment">📝 Комментарий к заказу</label>
+        <textarea name="comment" id="comment" rows="3" class="comment-input" placeholder="Напишите ваши пожелания, особенности или дополнительные требования..."></textarea>
+        <div class="comment-hint">💡 Например: «нужен отчёт по каждому этапу», «срочно», «бюджет ограничен»</div>
+    </div>
+{% endif %}
 
 <div style="text-align: center; margin-top: 20px;">
-    <button class="btn-add" id="addToCartBtn" onclick="addToCart()">🛒 Добавить в корзину</button>
+    <button class="btn-add" id="addToCartBtn">🛒 Добавить в корзину</button>
 </div>
 <div id="errorMessage" class="error-message" style="text-align: center; display: none;"></div>
 
@@ -161,6 +213,62 @@
         const minServices = {{ package.min_services }};
         const maxServices = {{ package.max_services }};
         let selectedServices = new Set();
+        
+        // Загрузка услуг из корзины и блокировка для конструктора
+        async function loadCartServices() {
+            try {
+                const response = await fetch('/cart/api/cart-services/');
+                const data = await response.json();
+                return data.service_ids || [];
+            } catch(e) {
+                console.error('Ошибка загрузки услуг из корзины', e);
+                return [];
+            }
+        }
+        
+        async function blockSelectedServices() {
+            const cartServiceIds = await loadCartServices();
+            if (cartServiceIds.length === 0) return;
+            
+            document.querySelectorAll('.service-card').forEach(card => {
+                const checkbox = card.querySelector('.service-checkbox');
+                const serviceId = parseInt(checkbox?.value);
+                
+                if (cartServiceIds.includes(serviceId)) {
+                    checkbox.disabled = true;
+                    card.classList.add('disabled-service');
+                    
+                    const serviceNameDiv = card.querySelector('.service-name');
+                    if (serviceNameDiv && !serviceNameDiv.querySelector('.cart-warning')) {
+                        const warningSpan = document.createElement('span');
+                        warningSpan.className = 'cart-warning';
+                        warningSpan.innerText = ' (уже в корзине)';
+                        warningSpan.style.color = '#dc3545';
+                        warningSpan.style.fontSize = '11px';
+                        serviceNameDiv.appendChild(warningSpan);
+                    }
+                }
+            });
+            
+            const errorDiv = document.getElementById('errorMessage');
+            if (errorDiv && cartServiceIds.length > 0) {
+                errorDiv.style.display = 'block';
+                errorDiv.style.background = '#fff3cd';
+                errorDiv.style.color = '#856404';
+                errorDiv.style.padding = '10px';
+                errorDiv.style.borderRadius = '8px';
+                errorDiv.style.marginTop = '15px';
+                errorDiv.innerText = '⚠️ Некоторые услуги уже добавлены в корзину из других пакетов. Они заблокированы для повторного выбора.';
+                setTimeout(() => {
+                    errorDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Если конструктор — блокируем уже выбранные услуги
+        if ("{{ package.name }}" === "Конструктор услуг") {
+            blockSelectedServices();
+        }
         
         function updateSelection() {
             const count = selectedServices.size;
@@ -199,20 +307,37 @@
             }
         }
         
-        window.toggleService = function(card) {
-            const id = parseInt(card.dataset.id);
+        // Обработчик клика по карточке
+        document.querySelectorAll('.service-card').forEach(card => {
+            const checkbox = card.querySelector('.service-checkbox');
+            if (checkbox.disabled) return;
             
-            if (selectedServices.has(id)) {
-                selectedServices.delete(id);
-            } else {
-                if (selectedServices.size >= maxServices) {
-                    alert('⚠️ Максимум можно выбрать ' + maxServices + ' услуг');
-                    return;
+            card.addEventListener('click', function(e) {
+                if (e.target.type !== 'checkbox') {
+                    const cb = this.querySelector('.service-checkbox');
+                    if (cb && !cb.disabled) {
+                        cb.checked = !cb.checked;
+                        const event = new Event('change');
+                        cb.dispatchEvent(event);
+                    }
                 }
-                selectedServices.add(id);
-            }
-            updateSelection();
-        };
+            });
+            
+            checkbox.addEventListener('change', function() {
+                const id = parseInt(card.dataset.id);
+                if (this.checked) {
+                    if (selectedServices.size >= maxServices) {
+                        alert('⚠️ Максимум можно выбрать ' + maxServices + ' услуг');
+                        this.checked = false;
+                        return;
+                    }
+                    selectedServices.add(id);
+                } else {
+                    selectedServices.delete(id);
+                }
+                updateSelection();
+            });
+        });
         
         window.addToCart = async function() {
             const count = selectedServices.size;
@@ -266,6 +391,8 @@
             }
             return cookieValue;
         }
+        
+        document.getElementById('addToCartBtn').addEventListener('click', addToCart);
     });
 </script>
 {% endblock %}

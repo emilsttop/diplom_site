@@ -86,12 +86,16 @@ def assign_specialist(role, new_hours, current_order_id=None):
 
 def is_specialist_available(role, required_hours):
     """Проверяет, есть ли свободный специалист для выполнения заказа"""
+    try:
+        required_hours = float(required_hours)
+    except (TypeError, ValueError):
+        return False
+    
     specialists = User.objects.filter(role=role, is_active=True)
     if not specialists:
         return False
     
     for specialist in specialists:
-        # Текущая загрузка (активные заказы)
         if role == 'programmer':
             current_load = Order.objects.filter(
                 assigned_programmer=specialist
@@ -111,6 +115,10 @@ def is_specialist_available(role, required_hours):
                 total=Sum('smm_hours')
             )['total'] or 0
         
-        if current_load + required_hours <= specialist.max_hours:
+        # Приводим всё к float
+        current_load = float(current_load)
+        max_load = float(specialist.max_hours)
+        
+        if current_load + required_hours <= max_load:
             return True
     return False
