@@ -30,13 +30,12 @@ def manager_dashboard(request):
     else:
         orders = Order.objects.filter(assigned_manager=request.user).order_by('-created_at')
     
-    # Получаем всех менеджеров для передачи заказов
     managers = User.objects.filter(role='manager', is_active=True)
-    
-    # Получаем всех специалистов для переназначения
     programmers = User.objects.filter(role='programmer', is_active=True)
     marketers = User.objects.filter(role='marketer', is_active=True)
     smms = User.objects.filter(role='smm', is_active=True)
+    
+    from django.db.models import Sum
     
     for order in orders:
         from chat.models import ChatMessage
@@ -45,6 +44,38 @@ def manager_dashboard(request):
             sender__role='client', 
             is_read=False
         ).exists()
+        
+        # Инициализация переменных перегрузки (на случай, если специалист не назначен)
+        order.programmer_overload = False
+        order.marketer_overload = False
+        order.smm_overload = False
+        
+        # Общая нагрузка программиста
+        if order.assigned_programmer:
+            total = Order.objects.filter(
+                assigned_programmer=order.assigned_programmer
+            ).exclude(status='completed').exclude(status='cancelled').aggregate(
+                total=Sum('programmer_hours')
+            )['total'] or 0
+            order.programmer_overload = total > 45
+        
+        # Общая нагрузка маркетолога
+        if order.assigned_marketer:
+            total = Order.objects.filter(
+                assigned_marketer=order.assigned_marketer
+            ).exclude(status='completed').exclude(status='cancelled').aggregate(
+                total=Sum('marketer_hours')
+            )['total'] or 0
+            order.marketer_overload = total > 45
+        
+        # Общая нагрузка SMM
+        if order.assigned_smm:
+            total = Order.objects.filter(
+                assigned_smm=order.assigned_smm
+            ).exclude(status='completed').exclude(status='cancelled').aggregate(
+                total=Sum('smm_hours')
+            )['total'] or 0
+            order.smm_overload = total > 45
     
     return render(request, 'orders/manager_dashboard.html', {
         'orders': orders,
@@ -53,7 +84,6 @@ def manager_dashboard(request):
         'marketers': marketers,
         'smms': smms,
     })
-
 
 @login_required
 def manager_update_order_status(request, order_id):
