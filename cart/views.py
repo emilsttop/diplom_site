@@ -97,18 +97,20 @@ def update_cart(request, package_id):
     return redirect('cart')
 
 
+@login_required
 def add_with_services(request):
-    """Добавление пакета с выбранными услугами"""
+    """Добавление пакета с выбранными услугами (включая комментарий)"""
     
-    # Проверяем авторизацию вручную
     if not request.user.is_authenticated:
         request.session['pending_package_id'] = request.POST.get('package_id')
         request.session['pending_service_ids'] = request.POST.get('service_ids')
+        request.session['pending_comment'] = request.POST.get('comment', '')
         return redirect('register')
     
     if request.method == 'POST':
         package_id = request.POST.get('package_id')
         service_ids = json.loads(request.POST.get('service_ids', '[]'))
+        comment = request.POST.get('comment', '')
         
         if not service_ids:
             return JsonResponse({'error': 'Не выбрано ни одной услуги'}, status=400)
@@ -119,12 +121,28 @@ def add_with_services(request):
         if services.count() < package.min_services:
             return JsonResponse({'error': f'Минимум {package.min_services} услуг'}, status=400)
         
-        # Считаем часы для выбранных услуг
-        programmer_hours = sum(s.programmer_hours for s in services)
-        marketer_hours = sum(s.marketer_hours for s in services)
-        smm_hours = sum(s.smm_hours for s in services)
+        # ===== ПРОВЕРКА НА ДУБЛИРОВАНИЕ УСЛУГ С КОРЗИНОЙ =====
+        cart = request.session.get('cart', {})
+        existing_service_ids = set()
+        
+        # Собираем все service_ids из уже существующих пакетов в корзине
+        for key, item in cart.items():
+            if key.startswith('package_') and isinstance(item, dict):
+                existing_service_ids.update(item.get('service_ids', []))
+        
+        # Проверяем, нет ли уже выбранных услуг в корзине
+        for service_id in service_ids:
+            if int(service_id) in existing_service_ids:
+                return JsonResponse({'error': f'Услуга "{Service.objects.get(id=service_id).name}" уже добавлена из другого пакета'}, status=400)
+        # ====================================================
+        
+        # Считаем часы
+        programmer_hours = sum(float(s.programmer_hours) for s in services)
+        marketer_hours = sum(float(s.marketer_hours) for s in services)
+        smm_hours = sum(float(s.smm_hours) for s in services)
         
         # Проверяем доступность специалистов
+        from orders.utils import is_specialist_available
         if not is_specialist_available('programmer', programmer_hours):
             return JsonResponse({'error': 'Нет свободных программистов'}, status=400)
         if not is_specialist_available('marketer', marketer_hours):
@@ -134,7 +152,6 @@ def add_with_services(request):
         
         total_price = sum(s.price for s in services)
         
-        cart = request.session.get('cart', {})
         package_key = f"package_{package_id}"
         
         cart[package_key] = {
@@ -149,6 +166,7 @@ def add_with_services(request):
                 'smm_hours': float(s.smm_hours),
             } for s in services],
             'total_price': float(total_price),
+            'comment': comment,  # ← сохраняем комментарий
         }
         request.session['cart'] = cart
         
@@ -176,7 +194,8 @@ def checkout(request):
         total_price=0,
         status='new',
         region=region,
-        created_at=timezone.now(),  # ← добавляем текущую дату
+        created_at=timezone.now(),
+        comment=request.POST.get('comment', '')  # ← добавляем текущую дату
     )
     
     total = Decimal('0')

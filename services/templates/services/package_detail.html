@@ -146,118 +146,126 @@
     {% endfor %}
 </div>
 
+<div class="form-group">
+    <label for="comment">📝 Комментарий к заказу</label>
+    <textarea name="comment" id="comment" rows="3" class="form-control" placeholder="Ваши пожелания..."></textarea>
+</div>
+
 <div style="text-align: center; margin-top: 20px;">
     <button class="btn-add" id="addToCartBtn" onclick="addToCart()">🛒 Добавить в корзину</button>
 </div>
 <div id="errorMessage" class="error-message" style="text-align: center; display: none;"></div>
 
 <script>
-    const minServices = {{ package.min_services }};
-    const maxServices = {{ package.max_services }};
-    let selectedServices = new Set();
-    
-    function updateSelection() {
-        const count = selectedServices.size;
-        let total = 0;
+    document.addEventListener('DOMContentLoaded', function() {
+        const minServices = {{ package.min_services }};
+        const maxServices = {{ package.max_services }};
+        let selectedServices = new Set();
         
-        document.querySelectorAll('.service-card').forEach(card => {
-            const id = parseInt(card.dataset.id);
-            const checkbox = card.querySelector('.service-checkbox');
-            if (selectedServices.has(id)) {
-                card.classList.add('selected');
-                checkbox.checked = true;
-                total += parseFloat(card.dataset.price);
+        function updateSelection() {
+            const count = selectedServices.size;
+            let total = 0;
+            
+            document.querySelectorAll('.service-card').forEach(card => {
+                const id = parseInt(card.dataset.id);
+                const checkbox = card.querySelector('.service-checkbox');
+                if (selectedServices.has(id)) {
+                    card.classList.add('selected');
+                    checkbox.checked = true;
+                    total += parseFloat(card.dataset.price);
+                } else {
+                    card.classList.remove('selected');
+                    checkbox.checked = false;
+                }
+            });
+            
+            document.getElementById('selectedCount').innerText = count;
+            document.getElementById('totalPrice').innerText = total.toLocaleString();
+            
+            const addBtn = document.getElementById('addToCartBtn');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            if (count < minServices) {
+                addBtn.disabled = true;
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = '⚠️ Необходимо выбрать минимум ' + minServices + ' услуг. Выбрано: ' + count;
+            } else if (count > maxServices) {
+                addBtn.disabled = true;
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = '⚠️ Максимум можно выбрать ' + maxServices + ' услуг. Уберите лишние.';
             } else {
-                card.classList.remove('selected');
-                checkbox.checked = false;
+                addBtn.disabled = false;
+                errorDiv.style.display = 'none';
             }
-        });
-        
-        document.getElementById('selectedCount').innerText = count;
-        document.getElementById('totalPrice').innerText = total.toLocaleString();
-        
-        const addBtn = document.getElementById('addToCartBtn');
-        const errorDiv = document.getElementById('errorMessage');
-        
-        if (count < minServices) {
-            addBtn.disabled = true;
-            errorDiv.style.display = 'block';
-            errorDiv.innerText = '⚠️ Необходимо выбрать минимум ' + minServices + ' услуг. Выбрано: ' + count;
-        } else if (count > maxServices) {
-            addBtn.disabled = true;
-            errorDiv.style.display = 'block';
-            errorDiv.innerText = '⚠️ Максимум можно выбрать ' + maxServices + ' услуг. Уберите лишние.';
-        } else {
-            addBtn.disabled = false;
-            errorDiv.style.display = 'none';
         }
-    }
-    
-    function toggleService(card) {
-        const id = parseInt(card.dataset.id);
         
-        if (selectedServices.has(id)) {
-            selectedServices.delete(id);
-        } else {
-            if (selectedServices.size >= maxServices) {
-                alert('⚠️ Максимум можно выбрать ' + maxServices + ' услуг');
-                return;
+        window.toggleService = function(card) {
+            const id = parseInt(card.dataset.id);
+            
+            if (selectedServices.has(id)) {
+                selectedServices.delete(id);
+            } else {
+                if (selectedServices.size >= maxServices) {
+                    alert('⚠️ Максимум можно выбрать ' + maxServices + ' услуг');
+                    return;
+                }
+                selectedServices.add(id);
             }
-            selectedServices.add(id);
-        }
-        updateSelection();
-    }
-    
-    async function addToCart() {
-    const count = selectedServices.size;
-    if (count < minServices || count > maxServices) return;
-    
-    const serviceIds = Array.from(selectedServices);
-    const formData = new FormData();
-    formData.append('package_id', {{ package.id }});
-    formData.append('service_ids', JSON.stringify(serviceIds));
-    
-    try {
-        const response = await fetch('/cart/add-with-services/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: formData
-        });
+            updateSelection();
+        };
         
-        // Если пользователь не авторизован, Django вернёт редирект (статус 302)
-        if (response.redirected) {
-            window.location.href = response.url;
-            return;
-        }
+        window.addToCart = async function() {
+            const count = selectedServices.size;
+            if (count < minServices || count > maxServices) return;
+            
+            const serviceIds = Array.from(selectedServices);
+            const comment = document.getElementById('comment')?.value || '';
+            const formData = new FormData();
+            formData.append('package_id', {{ package.id }});
+            formData.append('service_ids', JSON.stringify(serviceIds));
+            formData.append('comment', comment);
+            
+            try {
+                const response = await fetch('/cart/add-with-services/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+                
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = '/cart/';
+                } else {
+                    alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
+                }
+            } catch(e) {
+                alert('❌ Ошибка при добавлении');
+            }
+        };
         
-        const data = await response.json();
-        
-        if (data.success) {
-            window.location.href = '/cart/';
-        } else {
-            alert('❌ Ошибка: ' + (data.error || 'Неизвестная ошибка'));
-        }
-    } catch(e) {
-        alert('❌ Ошибка при добавлении');
-    }
-}
-    
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
+            return cookieValue;
         }
-        return cookieValue;
-    }
+    });
 </script>
 {% endblock %}

@@ -10,26 +10,25 @@ def home(request):
 
 from orders.utils import is_specialist_available
 
-from orders.utils import is_specialist_available
-
 def catalog(request):
+    """Каталог услуг с предупреждением о загрузке специалистов (без блокировки)"""
     packages = ServicePackage.objects.all()
     
-    # Для каждого пакета проверяем доступность специалистов на основе услуг
     for package in packages:
-        # Суммируем часы по всем услугам пакета
         programmer_hours = sum(s.programmer_hours for s in package.available_services.all())
         marketer_hours = sum(s.marketer_hours for s in package.available_services.all())
         smm_hours = sum(s.smm_hours for s in package.available_services.all())
         
+        # Проверяем доступность, но не блокируем
         package.programmer_available = is_specialist_available('programmer', programmer_hours)
         package.marketer_available = is_specialist_available('marketer', marketer_hours)
         package.smm_available = is_specialist_available('smm', smm_hours)
-        package.available = (
-            package.programmer_available and
-            package.marketer_available and
-            package.smm_available
-        )
+        
+        # Если какой-то специалист перегружен — показываем предупреждение
+        package.warning = not (package.programmer_available and 
+                               package.marketer_available and 
+                               package.smm_available)
+        package.available = True  # всегда доступен
     
     return render(request, 'services/catalog.html', {'packages': packages})
 
