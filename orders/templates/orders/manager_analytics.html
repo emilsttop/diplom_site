@@ -622,15 +622,26 @@
                 <input type="date" name="date_to_serv" value="{{ date_to_serv }}">
             </div>
             <div class="filter-group">
+                <label>🌍 Регион</label>
+                <select name="region_serv">
+                    <option value="">Все регионы</option>
+                    {% for region in regions_for_filter %}
+                        <option value="{{ region }}" {% if region_serv == region %}selected{% endif %}>{{ region }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-group">
                 <label>📊 Сортировать по</label>
                 <select name="sort_services">
-                    <option value="-orders_count" {% if sort_services == '-orders_count' %}selected{% endif %}>По популярности ↓</option>
-                    <option value="orders_count" {% if sort_services == 'orders_count' %}selected{% endif %}>По популярности ↑</option>
-                    <option value="-total_revenue" {% if sort_services == '-total_revenue' %}selected{% endif %}>По выручке ↓</option>
-                    <option value="total_revenue" {% if sort_services == 'total_revenue' %}selected{% endif %}>По выручке ↑</option>
-                    <option value="-price" {% if sort_services == '-price' %}selected{% endif %}>По цене ↓</option>
-                    <option value="price" {% if sort_services == 'price' %}selected{% endif %}>По цене ↑</option>
-                </select>
+    <option value="-orders_count" {% if sort_services == '-orders_count' %}selected{% endif %}>По популярности ↓</option>
+    <option value="orders_count" {% if sort_services == 'orders_count' %}selected{% endif %}>По популярности ↑</option>
+    <option value="-total_revenue" {% if sort_services == '-total_revenue' %}selected{% endif %}>По выручке ↓</option>
+    <option value="total_revenue" {% if sort_services == 'total_revenue' %}selected{% endif %}>По выручке ↑</option>
+    <option value="-price" {% if sort_services == '-price' %}selected{% endif %}>По цене ↓</option>
+    <option value="price" {% if sort_services == 'price' %}selected{% endif %}>По цене ↑</option>
+    <option value="-region" {% if sort_services == '-region' %}selected{% endif %}>По региону ↓</option>
+    <option value="region" {% if sort_services == 'region' %}selected{% endif %}>По региону ↑</option>
+</select>
             </div>
             <div class="filter-group">
                 <button type="submit">🔍 Применить</button>
@@ -642,34 +653,36 @@
     </div>
 
     <div class="analytics-card">
-        <div class="card-title">🔥 Топ услуг</div>
+        <div class="card-title">🔥 Самые популярные услуги</div>
         <div style="overflow-x: auto; max-height: 500px; overflow-y: auto;">
             <table style="width: 100%;">
-                <thead style="position: sticky; top: 0; background: var(--gray); z-index: 10;">
-                    <tr>
-                        <th style="text-align: center;">#</th>
-                        <th style="text-align: left;">Название услуги</th>
-                        <th style="text-align: center;">Цена</th>
-                        <th style="text-align: center;">Кол-во заказов</th>
-                        <th style="text-align: center;">Общая выручка</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for service in top_services %}
-                    <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}" style="border-bottom: 1px solid #eee;">
-                        <td style="text-align: center; padding: 12px;"><span class="rank-number">{{ forloop.counter }}</span></td>
-                        <td style="text-align: left; padding: 12px;">{{ service.name }}</td>
-                        <td style="text-align: center; padding: 12px;">{{ service.price|floatformat:0 }} ₽</td>
-                        <td style="text-align: center; padding: 12px;">{{ service.orders_count }}</td>
-                        <td style="text-align: center; padding: 12px;">{{ service.total_revenue|floatformat:0 }} ₽</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 40px;">😕 Нет данных за выбранный период</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <thead style="position: sticky; top: 0; background: var(--gray); z-index: 10;">
+        <tr>
+            <th style="text-align: center;">#</th>
+            <th style="text-align: left;">Название услуги</th>
+            <th style="text-align: center;">Регион</th>
+            <th style="text-align: center;">Цена</th>
+            <th style="text-align: center;">Кол-во заказов</th>
+            <th style="text-align: center;">Общая выручка</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for service in top_services %}
+        <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}" style="border-bottom: 1px solid #eee;">
+            <td style="text-align: center; padding: 12px;"><span class="rank-number">{{ forloop.counter }}</span></td>
+            <td style="text-align: left; padding: 12px;">{{ service.name }}</td>
+            <td style="text-align: center; padding: 12px;">{{ service.region }}</td>
+            <td style="text-align: center; padding: 12px;">{{ service.price|floatformat:0 }} ₽</td>
+            <td style="text-align: center; padding: 12px;">{{ service.orders_count }}</td>
+            <td style="text-align: center; padding: 12px;">{{ service.total_revenue|floatformat:0 }} ₽</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" style="text-align: center; padding: 40px;">😕 Нет данных за выбранный период</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
         </div>
         <div style="margin-top: 15px; text-align: center; font-size: 13px; color: var(--gray-dark);">
             Всего услуг: <strong>{{ top_services|length }}</strong>

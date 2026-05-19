@@ -106,13 +106,12 @@ def manager_chat(request, order_id):
     return render(request, 'orders/manager_chat.html', {'order': order})
 
 
-@login_required
 def manager_analytics(request):
     """Аналитика с вкладками: Заказы, Специалисты, Услуги"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
 
-    # --- 1. Данные для вкладки "Заказы" (существующая логика) ---
+    # --- 1. Данные для вкладки "Заказы" ---
     view_type = request.GET.get('view', 'company')
     if view_type == 'personal':
         orders = Order.objects.filter(assigned_manager=request.user)
@@ -147,7 +146,7 @@ def manager_analytics(request):
     sort_by = request.GET.get('sort', '-created_at')
     orders = orders.order_by(sort_by)
 
-    # Статистика для вкладки "Заказы"
+    # Статистика
     total_orders = orders.count()
     total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
     status_stats = {
@@ -160,6 +159,7 @@ def manager_analytics(request):
     # Динамика по дням
     orders_by_day = []
     if date_from and date_to:
+        from datetime import datetime
         start = datetime.strptime(date_from, '%Y-%m-%d').date()
         end = datetime.strptime(date_to, '%Y-%m-%d').date()
         delta = (end - start).days + 1
@@ -181,7 +181,7 @@ def manager_analytics(request):
 
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 
-    # --- 2. Данные для вкладки "Специалисты" (из specialists_rating) ---
+    # --- 2. Данные для вкладки "Специалисты" ---
     role_filter = request.GET.get('role', '')
     date_from_spec = request.GET.get('date_from_spec')
     date_to_spec = request.GET.get('date_to_spec')
@@ -227,7 +227,6 @@ def manager_analytics(request):
             'avg_check': avg_check,
         })
 
-    # Сортировка специалистов
     if sort_spec == 'total_orders':
         specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
     elif sort_spec == 'completed_orders':
@@ -239,9 +238,10 @@ def manager_analytics(request):
     else:
         specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
 
-    # --- 3. Данные для вкладки "Услуги" (из popular_services) ---
+        # --- 3. Данные для вкладки "Услуги" ---
     date_from_serv = request.GET.get('date_from_serv')
     date_to_serv = request.GET.get('date_to_serv')
+    region_serv = request.GET.get('region_serv', '')
     sort_services = request.GET.get('sort_services', '-orders_count')
     
     orders_for_services = Order.objects.all()
@@ -249,16 +249,28 @@ def manager_analytics(request):
         orders_for_services = orders_for_services.filter(created_at__date__gte=date_from_serv)
     if date_to_serv:
         orders_for_services = orders_for_services.filter(created_at__date__lte=date_to_serv)
+    if region_serv:
+        orders_for_services = orders_for_services.filter(region=region_serv)
 
     from services.models import Service
     services_stats = {}
+    
+    # Собираем статистику с привязкой к региону
     for order in orders_for_services:
+        order_region = order.region or 'Не указан'
         for item in order.items.all():
             for service in item.package.available_services.all():
-                if service.name not in services_stats:
-                    services_stats[service.name] = {'count': 0, 'revenue': 0, 'price': service.price}
-                services_stats[service.name]['count'] += item.quantity
-                services_stats[service.name]['revenue'] += float(service.price) * item.quantity
+                key = f"{service.name}_{order_region}"
+                if key not in services_stats:
+                    services_stats[key] = {
+                        'name': service.name,
+                        'region': order_region,
+                        'count': 0,
+                        'revenue': 0,
+                        'price': service.price
+                    }
+                services_stats[key]['count'] += item.quantity
+                services_stats[key]['revenue'] += float(service.price) * item.quantity
 
         if order.services_data and 'items' in order.services_data:
             for service_item in order.services_data['items']:
@@ -267,21 +279,29 @@ def manager_analytics(request):
                         name = service.get('name')
                         price = service.get('price', 0)
                         if name:
-                            if name not in services_stats:
-                                services_stats[name] = {'count': 0, 'revenue': 0, 'price': price}
-                            services_stats[name]['count'] += 1
-                            services_stats[name]['revenue'] += price
+                            key = f"{name}_{order_region}"
+                            if key not in services_stats:
+                                services_stats[key] = {
+                                    'name': name,
+                                    'region': order_region,
+                                    'count': 0,
+                                    'revenue': 0,
+                                    'price': price
+                                }
+                            services_stats[key]['count'] += 1
+                            services_stats[key]['revenue'] += price
 
-        popular_list = []
-    for name, data in services_stats.items():
+    popular_list = []
+    for key, data in services_stats.items():
         popular_list.append({
-            'name': name,
+            'name': data['name'],
+            'region': data['region'],
             'price': data['price'],
             'orders_count': data['count'],
             'total_revenue': data['revenue'],
         })
 
-    # Применяем сортировку
+    # Сортировка
     if sort_services == 'orders_count':
         popular_list.sort(key=lambda x: x['orders_count'], reverse=False)
     elif sort_services == '-orders_count':
@@ -294,16 +314,22 @@ def manager_analytics(request):
         popular_list.sort(key=lambda x: x['price'], reverse=False)
     elif sort_services == '-price':
         popular_list.sort(key=lambda x: x['price'], reverse=True)
+    elif sort_services == 'region':
+        popular_list.sort(key=lambda x: x['region'], reverse=False)
+    elif sort_services == '-region':
+        popular_list.sort(key=lambda x: x['region'], reverse=True)
     else:
         popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
 
     top_services = popular_list[:10]
+    
+    regions_for_filter = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 
-    # Получаем активную вкладку
+    # Активная вкладка
     active_tab = request.GET.get('active_tab', 'orders')
 
     context = {
-        # Для вкладки "Заказы"
+        # Вкладка "Заказы"
         'orders_list': orders,
         'total_orders': total_orders,
         'total_revenue': total_revenue,
@@ -321,17 +347,19 @@ def manager_analytics(request):
         'view_type': view_type,
         'title': title,
         'active_tab': active_tab,
-        # Для вкладки "Специалисты"
+        # Вкладка "Специалисты"
         'specialists': specialist_stats,
         'role_filter': role_filter,
         'date_from_spec': date_from_spec,
         'date_to_spec': date_to_spec,
         'sort_spec': sort_spec,
-        # Для вкладки "Услуги"
+        # Вкладка "Услуги"
         'top_services': top_services,
         'date_from_serv': date_from_serv,
         'date_to_serv': date_to_serv,
         'sort_services': sort_services,
+        'region_serv': region_serv,
+        'regions_for_filter': regions_for_filter,
     }
 
     return render(request, 'orders/manager_analytics.html', context)
@@ -470,8 +498,11 @@ def popular_services(request):
     
     context = {
         'top_services': top_services,
-        'date_from': date_from,
-        'date_to': date_to,
+        'date_from_serv': date_from_serv,
+        'date_to_serv': date_to_serv,
+        'sort_services': sort_services,
+        'region_serv': region_serv,          
+        'regions_for_filter': regions_for_filter,  
     }
     
     return render(request, 'orders/popular_services.html', context)
