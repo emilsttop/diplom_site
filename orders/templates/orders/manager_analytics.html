@@ -131,52 +131,61 @@
     }
     body.dark th {
         background: #2a2a3a;
-    }.analytics-tabs .tab-btn {
-    padding: 10px 24px;
-    background: #f0f0f0;
-    border-radius: 30px;
-    text-decoration: none;
-    color: #1a1a1a;
-    transition: all 0.3s;
-}
-.analytics-tabs .tab-btn.active {
-    background: #dc3545;
-    color: white;
-}
-.analytics-tabs .tab-btn:hover:not(.active) {
-    background: #ddd;
-}
-body.dark .analytics-tabs .tab-btn {
-    background: #2a2a3a;
-    color: #e0e0e0;
-}
-body.dark .analytics-tabs .tab-btn.active {
-    background: #dc3545;
-    color: white;
-}
-.analytics-tabs .tab-btn {
-    padding: 10px 24px;
-    background: #f0f0f0;
-    border-radius: 30px;
-    text-decoration: none;
-    color: #1a1a1a;
-    transition: all 0.3s;
-}
-.analytics-tabs .tab-btn.active {
-    background: #dc3545;
-    color: white;
-}
-.analytics-tabs .tab-btn:hover:not(.active) {
-    background: #ddd;
-}
-body.dark .analytics-tabs .tab-btn {
-    background: #2a2a3a;
-    color: #e0e0e0;
-}
-body.dark .analytics-tabs .tab-btn.active {
-    background: #dc3545;
-    color: white;
-}
+    }
+    .analytics-tabs .tab-btn {
+        padding: 10px 24px;
+        background: #f0f0f0;
+        border-radius: 30px;
+        text-decoration: none;
+        color: #1a1a1a;
+        transition: all 0.3s;
+    }
+    .analytics-tabs .tab-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    .analytics-tabs .tab-btn:hover:not(.active) {
+        background: #ddd;
+    }
+    body.dark .analytics-tabs .tab-btn {
+        background: #2a2a3a;
+        color: #e0e0e0;
+    }
+    body.dark .analytics-tabs .tab-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    /* Стиль для раскрывающегося состава заказа */
+    [id^="order-details-"] {
+        background: #fff;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+        margin-top: 12px;
+    }
+    body.dark [id^="order-details-"] {
+        background: #2a2a3a;
+        border-color: #444;
+    }
+    body.dark [id^="order-details-"] strong {
+        color: #e0e0e0;
+    }
+    .btn-details {
+        background: transparent;
+        border: 1px solid #dc3545;
+        border-radius: 30px;
+        color: #dc3545;
+        padding: 6px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .btn-details:hover {
+        background: #dc3545;
+        color: white;
+    }
 </style>
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -265,11 +274,12 @@ body.dark .analytics-tabs .tab-btn.active {
                     <th>Регион</th>
                     <th>Сумма</th>
                     <th>Статус</th>
+                    <th>Состав заказа</th>
                 </tr>
             </thead>
             <tbody>
                 {% for order in orders_list %}
-                <tr>
+                <tr style="border-bottom: 1px solid #eee;">
                     <td>#{{ order.id }}</td>
                     <td>{{ order.created_at|date:"d.m.Y" }}</td>
                     <td>{{ order.client.username }}</td>
@@ -282,10 +292,39 @@ body.dark .analytics-tabs .tab-btn.active {
                         {% elif order.status == 'cancelled' %}❌ Отменён
                         {% endif %}
                     </td>
+                    <td>
+                        <button onclick="toggleOrderDetails({{ order.id }})" class="btn-details">
+                            📋 Состав заказа
+                        </button>
+                        <div id="order-details-{{ order.id }}" style="display: none;">
+                            <div style="font-weight: 600; margin-bottom: 12px; color: #1a1a1a;">🧾 Что в заказе:</div>
+                            <ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+                                {% for item in order.items.all %}
+                                    <li>{{ item.package.name }} ×{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
+                                {% endfor %}
+                                {% if order.services_data.items %}
+                                    {% for service_item in order.services_data.items %}
+                                        {% if service_item.type == 'custom' %}
+                                            <li><strong>{{ service_item.package_name }}</strong> (конструктор)
+                                                <ul style="margin-top: 4px; padding-left: 20px;">
+                                                    {% for s in service_item.services %}
+                                                        <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </ul>
+                            <div style="margin-top: 10px; font-size: 13px; color: #666; border-top: 1px solid #eee; padding-top: 8px;">
+                                💰 Итого: <strong>{{ order.total_price|floatformat:0 }} ₽</strong>
+                            </div>
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center;">😕 Нет заказов по выбранным фильтрам</td>
+                    <td colspan="7" style="text-align: center;">😕 Нет заказов по выбранным фильтрам</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -295,7 +334,7 @@ body.dark .analytics-tabs .tab-btn.active {
 
 <!-- График динамики заказов -->
 <div class="chart-container">
-    <h3>📈 Динамика заказов</h3>
+    <h3>📈 Динамика заказов (последние 30 дней)</h3>
     <canvas id="ordersChart" width="800" height="300"></canvas>
 </div>
 
@@ -338,6 +377,16 @@ body.dark .analytics-tabs .tab-btn.active {
         const url = new URL(window.location.href);
         url.searchParams.set('sort', value);
         return url.toString();
+    }
+
+    function toggleOrderDetails(orderId) {
+        const detailsDiv = document.getElementById('order-details-' + orderId);
+        if (!detailsDiv) return;
+        if (detailsDiv.style.display === 'none') {
+            detailsDiv.style.display = 'block';
+        } else {
+            detailsDiv.style.display = 'none';
+        }
     }
 </script>
 {% endblock %}
