@@ -353,6 +353,58 @@
         border-color: #ff6666;
         outline: none;
     }
+    /* Стили для назначенных специалистов в панели менеджера */
+    .specialist-card {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 12px;
+        text-align: center;
+        transition: all 0.3s;
+        border: 1px solid #eee;
+    }
+    .specialist-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(220, 53, 69, 0.1);
+        border-color: #dc3545;
+    }
+    .specialist-role {
+        font-size: 12px;
+        color: #dc3545;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    .specialist-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 8px;
+    }
+    .specialist-reassign select {
+        font-size: 12px;
+        padding: 4px 8px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        background: white;
+    }
+    .specialist-reassign button {
+        margin-top: 6px;
+        font-size: 12px;
+        padding: 4px 12px;
+    }
+
+    /* Тёмная тема для специалистов */
+    body.dark .specialist-card {
+        background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3a 100%);
+        border-color: #dc3545;
+    }
+    body.dark .specialist-name {
+        color: #e0e0e0;
+    }
+    body.dark .specialist-reassign select {
+        background: #2a2a3a;
+        color: #e0e0e0;
+        border-color: #dc3545;
+    }
 </style>
 </head>
 <body>

@@ -10,6 +10,8 @@ from .utils import assign_manager_to_order
 from users.models import User
 import os
 from datetime import datetime, timedelta
+from users.models import User
+
 
 
 @login_required
@@ -28,7 +30,13 @@ def manager_dashboard(request):
     else:
         orders = Order.objects.filter(assigned_manager=request.user).order_by('-created_at')
     
+    # Получаем всех менеджеров для передачи заказов
     managers = User.objects.filter(role='manager', is_active=True)
+    
+    # Получаем всех специалистов для переназначения
+    programmers = User.objects.filter(role='programmer', is_active=True)
+    marketers = User.objects.filter(role='marketer', is_active=True)
+    smms = User.objects.filter(role='smm', is_active=True)
     
     for order in orders:
         from chat.models import ChatMessage
@@ -41,6 +49,9 @@ def manager_dashboard(request):
     return render(request, 'orders/manager_dashboard.html', {
         'orders': orders,
         'managers': managers,
+        'programmers': programmers,
+        'marketers': marketers,
+        'smms': smms,
     })
 
 
@@ -197,6 +208,38 @@ def reassign_order(request, order_id):
                 order=order,
                 sender=request.user,
                 message=f"🔄 Заказ передан менеджеру {new_manager.get_full_name() or new_manager.username}",
+                is_read=False
+            )
+    
+    return redirect('manager_dashboard')
+
+@login_required
+def reassign_specialist(request, order_id, role):
+    """Переназначение специалиста (программист, маркетолог, SMM)"""
+    if request.user.role not in ['manager', 'admin']:
+        return redirect('catalog')
+    
+    order = get_object_or_404(Order, id=order_id)
+    
+    if request.method == 'POST':
+        new_specialist_id = request.POST.get('new_specialist')
+        if new_specialist_id:
+            new_specialist = get_object_or_404(User, id=new_specialist_id)
+            
+            if role == 'programmer':
+                order.assigned_programmer = new_specialist
+            elif role == 'marketer':
+                order.assigned_marketer = new_specialist
+            elif role == 'smm':
+                order.assigned_smm = new_specialist
+            order.save()
+            
+            # Уведомление в чат
+            from chat.models import ChatMessage
+            ChatMessage.objects.create(
+                order=order,
+                sender=request.user,
+                message=f"🔄 Переназначен {role} на {new_specialist.get_full_name() or new_specialist.username}",
                 is_read=False
             )
     

@@ -4,16 +4,25 @@
 
 {% block content %}
 <style>
+    :root {
+        --red: #dc3545;
+        --red-dark: #bb2d3b;
+        --black: #1a1a1a;
+        --black-light: #2a2a2a;
+        --white: #ffffff;
+        --gray: #f5f5f5;
+        --gray-dark: #666;
+    }
+
     .dashboard-header {
-        background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%);
-        color: white;
+        background: linear-gradient(135deg, var(--black) 0%, var(--red) 100%);
+        color: var(--white);
         padding: 25px;
         border-radius: 20px;
         margin-bottom: 30px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
     }
-    .dashboard-header h1 {
-        margin: 0 0 10px 0;
-    }
+
     .stats {
         display: flex;
         gap: 15px;
@@ -21,31 +30,37 @@
         flex-wrap: wrap;
     }
     .stat-card {
-        background: white;
-        padding: 15px 25px;
-        border-radius: 15px;
+        background: var(--white);
+        border-radius: 20px;
+        padding: 15px 20px;
         text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         flex: 1;
-        min-width: 100px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #eee;
+        transition: all 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(220,53,69,0.1);
+        border-color: var(--red);
     }
     .stat-number {
-        font-size: 28px;
-        font-weight: bold;
-        color: #dc3545;
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--red);
     }
     .stat-label {
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
+        font-size: 13px;
+        color: var(--gray-dark);
     }
+
     .filter-bar {
         display: flex;
         gap: 10px;
         margin-bottom: 25px;
         flex-wrap: wrap;
-        background: #f5f5f5;
-        padding: 10px;
+        background: var(--gray);
+        padding: 8px;
         border-radius: 50px;
     }
     .filter-btn {
@@ -54,68 +69,58 @@
         border: none;
         border-radius: 30px;
         cursor: pointer;
-        transition: all 0.3s;
+        transition: all 0.2s;
         font-weight: 500;
     }
     .filter-btn.active {
-        background: #dc3545;
-        color: white;
+        background: var(--red);
+        color: var(--white);
+        box-shadow: 0 2px 6px rgba(220,53,69,0.3);
     }
     .filter-btn:hover:not(.active) {
-        background: #e0e0e0;
+        background: #ddd;
     }
-    .orders-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
+
     .order-card {
-        background: white;
-        border-radius: 16px;
+        background: var(--white);
+        border-radius: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border-left: 4px solid var(--red);
+        transition: all 0.2s;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        transition: all 0.3s;
-        border-left: 4px solid #dc3545;
     }
     .order-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
-    .order-card.has-unread {
-        background: #fff8f0;
-        border-left-color: #ffc107;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
     .order-header {
         padding: 15px 20px;
+        background: #fafafa;
+        cursor: pointer;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
-        cursor: pointer;
-        background: #fafafa;
+        gap: 15px;
     }
     .order-id {
-        font-weight: bold;
-        font-size: 16px;
-        color: #dc3545;
+        font-weight: 700;
+        color: var(--red);
     }
-    .order-client {
-        color: #333;
-    }
-    .order-date {
-        color: #888;
-        font-size: 13px;
+    .order-client, .order-date {
+        color: var(--gray-dark);
+        font-size: 14px;
     }
     .order-price {
         font-size: 18px;
-        font-weight: bold;
-        color: #1a1a1a;
+        font-weight: 700;
+        color: var(--black);
     }
     .expand-icon {
         font-size: 20px;
-        color: #dc3545;
-        transition: transform 0.3s;
+        color: var(--red);
+        transition: transform 0.2s;
     }
     .order-card.expanded .expand-icon {
         transform: rotate(180deg);
@@ -123,7 +128,6 @@
     .order-details {
         display: none;
         padding: 20px;
-        background: white;
         border-top: 1px solid #eee;
     }
     .order-card.expanded .order-details {
@@ -131,50 +135,42 @@
     }
     .detail-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
         margin-bottom: 20px;
     }
     .detail-card {
-        background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-        border-radius: 12px;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        background: var(--white);
+        border-radius: 16px;
+        padding: 16px;
         border: 1px solid #eee;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
     }
     .detail-label {
         font-size: 11px;
-        color: #999;
+        color: var(--gray-dark);
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-bottom: 8px;
     }
     .detail-value {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
-        color: #1a1a1a;
+        color: var(--black);
     }
     .detail-value-large {
-        font-size: 24px;
-        font-weight: bold;
-        color: #dc3545;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--red);
     }
     .status-select {
         width: 100%;
-        padding: 12px;
+        padding: 10px;
         border-radius: 12px;
         font-weight: bold;
-        font-size: 14px;
-        letter-spacing: 1px;
-        cursor: pointer;
         border: none;
-        text-align: center;
+        cursor: pointer;
     }
-    .status-option-new { background: #6c757d; color: white; }
-    .status-option-processing { background: #fd7e14; color: white; }
-    .status-option-completed { background: #28a745; color: white; }
-    .status-option-cancelled { background: #dc3545; color: white; }
     .action-buttons {
         display: flex;
         justify-content: space-between;
@@ -185,100 +181,90 @@
         padding-top: 20px;
         border-top: 1px solid #eee;
     }
-    .btn-group-left {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    .btn-group-right {
+    .btn-group-left, .btn-group-right {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
     }
     .btn-sm {
-        padding: 8px 18px;
-        border-radius: 30px;
+        padding: 6px 16px;
+        border-radius: 40px;
         font-size: 13px;
-        text-decoration: none;
         font-weight: 500;
-        transition: all 0.3s;
-        display: inline-block;
-        cursor: pointer;
+        text-decoration: none;
         border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-block;
     }
-    .btn-chat {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    .btn-danger { background: var(--red); color: white; }
+    .btn-danger:hover { background: var(--red-dark); transform: translateY(-1px); }
+    .btn-chat { background: linear-gradient(135deg, #28a745, #20c997); color: white; }
+    .btn-warning { background: #ffc107; color: black; }
+    .btn-analytics {
+        background: var(--red);
+        padding: 8px 20px;
+        border-radius: 40px;
         color: white;
-        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        text-decoration: none;
+        display: inline-block;
+        transition: 0.2s;
     }
-    .btn-chat:hover {
+    .btn-analytics:hover {
+        background: var(--red-dark);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
     }
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-    }
-    .btn-danger:hover {
-        background: #bb2d3b;
-        transform: translateY(-1px);
-    }
-    .btn-dark {
-        background: #1a1a1a;
-        color: white;
-    }
-    .btn-dark:hover {
-        background: #333;
-        transform: translateY(-1px);
-    }
-    .btn-warning {
-        background: #ffc107;
-        color: black;
-    }
-    .btn-warning:hover {
-        background: #e0a800;
-        transform: translateY(-1px);
-    }
-    select {
-        padding: 8px 14px;
+    .order-status {
+        padding: 4px 12px;
         border-radius: 30px;
-        border: 1px solid #ddd;
-        background: white;
-        font-size: 13px;
+        font-size: 12px;
+        font-weight: 600;
     }
+    .status-new { background: #007bff; color: white; }
+    .status-processing { background: #ffc107; color: black; }
+    .status-completed { background: #28a745; color: white; }
+    .status-cancelled { background: var(--red); color: white; }
     .unread-badge {
         background: #ffc107;
-        color: #1a1a1a;
+        color: black;
         border-radius: 20px;
         padding: 2px 10px;
         font-size: 11px;
         margin-left: 8px;
     }
+    select {
+        padding: 6px 12px;
+        border-radius: 30px;
+        border: 1px solid #ddd;
+    }
 
-    .order-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: bold;
-}
-.status-new { background: #007bff; color: white; }
-.status-processing { background: #ffc107; color: black; }
-.status-completed { background: #28a745; color: white; }
-.status-cancelled { background: #dc3545; color: white; }
-.btn-analytics {
-    background: #dc3545;
-    color: white;
-    padding: 10px 20px;
-    text-decoration: none;
-    border-radius: 8px;
-    display: inline-block;
-    transition: all 0.3s;
-}
-.btn-analytics:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
+    /* Тёмная тема */
+    body.dark .stat-card,
+    body.dark .order-card,
+    body.dark .detail-card {
+        background: var(--black-light);
+        border-color: #3a3a4a;
+    }
+    body.dark .order-header {
+        background: #222;
+    }
+    body.dark .order-client,
+    body.dark .order-date {
+        color: #aaa;
+    }
+    body.dark .detail-value {
+        color: #e0e0e0;
+    }
+    body.dark .filter-bar {
+        background: #2a2a3a;
+    }
+    body.dark .filter-btn {
+        color: #ccc;
+    }
+    body.dark .filter-btn.active {
+        background: var(--red);
+        color: white;
+    }
 </style>
 
 <div class="dashboard-header">
@@ -288,26 +274,15 @@
         <a href="{% url 'popular_services' %}" class="btn-analytics" style="background: #ffc107; color: black;">🔥 Популярные услуги</a>
         <a href="{% url 'manager_rating' %}" class="btn-analytics" style="background: #17a2b8;">🏆 Рейтинг менеджеров</a>
     </div>
-    <p>Добро пожаловать, {{ user.username }}! Управляйте заказами, общайтесь с клиентами.</p>
+    <p>Добро пожаловать, {{ user.username }}!</p>
 </div>
 
-<!-- Статистика -->
 <div class="stats">
-    <div class="stat-card">
-        <div class="stat-number">{{ orders.count }}</div>
-        <div class="stat-label">Всего</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ orders|dictsort:"status"|length }}</div>
-        <div class="stat-label">Активных</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-number">{{ orders|dictsortreversed:"created_at"|length }}</div>
-        <div class="stat-label">За сегодня</div>
-    </div>
+    <div class="stat-card"><div class="stat-number">{{ orders.count }}</div><div class="stat-label">Всего</div></div>
+    <div class="stat-card"><div class="stat-number">{{ orders|dictsort:"status"|length }}</div><div class="stat-label">Активных</div></div>
+    <div class="stat-card"><div class="stat-number">{{ orders|dictsortreversed:"created_at"|length }}</div><div class="stat-label">За сегодня</div></div>
 </div>
 
-<!-- Фильтры -->
 <div class="filter-bar">
     <button class="filter-btn active" onclick="filterOrders('all')">📋 Все</button>
     <button class="filter-btn" onclick="filterOrders('new')">🆕 Новые</button>
@@ -316,8 +291,7 @@
     <button class="filter-btn" onclick="filterOrders('cancelled')">❌ Отменённые</button>
 </div>
 
-<!-- Список заказов -->
-<div class="orders-list" id="orders-list">
+<div class="orders-list">
     {% for order in orders %}
     <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
         <div class="order-header" onclick="toggleOrder({{ order.id }})">
@@ -325,82 +299,72 @@
                 <span class="order-id">Заказ №{{ order.id }}</span>
                 <span class="order-client">{{ order.client.username }}</span>
                 <span class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</span>
-<span class="order-status status-{{ order.status }}">
-    {% if order.status == 'new' %}🆕 Новый
-    {% elif order.status == 'processing' %}⚙️ В обработке
-    {% elif order.status == 'completed' %}✅ Выполнен
-    {% elif order.status == 'cancelled' %}❌ Отменён
-    {% endif %}
-</span>
-                {% if order.has_unread_messages %}
-                    <span class="unread-badge">📩 Новое сообщение</span>
-                {% endif %}
+                <span class="order-status status-{{ order.status }}">
+                    {% if order.status == 'new' %}🆕 Новый
+                    {% elif order.status == 'processing' %}⚙️ В обработке
+                    {% elif order.status == 'completed' %}✅ Выполнен
+                    {% elif order.status == 'cancelled' %}❌ Отменён
+                    {% endif %}
+                </span>
+                {% if order.has_unread_messages %}<span class="unread-badge">📩 Новое сообщение</span>{% endif %}
             </div>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <span class="order-price">{{ order.total_price|floatformat:0 }} ₽</span>
                 <span class="expand-icon">▼</span>
             </div>
         </div>
-        
+
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-grid">
                 <div class="detail-card">
                     <div class="detail-label">👤 Клиент</div>
                     <div class="detail-value">{{ order.client.username }}</div>
-                    <div style="font-size: 12px; color: #888; margin-top: 5px;">{{ order.client.email }}</div>
+                    <div style="font-size:12px; color:#888;">{{ order.client.email }}</div>
                 </div>
                 <div class="detail-card">
-    <div class="detail-label">📦 Состав заказа</div>
-    <div class="detail-value" style="max-height: 150px; overflow-y: auto;">
-        {% for item in order.items.all %}
-            <div>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
-        {% endfor %}
-        {% if order.services_data.items %}
-            {% for service_item in order.services_data.items %}
-                {% if service_item.type == 'custom' %}
-                    <div><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
-                    {% for s in service_item.services %}
-                        <div style="margin-left: 15px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
-                    {% endfor %}
-                {% elif service_item.type == 'package' %}
-                    <div>{{ service_item.package_name }} x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    </div>
-</div>
+                    <div class="detail-label">📦 Состав заказа</div>
+                    <div class="detail-value" style="max-height:150px; overflow-y:auto;">
+                        {% for item in order.items.all %}
+                            <div>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
+                        {% endfor %}
+                        {% if order.services_data.items %}
+                            {% for service_item in order.services_data.items %}
+                                {% if service_item.type == 'custom' %}
+                                    <div><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
+                                    {% for s in service_item.services %}
+                                        <div style="margin-left:15px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
                 <div class="detail-card">
                     <div class="detail-label">💰 Сумма</div>
                     <div class="detail-value-large">{{ order.total_price|floatformat:0 }} ₽</div>
                 </div>
-                <div class="detail-card" style="padding: 5px 0; background: transparent; box-shadow: none;">
-                    <form method="post" action="{% url 'manager_update_status' order.id %}" id="status-form-{{ order.id }}">
+                <div class="detail-card">
+                    <form method="post" action="{% url 'manager_update_status' order.id %}">
                         {% csrf_token %}
-                        <select name="status" onchange="document.getElementById('status-form-{{ order.id }}').submit()" 
-                                class="status-select"
-                                style="{% if order.status == 'new' %}background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%); color: white;
-                                       {% elif order.status == 'processing' %}background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%); color: white;
-                                       {% elif order.status == 'completed' %}background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;
-                                       {% elif order.status == 'cancelled' %}background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white;
-                                       {% endif %}">
-                            <option value="new" {% if order.status == 'new' %}selected{% endif %} class="status-option-new">🆕 НОВЫЙ ЗАКАЗ</option>
-                            <option value="processing" {% if order.status == 'processing' %}selected{% endif %} class="status-option-processing">⚙️ В ОБРАБОТКЕ</option>
-                            <option value="completed" {% if order.status == 'completed' %}selected{% endif %} class="status-option-completed">✅ ВЫПОЛНЕН</option>
-                            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %} class="status-option-cancelled">❌ ОТМЕНЁН</option>
+                        <select name="status" onchange="this.form.submit()" class="status-select" style="background:var(--red); color:white;">
+                            <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
+                            <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
+                            <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
+                            <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>❌ Отменён</option>
                         </select>
                     </form>
                 </div>
             </div>
-            
+
             <div class="action-buttons">
                 <div class="btn-group-left">
-                    <a href="{% url 'download_contract' order.id %}" class="btn-sm btn-danger">📥 Скачать договор</a>
+                    <a href="{% url 'download_contract' order.id %}" class="btn-sm btn-danger">📥 Скачать шаблон договора</a>
                 </div>
                 <div class="btn-group-right">
                     <a href="{% url 'manager_chat' order.id %}" class="btn-sm btn-chat">💬 Чат с клиентом</a>
-                    <form method="post" action="{% url 'reassign_order' order.id %}" style="display: inline-block;">
+                    <form method="post" action="{% url 'reassign_order' order.id %}" style="display:inline;">
                         {% csrf_token %}
-                        <select name="new_manager" style="padding: 6px 12px; border-radius: 20px;">
+                        <select name="new_manager">
                             <option value="">🔄 Передать</option>
                             {% for manager in managers %}
                                 {% if manager != order.assigned_manager %}
@@ -412,10 +376,82 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Специалисты -->
+            <div class="detail-grid" style="margin-top:20px;">
+                <div class="detail-card">
+                    <div class="detail-label">👨‍💻 Программист</div>
+                    <div class="detail-value">
+                        {% if order.assigned_programmer %}
+                            {{ order.assigned_programmer.get_full_name|default:order.assigned_programmer.username }}
+                        {% else %}Не назначен{% endif %}
+                    </div>
+                    {% if order.assigned_programmer %}
+                    <form method="post" action="{% url 'reassign_specialist' order.id 'programmer' %}" style="margin-top:10px;">
+                        {% csrf_token %}
+                        <select name="new_specialist">
+                            <option value="">Переназначить</option>
+                            {% for prog in programmers %}
+                                {% if prog != order.assigned_programmer %}
+                                    <option value="{{ prog.id }}">{{ prog.get_full_name|default:prog.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-sm btn-warning" style="margin-top:5px;">🔄 Переназначить</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-label">📊 Маркетолог</div>
+                    <div class="detail-value">
+                        {% if order.assigned_marketer %}
+                            {{ order.assigned_marketer.get_full_name|default:order.assigned_marketer.username }}
+                        {% else %}Не назначен{% endif %}
+                    </div>
+                    {% if order.assigned_marketer %}
+                    <form method="post" action="{% url 'reassign_specialist' order.id 'marketer' %}" style="margin-top:10px;">
+                        {% csrf_token %}
+                        <select name="new_specialist">
+                            <option value="">Переназначить</option>
+                            {% for mark in marketers %}
+                                {% if mark != order.assigned_marketer %}
+                                    <option value="{{ mark.id }}">{{ mark.get_full_name|default:mark.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-sm btn-warning">🔄 Переназначить</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-label">📱 SMM-менеджер</div>
+                    <div class="detail-value">
+                        {% if order.assigned_smm %}
+                            {{ order.assigned_smm.get_full_name|default:order.assigned_smm.username }}
+                        {% else %}Не назначен{% endif %}
+                    </div>
+                    {% if order.assigned_smm %}
+                    <form method="post" action="{% url 'reassign_specialist' order.id 'smm' %}" style="margin-top:10px;">
+                        {% csrf_token %}
+                        <select name="new_specialist">
+                            <option value="">Переназначить</option>
+                            {% for s in smms %}
+                                {% if s != order.assigned_smm %}
+                                    <option value="{{ s.id }}">{{ s.get_full_name|default:s.username }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-sm btn-warning">🔄 Переназначить</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
     {% empty %}
-    <div style="text-align: center; padding: 50px; background: white; border-radius: 16px;">
+    <div style="text-align:center; padding:50px; background:white; border-radius:20px;">
         <p>😕 Заказов пока нет</p>
     </div>
     {% endfor %}
@@ -423,22 +459,12 @@
 
 <script>
     function toggleOrder(orderId) {
-        const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
-        card.classList.toggle('expanded');
+        document.querySelector(`.order-card[data-order-id="${orderId}"]`).classList.toggle('expanded');
     }
-    
     function filterOrders(status) {
-        const cards = document.querySelectorAll('.order-card');
-        cards.forEach(card => {
-            if (status === 'all') {
-                card.style.display = 'block';
-            } else if (card.getAttribute('data-status') === status) {
-                card.style.display = 'block';
-            } else {
-                card.style.display = 'none';
-            }
+        document.querySelectorAll('.order-card').forEach(card => {
+            card.style.display = (status === 'all' || card.dataset.status === status) ? 'block' : 'none';
         });
-        
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
     }

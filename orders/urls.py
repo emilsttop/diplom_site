@@ -11,4 +11,5 @@ urlpatterns = [
     path('reassign/<int:order_id>/', views.reassign_order, name='reassign_order'),
     path('popular-services/', views.popular_services, name='popular_services'),
     path('manager-rating/', views.manager_rating, name='manager_rating'),
+    path('reassign-specialist/<int:order_id>/<str:role>/', views.reassign_specialist, name='reassign_specialist'),
 ]
