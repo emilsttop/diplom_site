@@ -108,92 +108,185 @@ def manager_chat(request, order_id):
 
 @login_required
 def manager_analytics(request):
-    """Аналитика с вкладками: по компании и по менеджеру"""
+    """Аналитика с вкладками: Заказы, Специалисты, Услуги"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
-    
-    # Определяем, какую аналитику показывать
-    view_type = request.GET.get('view', 'company')  # company или personal
-    
-    # Базовый queryset
+
+    # --- 1. Данные для вкладки "Заказы" (существующая логика) ---
+    view_type = request.GET.get('view', 'company')
     if view_type == 'personal':
         orders = Order.objects.filter(assigned_manager=request.user)
         title = "Моя аналитика"
     else:
         orders = Order.objects.all()
         title = "Аналитика компании"
-    
-    # === ФИЛЬТРЫ ===
+
+    # Фильтры для заказов
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     if date_from:
         orders = orders.filter(created_at__date__gte=date_from)
     if date_to:
         orders = orders.filter(created_at__date__lte=date_to)
-    
+
     region = request.GET.get('region')
     if region:
         orders = orders.filter(region=region)
-    
+
     status = request.GET.get('status')
     if status:
         orders = orders.filter(status=status)
-    
+
     price_from = request.GET.get('price_from')
     price_to = request.GET.get('price_to')
     if price_from:
         orders = orders.filter(total_price__gte=price_from)
     if price_to:
         orders = orders.filter(total_price__lte=price_to)
-    
-    # === СОРТИРОВКА ===
+
     sort_by = request.GET.get('sort', '-created_at')
     orders = orders.order_by(sort_by)
-    
-    # === СТАТИСТИКА ===
+
+    # Статистика для вкладки "Заказы"
     total_orders = orders.count()
     total_revenue = orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
-    
-    # Статусы
     status_stats = {
         'new': orders.filter(status='new').count(),
         'processing': orders.filter(status='processing').count(),
         'completed': orders.filter(status='completed').count(),
         'cancelled': orders.filter(status='cancelled').count(),
     }
-    
-            # Динамика по дням (с учётом фильтров)
+
+    # Динамика по дням
     orders_by_day = []
-    
-    # Если выбран период фильтра, показываем график по дням в этом периоде
     if date_from and date_to:
         start = datetime.strptime(date_from, '%Y-%m-%d').date()
         end = datetime.strptime(date_to, '%Y-%m-%d').date()
         delta = (end - start).days + 1
-        
         for i in range(delta):
             day = start + timedelta(days=i)
             count = orders.filter(created_at__date=day).count()
             orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
-    
-    # Если фильтр по дате не выбран — показываем последние 30 дней
     else:
         today = timezone.now().date()
         for i in range(29, -1, -1):
             day = today - timedelta(days=i)
             count = orders.filter(created_at__date=day).count()
             orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
-    
-    # Топ клиентов
+
     top_clients = orders.filter(status='completed').values('client__username').annotate(
         total_spent=Sum('total_price'),
         orders_count=Count('id')
     ).order_by('-total_spent')[:5]
-    
-    # Список регионов для фильтра
+
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
+
+    # --- 2. Данные для вкладки "Специалисты" (из specialists_rating) ---
+    role_filter = request.GET.get('role', '')
+    date_from_spec = request.GET.get('date_from_spec')
+    date_to_spec = request.GET.get('date_to_spec')
+    sort_spec = request.GET.get('sort_spec', '-total_orders')
     
+    orders_for_spec = Order.objects.all()
+    if date_from_spec:
+        orders_for_spec = orders_for_spec.filter(created_at__date__gte=date_from_spec)
+    if date_to_spec:
+        orders_for_spec = orders_for_spec.filter(created_at__date__lte=date_to_spec)
+
+    if role_filter:
+        specialists = User.objects.filter(role=role_filter, is_active=True)
+    else:
+        specialists = User.objects.filter(role__in=['programmer', 'marketer', 'smm'], is_active=True)
+
+    specialist_stats = []
+    for specialist in specialists:
+        if specialist.role == 'programmer':
+            specialist_orders = orders_for_spec.filter(assigned_programmer=specialist)
+            hours_field = 'programmer_hours'
+        elif specialist.role == 'marketer':
+            specialist_orders = orders_for_spec.filter(assigned_marketer=specialist)
+            hours_field = 'marketer_hours'
+        else:
+            specialist_orders = orders_for_spec.filter(assigned_smm=specialist)
+            hours_field = 'smm_hours'
+
+        total_orders_spec = specialist_orders.count()
+        completed_orders_spec = specialist_orders.filter(status='completed').count()
+        total_hours = specialist_orders.aggregate(total=Sum(hours_field))['total'] or 0
+        total_revenue_spec = specialist_orders.filter(status='completed').aggregate(total=Sum('total_price'))['total'] or 0
+        avg_check = total_revenue_spec / completed_orders_spec if completed_orders_spec > 0 else 0
+
+        specialist_stats.append({
+            'name': specialist.get_full_name() or specialist.username,
+            'role': specialist.role,
+            'role_display': dict(User.ROLE_CHOICES).get(specialist.role, specialist.role),
+            'total_orders': total_orders_spec,
+            'completed_orders': completed_orders_spec,
+            'total_hours': total_hours,
+            'total_revenue': total_revenue_spec,
+            'avg_check': avg_check,
+        })
+
+    # Сортировка специалистов
+    if sort_spec == 'total_orders':
+        specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
+    elif sort_spec == 'completed_orders':
+        specialist_stats.sort(key=lambda x: x['completed_orders'], reverse=True)
+    elif sort_spec == 'total_revenue':
+        specialist_stats.sort(key=lambda x: x['total_revenue'], reverse=True)
+    elif sort_spec == 'total_hours':
+        specialist_stats.sort(key=lambda x: x['total_hours'], reverse=True)
+    else:
+        specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
+
+    # --- 3. Данные для вкладки "Услуги" (из popular_services) ---
+    date_from_serv = request.GET.get('date_from_serv')
+    date_to_serv = request.GET.get('date_to_serv')
+    
+    orders_for_services = Order.objects.all()
+    if date_from_serv:
+        orders_for_services = orders_for_services.filter(created_at__date__gte=date_from_serv)
+    if date_to_serv:
+        orders_for_services = orders_for_services.filter(created_at__date__lte=date_to_serv)
+
+    from services.models import Service
+    services_stats = {}
+    for order in orders_for_services:
+        for item in order.items.all():
+            for service in item.package.available_services.all():
+                if service.name not in services_stats:
+                    services_stats[service.name] = {'count': 0, 'revenue': 0, 'price': service.price}
+                services_stats[service.name]['count'] += item.quantity
+                services_stats[service.name]['revenue'] += float(service.price) * item.quantity
+
+        if order.services_data and 'items' in order.services_data:
+            for service_item in order.services_data['items']:
+                if service_item.get('type') == 'custom':
+                    for service in service_item.get('services', []):
+                        name = service.get('name')
+                        price = service.get('price', 0)
+                        if name:
+                            if name not in services_stats:
+                                services_stats[name] = {'count': 0, 'revenue': 0, 'price': price}
+                            services_stats[name]['count'] += 1
+                            services_stats[name]['revenue'] += price
+
+    popular_list = []
+    for name, data in services_stats.items():
+        popular_list.append({
+            'name': name,
+            'price': data['price'],
+            'orders_count': data['count'],
+            'total_revenue': data['revenue'],
+        })
+    popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
+    top_services = popular_list[:10]
+
+    # Получаем активную вкладку
+    active_tab = request.GET.get('active_tab', 'orders')
+
     context = {
+        # Для вкладки "Заказы"
         'orders_list': orders,
         'total_orders': total_orders,
         'total_revenue': total_revenue,
@@ -210,8 +303,19 @@ def manager_analytics(request):
         'sort_by': sort_by,
         'view_type': view_type,
         'title': title,
+        'active_tab': active_tab,
+        # Для вкладки "Специалисты"
+        'specialists': specialist_stats,
+        'role_filter': role_filter,
+        'date_from_spec': date_from_spec,
+        'date_to_spec': date_to_spec,
+        'sort_spec': sort_spec,
+        # Для вкладки "Услуги"
+        'top_services': top_services,
+        'date_from_serv': date_from_serv,
+        'date_to_serv': date_to_serv,
     }
-    
+
     return render(request, 'orders/manager_analytics.html', context)
 
 
