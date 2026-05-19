@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Sum, Q
+from django.utils import timezone
+from datetime import timedelta, datetime
 from .forms import RegistrationForm
 from orders.models import Order
 from users.models import User
@@ -126,32 +129,115 @@ def profile(request):
 def specialist_dashboard(request):
     if request.user.role not in ['programmer', 'marketer', 'smm']:
         return redirect('catalog')
-    
-    role = request.user.role
-    role_field = f'{role}_hours'
-    
-    # Фильтруем заказы по назначенному специалисту, исключая выполненные
+
+    user = request.user
+    role = user.role
+
+    # Получаем фильтры из GET-параметров
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    period = request.GET.get('period', 'week')
+    chart_type = request.GET.get('chart_type', 'all')  # all, completed, cancelled
+
+    # Определяем поле часов и фильтр в зависимости от роли
     if role == 'programmer':
-        orders = Order.objects.filter(assigned_programmer=request.user).exclude(status='completed').order_by('-created_at')
+        hours_field = 'programmer_hours'
+        orders_filter = Q(assigned_programmer=user)
+        role_display = 'Программист'
     elif role == 'marketer':
-        orders = Order.objects.filter(assigned_marketer=request.user).exclude(status='completed').order_by('-created_at')
-    elif role == 'smm':
-        orders = Order.objects.filter(assigned_smm=request.user).exclude(status='completed').order_by('-created_at')
+        hours_field = 'marketer_hours'
+        orders_filter = Q(assigned_marketer=user)
+        role_display = 'Маркетолог'
+    else:  # smm
+        hours_field = 'smm_hours'
+        orders_filter = Q(assigned_smm=user)
+        role_display = 'SMM-менеджер'
+
+    # Базовый запрос заказов специалиста
+    base_orders = Order.objects.filter(orders_filter)
+
+    # Применяем фильтры по дате
+    if date_from:
+        base_orders = base_orders.filter(created_at__date__gte=date_from)
+    if date_to:
+        base_orders = base_orders.filter(created_at__date__lte=date_to)
+
+    # ========== ФИЛЬТРАЦИЯ ДЛЯ ГРАФИКА И СПИСКА В ЗАВИСИМОСТИ ОТ chart_type ==========
+    if chart_type == 'completed':
+        filtered_orders = base_orders.filter(status='completed')
+    elif chart_type == 'cancelled':
+        filtered_orders = base_orders.filter(status='cancelled')
+    else:  # 'all'
+        filtered_orders = base_orders
+
+    # Общая статистика (часы только по активным заказам, не отменённым)
+    hours_queryset = base_orders.exclude(status='cancelled')
+    total_hours = hours_queryset.aggregate(total=Sum(hours_field))['total'] or 0
+    
+    # Статистика по статусам (для карточек сверху)
+    completed_orders_count = base_orders.filter(status='completed').count()
+    cancelled_orders_count = base_orders.filter(status='cancelled').count()
+    processing_orders_count = base_orders.exclude(status='completed').exclude(status='cancelled').count()
+
+    # Данные для графика (используем filtered_orders)
+    chart_data = []
+    today = timezone.now().date()
+
+    if period == 'day':
+        for i in range(29, -1, -1):
+            day = today - timedelta(days=i)
+            day_orders = filtered_orders.filter(created_at__date=day).count()
+            chart_data.append({'period': day.strftime('%d.%m'), 'count': day_orders})
+
+    elif period == 'week':
+        for i in range(11, -1, -1):
+            week_start = today - timedelta(days=today.weekday() + 7 * i)
+            week_end = week_start + timedelta(days=6)
+            week_orders = filtered_orders.filter(
+                created_at__date__gte=week_start,
+                created_at__date__lte=week_end
+            ).count()
+            chart_data.append({'period': f'{week_start.strftime("%d.%m")}-{week_end.strftime("%d.%m")}', 'count': week_orders})
+
+    else:  # month
+        for i in range(11, -1, -1):
+            month = today.replace(day=1) - timedelta(days=30 * i)
+            month_start = month.replace(day=1)
+            if month_start.month == 12:
+                month_end = month_start.replace(year=month_start.year + 1, month=1, day=1) - timedelta(days=1)
+            else:
+                month_end = month_start.replace(month=month_start.month + 1, day=1) - timedelta(days=1)
+            month_orders = filtered_orders.filter(
+                created_at__date__gte=month_start,
+                created_at__date__lte=month_end
+            ).count()
+            chart_data.append({'period': month_start.strftime('%b %Y'), 'count': month_orders})
+
+    # ========== СПИСОК ЗАКАЗОВ (используем ТЕ ЖЕ filtered_orders, что и для графика) ==========
+    orders_list = filtered_orders.order_by('-created_at')
+
+    # Название для графика
+    if chart_type == 'completed':
+        chart_title = 'Выполненные заказы'
+    elif chart_type == 'cancelled':
+        chart_title = 'Отменённые заказы'
     else:
-        orders = Order.objects.none()
-    
-    total_hours = sum(getattr(order, role_field, 0) for order in orders)
-    
-    role_display = {
-        'programmer': 'Программист',
-        'marketer': 'Маркетолог',
-        'smm': 'SMM-менеджер',
-    }.get(role, role)
-    
-    return render(request, 'accounts/specialist_dashboard.html', {
-        'orders': orders,
+        chart_title = 'Полученные заказы'
+
+    context = {
         'role': role,
-        'role_field': role_field,
         'role_display': role_display,
+        'orders': orders_list,
         'total_hours': total_hours,
-    })
+        'completed_orders_count': completed_orders_count,
+        'cancelled_orders_count': cancelled_orders_count,
+        'processing_orders_count': processing_orders_count,
+        'chart_data': chart_data,
+        'chart_title': chart_title,
+        'chart_type': chart_type,
+        'date_from': date_from,
+        'date_to': date_to,
+        'period': period,
+    }
+
+    return render(request, 'accounts/specialist_dashboard.html', context)
