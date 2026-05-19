@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Рейтинг менеджеров{% endblock %}
+{% block title %}Рейтинг специалистов{% endblock %}
 
 {% block content %}
 <style>
     .rating-container {
-        max-width: 1100px;
+        max-width: 1200px;
         margin: 0 auto;
     }
     .rating-header {
@@ -42,12 +42,12 @@
         font-weight: bold;
         color: #666;
     }
-    .filter-group input {
+    .filter-group input, .filter-group select {
         padding: 8px 12px;
         border-radius: 8px;
         border: 1px solid #ddd;
     }
-    body.dark .filter-group input {
+    body.dark .filter-group input, body.dark .filter-group select {
         background: #2a2a3a;
         color: #e0e0e0;
         border-color: #dc3545;
@@ -152,17 +152,46 @@
         text-decoration: none;
         margin-bottom: 20px;
     }
+    .role-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    }   
+    .role-programmer { background: #007bff; color: white; }
+    .role-marketer { background: #28a745; color: white; }
+    .role-smm { background: #dc3545; color: white; }
+    /* Выравнивание таблицы */
+    .rating-table th,
+    .rating-table td {
+        text-align: center;
+    }
+    .rating-table th:first-child,
+    .rating-table td:first-child {
+        width: 70px;
+    }
+    .rating-table th:nth-child(2),
+    .rating-table td:nth-child(2) {
+        text-align: left;
+    }
+    .rating-table th:nth-child(3),
+    .rating-table td:nth-child(3) {
+    min-width: 110px;
+    white-space: nowrap;
+    }
 </style>
 
 <div class="rating-container">
     <a href="{% url 'manager_dashboard' %}" class="btn-back">← Назад в панель менеджера</a>
     
     <div class="rating-header">
-        <h1>🏆 Рейтинг менеджеров</h1>
-        <p>По количеству заказов, выручке и среднему чеку</p>
+        <h1>🏆 Рейтинг специалистов</h1>
+        <p>Программисты, маркетологи, SMM — по заказам, выручке и загрузке</p>
     </div>
     
-    <!-- Панель фильтров по дате -->
+    <!-- Панель фильтров -->
     <div class="filters-panel">
         <form method="get" class="filters-form">
             <div class="filter-group">
@@ -174,20 +203,30 @@
                 <input type="date" name="date_to" value="{{ date_to }}">
             </div>
             <div class="filter-group">
+                <label>👤 Роль</label>
+                <select name="role">
+                    <option value="">Все специалисты</option>
+                    <option value="programmer" {% if role_filter == 'programmer' %}selected{% endif %}>Программисты</option>
+                    <option value="marketer" {% if role_filter == 'marketer' %}selected{% endif %}>Маркетологи</option>
+                    <option value="smm" {% if role_filter == 'smm' %}selected{% endif %}>SMM</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <button type="submit">🔍 Применить</button>
             </div>
             <div class="filter-group">
-                <a href="{% url 'manager_rating' %}" class="btn-clear">✖️ Сбросить</a>
+                <a href="{% url 'specialists_rating' %}" class="btn-clear">✖️ Сбросить</a>
             </div>
         </form>
     </div>
     
     <!-- Кнопки сортировки -->
     <div class="sort-buttons">
-        <a href="?sort=total_orders{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="sort-btn {% if sort_by == 'total_orders' %}active{% endif %}">📦 По заказам</a>
-        <a href="?sort=completed_orders{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="sort-btn {% if sort_by == 'completed_orders' %}active{% endif %}">✅ По выполненным</a>
-        <a href="?sort=total_revenue{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="sort-btn {% if sort_by == 'total_revenue' %}active{% endif %}">💰 По выручке</a>
-        <a href="?sort=avg_check{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}" class="sort-btn {% if sort_by == 'avg_check' %}active{% endif %}">📊 По среднему чеку</a>
+        <a href="?sort=total_orders{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn {% if sort_by == 'total_orders' %}active{% endif %}">📦 По заказам</a>
+        <a href="?sort=completed_orders{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn {% if sort_by == 'completed_orders' %}active{% endif %}">✅ По выполненным</a>
+        <a href="?sort=total_revenue{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn {% if sort_by == 'total_revenue' %}active{% endif %}">💰 По выручке</a>
+        <a href="?sort=total_hours{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn {% if sort_by == 'total_hours' %}active{% endif %}">⏱️ По часам</a>
+        <a href="?sort=avg_check{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn {% if sort_by == 'avg_check' %}active{% endif %}">📊 По среднему чеку</a>
     </div>
     
     <div class="rating-table">
@@ -195,26 +234,34 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Менеджер</th>
-                    <th>Всего заказов</th>
+                    <th>Специалист</th>
+                    <th>Роль</th>
+                    <th>Заказов</th>
                     <th>Выполнено</th>
+                    <th>Часы</th>
                     <th>Выручка</th>
-                    <th>Средний чек</th>
+                    <th>Ср. чек</th>
                 </tr>
             </thead>
             <tbody>
-                {% for manager in managers %}
+                {% for specialist in specialists %}
                 <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
-                    <td><span class="rank-number">{{ forloop.counter }}</span></td>
-                    <td>{{ manager.name }}</td>
-                    <td>{{ manager.total_orders }}</td>
-                    <td>{{ manager.completed_orders }}</td>
-                    <td>{{ manager.total_revenue|floatformat:0 }} ₽</td>
-                    <td>{{ manager.avg_check|floatformat:0 }} ₽</td>
+                    <td style="font-weight: bold;">{{ forloop.counter }}</td>
+                    <td>{{ specialist.name }}</td>
+                    <td>
+                        <span class="role-badge role-{{ specialist.role }}">
+                            {{ specialist.role_display }}
+                        </span>
+                    </td>
+                    <td>{{ specialist.total_orders }}</td>
+                    <td>{{ specialist.completed_orders }}</td>
+                    <td>{{ specialist.total_hours|floatformat:0 }} ч</td>
+                    <td>{{ specialist.total_revenue|floatformat:0 }} ₽</td>
+                    <td>{{ specialist.avg_check|floatformat:0 }} ₽</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="text-align: center;">😕 Нет данных за выбранный период</td>
+                    <td colspan="8" style="text-align: center;">😕 Нет данных о специалистах</td>
                 </tr>
                 {% endfor %}
             </tbody>

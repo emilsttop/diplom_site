@@ -338,19 +338,6 @@
     <canvas id="ordersChart" width="800" height="300"></canvas>
 </div>
 
-<!-- Топ-5 клиентов (в самом низу) -->
-<div class="analytics-card">
-    <h3>🏆 Топ-5 клиентов</h3>
-    {% for client in top_clients %}
-    <div class="stat-item">
-        <span>{{ forloop.counter }}. {{ client.client__username }}</span>
-        <span>{{ client.total_spent|floatformat:0 }} ₽ ({{ client.orders_count }} заказов)</span>
-    </div>
-    {% empty %}
-    <p>😕 Нет данных</p>
-    {% endfor %}
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     const chartData = {

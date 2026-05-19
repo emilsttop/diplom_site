@@ -355,18 +355,16 @@ def popular_services(request):
     return render(request, 'orders/popular_services.html', context)
 
 @login_required
-def manager_rating(request):
-    """Рейтинг менеджеров с фильтром по дате"""
+def specialists_rating(request):
+    """Рейтинг специалистов (программисты, маркетологи, SMM) с фильтрами и сортировкой"""
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
-    from users.models import User
-    from django.db.models import Sum, Count
-    from datetime import datetime
-    
     # Получаем параметры фильтрации
+    role_filter = request.GET.get('role', '')
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
+    sort_by = request.GET.get('sort', '-total_orders')
     
     # Базовый queryset заказов
     orders = Order.objects.all()
@@ -375,43 +373,63 @@ def manager_rating(request):
     if date_to:
         orders = orders.filter(created_at__date__lte=date_to)
     
-    # Получаем параметр сортировки
-    sort_by = request.GET.get('sort', 'total_orders')
+    # Специалисты
+    if role_filter:
+        specialists = User.objects.filter(role=role_filter, is_active=True)
+    else:
+        specialists = User.objects.filter(role__in=['programmer', 'marketer', 'smm'], is_active=True)
     
-    managers = User.objects.filter(role='manager', is_active=True)
-    manager_stats = []
+    specialist_stats = []
     
-    for manager in managers:
-        manager_orders = orders.filter(assigned_manager=manager)
-        total_orders = manager_orders.count()
-        completed_orders = manager_orders.filter(status='completed').count()
-        total_revenue = manager_orders.filter(status='completed').aggregate(Sum('total_price'))['total_price__sum'] or 0
+    for specialist in specialists:
+        if specialist.role == 'programmer':
+            specialist_orders = orders.filter(assigned_programmer=specialist)
+            hours_field = 'programmer_hours'
+        elif specialist.role == 'marketer':
+            specialist_orders = orders.filter(assigned_marketer=specialist)
+            hours_field = 'marketer_hours'
+        else:
+            specialist_orders = orders.filter(assigned_smm=specialist)
+            hours_field = 'smm_hours'
+        
+        total_orders = specialist_orders.count()
+        completed_orders = specialist_orders.filter(status='completed').count()
+        total_hours = specialist_orders.aggregate(total=Sum(hours_field))['total'] or 0
+        total_revenue = specialist_orders.filter(status='completed').aggregate(total=Sum('total_price'))['total'] or 0
         avg_check = total_revenue / completed_orders if completed_orders > 0 else 0
         
-        manager_stats.append({
-            'name': manager.get_full_name() or manager.username,
+        specialist_stats.append({
+            'id': specialist.id,
+            'name': specialist.get_full_name() or specialist.username,
+            'role': specialist.role,
+            'role_display': dict(User.ROLE_CHOICES).get(specialist.role, specialist.role),
             'total_orders': total_orders,
             'completed_orders': completed_orders,
+            'total_hours': total_hours,
             'total_revenue': total_revenue,
             'avg_check': avg_check,
         })
     
     # Сортировка
-    reverse = True
-    if sort_by == 'avg_check':
-        manager_stats.sort(key=lambda x: x['avg_check'], reverse=reverse)
-    elif sort_by == 'total_orders':
-        manager_stats.sort(key=lambda x: x['total_orders'], reverse=reverse)
-    elif sort_by == 'total_revenue':
-        manager_stats.sort(key=lambda x: x['total_revenue'], reverse=reverse)
+    if sort_by == 'total_orders':
+        specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
     elif sort_by == 'completed_orders':
-        manager_stats.sort(key=lambda x: x['completed_orders'], reverse=reverse)
+        specialist_stats.sort(key=lambda x: x['completed_orders'], reverse=True)
+    elif sort_by == 'total_revenue':
+        specialist_stats.sort(key=lambda x: x['total_revenue'], reverse=True)
+    elif sort_by == 'total_hours':
+        specialist_stats.sort(key=lambda x: x['total_hours'], reverse=True)
+    elif sort_by == 'avg_check':
+        specialist_stats.sort(key=lambda x: x['avg_check'], reverse=True)
     else:
-        manager_stats.sort(key=lambda x: x['total_orders'], reverse=reverse)
+        specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
     
-    return render(request, 'orders/manager_rating.html', {
-        'managers': manager_stats,
-        'sort_by': sort_by,
+    context = {
+        'specialists': specialist_stats,
+        'role_filter': role_filter,
         'date_from': date_from,
         'date_to': date_to,
-    })
+        'sort_by': sort_by,
+    }
+    
+    return render(request, 'orders/specialists_rating.html', context)
