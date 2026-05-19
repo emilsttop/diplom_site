@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.http import FileResponse, HttpResponse
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -11,6 +11,7 @@ from users.models import User
 import os
 from datetime import datetime, timedelta
 from users.models import User
+
 
 
 
@@ -181,12 +182,150 @@ def manager_analytics(request):
 
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 
-    # --- 2. Данные для вкладки "Специалисты" ---
+        # --- 2. Данные для вкладки "Специалисты" ---
     role_filter = request.GET.get('role', '')
     date_from_spec = request.GET.get('date_from_spec')
     date_to_spec = request.GET.get('date_to_spec')
     sort_spec = request.GET.get('sort_spec', '-total_orders')
     
+            # ========== НОВЫЙ ГРАФИК ЗАГРУЖЕННОСТИ СПЕЦИАЛИСТОВ ==========
+    # Параметры для графика
+    workload_period = request.GET.get('workload_period', 'week')
+    workload_chart_type = request.GET.get('workload_chart_type', 'hours')
+    workload_status = request.GET.get('workload_status', 'all')  # ← НОВЫЙ ПАРАМЕТР
+    
+    orders_for_workload = Order.objects.all()
+    if date_from_spec:
+        orders_for_workload = orders_for_workload.filter(created_at__date__gte=date_from_spec)
+    if date_to_spec:
+        orders_for_workload = orders_for_workload.filter(created_at__date__lte=date_to_spec)
+    
+    # ← НОВЫЙ ФИЛЬТР ПО СТАТУСУ ЗАКАЗОВ
+    if workload_status == 'completed':
+        orders_for_workload = orders_for_workload.filter(status='completed')
+    elif workload_status == 'cancelled':
+        orders_for_workload = orders_for_workload.filter(status='cancelled')
+    elif workload_status == 'processing':
+        orders_for_workload = orders_for_workload.filter(status='processing')
+    elif workload_status == 'new':
+        orders_for_workload = orders_for_workload.filter(status='new')
+    # else 'all' - все заказы, ничего не фильтруем
+    
+    # Фильтр по роли для графика
+    if role_filter:
+        if role_filter == 'programmer':
+            workload_orders = orders_for_workload.filter(assigned_programmer__isnull=False)
+        elif role_filter == 'marketer':
+            workload_orders = orders_for_workload.filter(assigned_marketer__isnull=False)
+        elif role_filter == 'smm':
+            workload_orders = orders_for_workload.filter(assigned_smm__isnull=False)
+        else:
+            workload_orders = orders_for_workload.filter(
+                Q(assigned_programmer__isnull=False) |
+                Q(assigned_marketer__isnull=False) |
+                Q(assigned_smm__isnull=False)
+            )
+    else:
+        workload_orders = orders_for_workload.filter(
+            Q(assigned_programmer__isnull=False) |
+            Q(assigned_marketer__isnull=False) |
+            Q(assigned_smm__isnull=False)
+        )
+    
+    # Данные для графика загруженности
+    workload_data = []
+    today = timezone.now().date()
+    
+    if workload_period == 'day':
+        # Последние 30 дней
+        for i in range(29, -1, -1):
+            day = today - timedelta(days=i)
+            day_orders = workload_orders.filter(created_at__date=day)
+            
+            if workload_chart_type == 'hours':
+                # Суммируем часы всех специалистов
+                day_hours = 0
+                for order in day_orders:
+                    day_hours += float(order.programmer_hours or 0)
+                    day_hours += float(order.marketer_hours or 0)
+                    day_hours += float(order.smm_hours or 0)
+                workload_data.append({'period': day.strftime('%d.%m'), 'value': day_hours})
+            else:
+                # Количество заказов
+                workload_data.append({'period': day.strftime('%d.%m'), 'value': day_orders.count()})
+    
+    elif workload_period == 'week':
+        # Последние 12 недель
+        for i in range(11, -1, -1):
+            week_start = today - timedelta(days=today.weekday() + 7 * i)
+            week_end = week_start + timedelta(days=6)
+            week_orders = workload_orders.filter(
+                created_at__date__gte=week_start,
+                created_at__date__lte=week_end
+            )
+            
+            if workload_chart_type == 'hours':
+                week_hours = 0
+                for order in week_orders:
+                    week_hours += float(order.programmer_hours or 0)
+                    week_hours += float(order.marketer_hours or 0)
+                    week_hours += float(order.smm_hours or 0)
+                workload_data.append({'period': f'{week_start.strftime("%d.%m")}-{week_end.strftime("%d.%m")}', 'value': week_hours})
+            else:
+                workload_data.append({'period': f'{week_start.strftime("%d.%m")}-{week_end.strftime("%d.%m")}', 'value': week_orders.count()})
+    
+    else:  # month
+        # Словарь русских названий месяцев
+        months_ru = {
+            1: 'Янв', 2: 'Фев', 3: 'Мар', 4: 'Апр', 5: 'Май', 6: 'Июн',
+            7: 'Июл', 8: 'Авг', 9: 'Сен', 10: 'Окт', 11: 'Ноя', 12: 'Дек'
+        }
+        # Последние 12 месяцев
+        for i in range(11, -1, -1):
+            month = today.replace(day=1) - timedelta(days=30 * i)
+            month_start = month.replace(day=1)
+            if month_start.month == 12:
+                month_end = month_start.replace(year=month_start.year + 1, month=1, day=1) - timedelta(days=1)
+            else:
+                month_end = month_start.replace(month=month_start.month + 1, day=1) - timedelta(days=1)
+            
+            month_orders = workload_orders.filter(
+                created_at__date__gte=month_start,
+                created_at__date__lte=month_end
+            )
+            
+            if workload_chart_type == 'hours':
+                month_hours = 0
+                for order in month_orders:
+                    month_hours += float(order.programmer_hours or 0)
+                    month_hours += float(order.marketer_hours or 0)
+                    month_hours += float(order.smm_hours or 0)
+                month_name = months_ru[month_start.month]
+                workload_data.append({'period': f'{month_name} {month_start.year}', 'value': month_hours})
+            else:
+                month_name = months_ru[month_start.month]
+                workload_data.append({'period': f'{month_name} {month_start.year}', 'value': month_orders.count()})
+    
+    # Название для графика
+    if workload_chart_type == 'hours':
+        workload_title = 'Загруженность специалистов (часы)'
+    else:
+        workload_title = 'Загруженность специалистов (заказы)'
+    
+    # Добавляем статус в название, если выбран не "все"
+    status_names = {
+        'new': 'Новые',
+        'processing': 'В обработке',
+        'completed': 'Выполненные',
+        'cancelled': 'Отменённые',
+        'all': ''
+    }
+    if workload_status != 'all':
+        workload_title += f' — {status_names.get(workload_status, "")}'
+    
+    # ========== КОНЕЦ НОВОГО ГРАФИКА ==========
+    
+    # Данные для таблицы специалистов (оставляем как было)
     orders_for_spec = Order.objects.all()
     if date_from_spec:
         orders_for_spec = orders_for_spec.filter(created_at__date__gte=date_from_spec)
@@ -353,6 +492,12 @@ def manager_analytics(request):
         'date_from_spec': date_from_spec,
         'date_to_spec': date_to_spec,
         'sort_spec': sort_spec,
+        # Для графика загруженности специалистов
+        'workload_data': workload_data,
+        'workload_title': workload_title,
+        'workload_period': workload_period,
+        'workload_chart_type': workload_chart_type,
+        'workload_status': workload_status,
         # Вкладка "Услуги"
         'top_services': top_services,
         'date_from_serv': date_from_serv,

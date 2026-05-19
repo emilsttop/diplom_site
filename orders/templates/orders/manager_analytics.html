@@ -532,79 +532,107 @@
     </div>
 
     <!-- ==================== ВКЛАДКА 2: СПЕЦИАЛИСТЫ ==================== -->
-    <div class="tab-content {% if active_tab == 'specialists' %}active{% endif %}" id="tab-specialists">
-        <div class="filters-panel">
-            <div class="filters-title">👥 Фильтры специалистов</div>
-            <form method="get" class="filters-form">
-                <input type="hidden" name="view" value="{{ view_type }}">
-                <input type="hidden" name="active_tab" value="specialists">
-                <div class="filter-group">
-                    <label>📅 Дата от</label>
-                    <input type="date" name="date_from_spec" value="{{ date_from_spec }}">
-                </div>
-                <div class="filter-group">
-                    <label>📅 Дата до</label>
-                    <input type="date" name="date_to_spec" value="{{ date_to_spec }}">
-                </div>
-                <div class="filter-group">
-                    <label>👤 Роль</label>
-                    <select name="role">
-                        <option value="">Все специалисты</option>
-                        <option value="programmer" {% if role_filter == 'programmer' %}selected{% endif %}>Программисты</option>
-                        <option value="marketer" {% if role_filter == 'marketer' %}selected{% endif %}>Маркетологи</option>
-                        <option value="smm" {% if role_filter == 'smm' %}selected{% endif %}>SMM</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <button type="submit">🔍 Применить</button>
-                </div>
-                <div class="filter-group">
-                    <a href="?view={{ view_type }}&active_tab=specialists" class="btn-clear">✖️ Сбросить</a>
-                </div>
-            </form>
-        </div>
-
-        <div class="sort-buttons">
-            <a href="?sort_spec=total_orders&view={{ view_type }}&active_tab=specialists" class="sort-btn">📦 По заказам</a>
-            <a href="?sort_spec=completed_orders&view={{ view_type }}&active_tab=specialists" class="sort-btn">✅ По выполненным</a>
-            <a href="?sort_spec=total_revenue&view={{ view_type }}&active_tab=specialists" class="sort-btn">💰 По выручке</a>
-            <a href="?sort_spec=total_hours&view={{ view_type }}&active_tab=specialists" class="sort-btn">⏱️ По часам</a>
-        </div>
-
-        <div class="analytics-card">
-            <div class="card-title">🏆 Рейтинг специалистов</div>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Специалист</th>
-                            <th>Роль</th>
-                            <th>Заказов</th>
-                            <th>Выполнено</th>
-                            <th>Часы</th>
-                            <th>Выручка</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for spec in specialists %}
-                        <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
-                            <td><span class="rank-number">{{ forloop.counter }}</span></td>
-                            <td>{{ spec.name }}</td>
-                            <td><span class="role-badge role-{{ spec.role }}">{{ spec.role_display }}</span></td>
-                            <td>{{ spec.total_orders }}</td>
-                            <td>{{ spec.completed_orders }}</td>
-                            <td>{{ spec.total_hours|floatformat:0 }} ч</td>
-                            <td>{{ spec.total_revenue|floatformat:0 }} ₽</td>
-                        </tr>
-                        {% empty %}
-                        <tr><td colspan="7" style="text-align: center;">😕 Нет данных о специалистах</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="tab-content {% if active_tab == 'specialists' %}active{% endif %}" id="tab-specialists">
+    <div class="filters-panel">
+        <div class="filters-title">👥 Фильтры специалистов</div>
+        <form method="get" class="filters-form">
+            <input type="hidden" name="view" value="{{ view_type }}">
+            <input type="hidden" name="active_tab" value="specialists">
+            <div class="filter-group">
+                <label>📅 Дата от</label>
+                <input type="date" name="date_from_spec" value="{{ date_from_spec }}">
             </div>
+            <div class="filter-group">
+                <label>📅 Дата до</label>
+                <input type="date" name="date_to_spec" value="{{ date_to_spec }}">
+            </div>
+            <div class="filter-group">
+                <label>👤 Роль</label>
+                <select name="role">
+                    <option value="">Все специалисты</option>
+                    <option value="programmer" {% if role_filter == 'programmer' %}selected{% endif %}>Программисты</option>
+                    <option value="marketer" {% if role_filter == 'marketer' %}selected{% endif %}>Маркетологи</option>
+                    <option value="smm" {% if role_filter == 'smm' %}selected{% endif %}>SMM</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <button type="submit">🔍 Применить</button>
+            </div>
+            <div class="filter-group">
+                <a href="?view={{ view_type }}&active_tab=specialists" class="btn-clear">✖️ Сбросить</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- НОВЫЙ ГРАФИК ЗАГРУЖЕННОСТИ -->
+    <div class="chart-container" style="margin-bottom: 30px;">
+        <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <span>📊 {{ workload_title }}</span>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <select name="workload_period" id="workloadPeriod" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+        <option value="day" {% if workload_period == 'day' %}selected{% endif %}>По дням</option>
+        <option value="week" {% if workload_period == 'week' %}selected{% endif %}>По неделям</option>
+        <option value="month" {% if workload_period == 'month' %}selected{% endif %}>По месяцам</option>
+    </select>
+    <select name="workload_chart_type" id="workloadChartType" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+        <option value="hours" {% if workload_chart_type == 'hours' %}selected{% endif %}>Часы</option>
+        <option value="orders" {% if workload_chart_type == 'orders' %}selected{% endif %}>Количество заказов</option>
+    </select>
+    <select name="workload_status" id="workloadStatus" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+        <option value="all" {% if workload_status == 'all' %}selected{% endif %}>Все заказы</option>
+        <option value="new" {% if workload_status == 'new' %}selected{% endif %}>🆕 Новые</option>
+        <option value="processing" {% if workload_status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
+        <option value="completed" {% if workload_status == 'completed' %}selected{% endif %}>✅ Выполненные</option>
+        <option value="cancelled" {% if workload_status == 'cancelled' %}selected{% endif %}>❌ Отменённые</option>
+    </select>
+</div>
+        </div>
+        <canvas id="workloadChart" width="800" height="300" style="margin-top: 20px;"></canvas>
+    </div>
+
+    <!-- Кнопки сортировки для таблицы -->
+    <div class="sort-buttons">
+        <a href="?sort_spec=total_orders&view={{ view_type }}&active_tab=specialists&workload_period={{ workload_period }}&workload_chart_type={{ workload_chart_type }}{% if date_from_spec %}&date_from_spec={{ date_from_spec }}{% endif %}{% if date_to_spec %}&date_to_spec={{ date_to_spec }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn">📦 По заказам</a>
+        <a href="?sort_spec=completed_orders&view={{ view_type }}&active_tab=specialists&workload_period={{ workload_period }}&workload_chart_type={{ workload_chart_type }}{% if date_from_spec %}&date_from_spec={{ date_from_spec }}{% endif %}{% if date_to_spec %}&date_to_spec={{ date_to_spec }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn">✅ По выполненным</a>
+        <a href="?sort_spec=total_revenue&view={{ view_type }}&active_tab=specialists&workload_period={{ workload_period }}&workload_chart_type={{ workload_chart_type }}{% if date_from_spec %}&date_from_spec={{ date_from_spec }}{% endif %}{% if date_to_spec %}&date_to_spec={{ date_to_spec }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn">💰 По выручке</a>
+        <a href="?sort_spec=total_hours&view={{ view_type }}&active_tab=specialists&workload_period={{ workload_period }}&workload_chart_type={{ workload_chart_type }}{% if date_from_spec %}&date_from_spec={{ date_from_spec }}{% endif %}{% if date_to_spec %}&date_to_spec={{ date_to_spec }}{% endif %}{% if role_filter %}&role={{ role_filter }}{% endif %}" class="sort-btn">⏱️ По часам</a>
+    </div>
+
+    <!-- Таблица специалистов -->
+    <div class="analytics-card">
+        <div class="card-title">🏆 Рейтинг специалистов</div>
+        <div style="overflow-x: auto;">
+            <table style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th style="text-align: center;">#</th>
+                        <th style="text-align: left;">Специалист</th>
+                        <th style="text-align: center;">Роль</th>
+                        <th style="text-align: center;">Заказов</th>
+                        <th style="text-align: center;">Выполнено</th>
+                        <th style="text-align: center;">Часы</th>
+                        <th style="text-align: center;">Выручка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for spec in specialists %}
+                    <tr class="{% if forloop.counter == 1 %}rank-1{% elif forloop.counter == 2 %}rank-2{% elif forloop.counter == 3 %}rank-3{% endif %}">
+                        <td style="text-align: center;"><span class="rank-number">{{ forloop.counter }}</span></td>
+                        <td style="text-align: left;">{{ spec.name }}</td>
+                        <td style="text-align: center;"><span class="role-badge role-{{ spec.role }}">{{ spec.role_display }}</span></td>
+                        <td style="text-align: center;">{{ spec.total_orders }}</td>
+                        <td style="text-align: center;">{{ spec.completed_orders }}</td>
+                        <td style="text-align: center;">{{ spec.total_hours|floatformat:0 }} ч</td>
+                        <td style="text-align: center;">{{ spec.total_revenue|floatformat:0 }} ₽</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="text-align: center;">😕 Нет данных о специалистах</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
     <!-- ==================== ВКЛАДКА 3: УСЛУГИ ==================== -->
 <div class="tab-content {% if active_tab == 'services' %}active{% endif %}" id="tab-services">
@@ -711,5 +739,88 @@
         data: chartData, 
         options: { responsive: true } 
     });
+</script>
+<script>
+    // График загруженности специалистов
+    const workloadLabels = [{% for item in workload_data %}'{{ item.period }}',{% endfor %}];
+    const workloadValues = [{% for item in workload_data %}{{ item.value }},{% endfor %}];
+    
+    const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+    let workloadChart = new Chart(workloadCtx, {
+        type: 'bar',
+        data: {
+            labels: workloadLabels,
+            datasets: [{
+                label: '{{ workload_title }}',
+                data: workloadValues,
+                backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                borderColor: '#dc3545',
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let value = context.raw;
+                            let unit = '{% if workload_chart_type == "hours" %}часов{% else %}заказов{% endif %}';
+                            return value + ' ' + unit;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: '{% if workload_chart_type == "hours" %}Часы{% else %}Заказы{% endif %}'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Период'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Функция обновления фильтров
+    function updateWorkloadFilter(param, value) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(param, value);
+        url.searchParams.set('active_tab', 'specialists');
+        window.location.href = url.toString();
+    }
+    
+    // Обработчики для всех трёх select (с проверкой, что элементы существуют)
+    const periodSelect = document.getElementById('workloadPeriod');
+    const chartTypeSelect = document.getElementById('workloadChartType');
+    const statusSelect = document.getElementById('workloadStatus');
+    
+    if (periodSelect) {
+        periodSelect.addEventListener('change', function() {
+            updateWorkloadFilter('workload_period', this.value);
+        });
+    }
+    
+    if (chartTypeSelect) {
+        chartTypeSelect.addEventListener('change', function() {
+            updateWorkloadFilter('workload_chart_type', this.value);
+        });
+    }
+    
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            updateWorkloadFilter('workload_status', this.value);
+        });
+    }
 </script>
 {% endblock %}
