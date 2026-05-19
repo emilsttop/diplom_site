@@ -125,13 +125,13 @@
         margin-top: 10px;
     }
     .comment-group {
-    margin: 30px 0;
-    padding: 20px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
-    border-radius: 24px;
-    border: 1px solid #eee;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        margin: 30px 0;
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+        border-radius: 24px;
+        border: 1px solid #eee;
+        transition: all 0.2s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
     }
     body.dark .comment-group {
         background: linear-gradient(135deg, #2a2a3a 0%, #1e1e2e 100%);
@@ -166,7 +166,7 @@
         background: #3a3a4a;
         color: #aaa;
     }
-        .comment-input {
+    .comment-input {
         width: 100%;
         padding: 14px 16px;
         font-size: 14px;
@@ -207,6 +207,26 @@
         font-size: 11px;
         color: #adb5bd;
     }
+    .btn-select-all {
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        padding: 8px 20px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-select-all:hover {
+        background: #218838;
+        transform: translateY(-1px);
+    }
+    body.dark .btn-select-all {
+        background: #2c7a3e;
+    }
+    body.dark .btn-select-all:hover {
+        background: #1e5a2f;
+    }
 </style>
 
 <div class="package-header">
@@ -224,6 +244,7 @@
     <div class="total-price">
         Общая сумма: <span id="totalPrice">0</span> ₽
     </div>
+    <button id="selectAllBtn" class="btn-select-all">✅ Выбрать все доступные услуги</button>
 </div>
 
 <div class="services-grid" id="servicesGrid">
@@ -239,7 +260,7 @@
 </div>
 
 {% if package.name == "Конструктор услуг" %}
-    <div class="comment-group">
+<div class="comment-group">
     <div class="comment-header">
         <span class="comment-icon">💬</span>
         <label for="comment" class="comment-label">Комментарий к заказу</label>
@@ -264,17 +285,13 @@
         const maxServices = {{ package.max_services }};
         let selectedServices = new Set();
         
-                // Счётчик символов для комментария
+        // Счётчик символов для комментария
         const commentField = document.getElementById('comment');
         const commentLengthSpan = document.getElementById('commentLength');
-
         if (commentField && commentLengthSpan) {
-            // Функция обновления счётчика
             function updateCommentLength() {
                 const length = commentField.value.length;
                 commentLengthSpan.innerText = length;
-                
-                // Визуальное предупреждение при приближении к лимиту
                 if (length > 900) {
                     commentLengthSpan.style.color = '#dc3545';
                 } else if (length > 800) {
@@ -283,45 +300,30 @@
                     commentLengthSpan.style.color = '#adb5bd';
                 }
             }
-            
-            // Запускаем при загрузке
             updateCommentLength();
-            
-            // Запускаем при вводе
             commentField.addEventListener('input', updateCommentLength);
-            
-            // Ограничиваем длину (максимум 1000 символов)
             commentField.addEventListener('keydown', function(e) {
                 if (this.value.length >= 1000 && e.key !== 'Backspace' && e.key !== 'Delete') {
                     e.preventDefault();
                 }
             });
         }
-
-                // Авто-высота для textarea
+        
+        // Авто-высота для комментария
         function autoResize(textarea) {
             if (!textarea) return;
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         }
-
         const commentTextarea = document.getElementById('comment');
         if (commentTextarea) {
-            // Первоначальная настройка
             commentTextarea.style.overflow = 'hidden';
             autoResize(commentTextarea);
-            
-            // При вводе
-            commentTextarea.addEventListener('input', function() {
-                autoResize(this);
-            });
-            
-            // При загрузке страницы (если есть сохранённое значение)
-            window.addEventListener('load', function() {
-                autoResize(commentTextarea);
-            });
+            commentTextarea.addEventListener('input', function() { autoResize(this); });
+            window.addEventListener('load', function() { autoResize(commentTextarea); });
         }
-
+        
+        // Блокировка услуг из корзины
         async function loadCartServices() {
             try {
                 const response = await fetch('/cart/api/cart-services/');
@@ -340,11 +342,9 @@
             document.querySelectorAll('.service-card').forEach(card => {
                 const checkbox = card.querySelector('.service-checkbox');
                 const serviceId = parseInt(checkbox?.value);
-                
                 if (cartServiceIds.includes(serviceId)) {
                     checkbox.disabled = true;
                     card.classList.add('disabled-service');
-                    
                     const serviceNameDiv = card.querySelector('.service-name');
                     if (serviceNameDiv && !serviceNameDiv.querySelector('.cart-warning')) {
                         const warningSpan = document.createElement('span');
@@ -366,13 +366,9 @@
                 errorDiv.style.borderRadius = '8px';
                 errorDiv.style.marginTop = '15px';
                 errorDiv.innerText = '⚠️ Некоторые услуги уже добавлены в корзину из других пакетов. Они заблокированы для повторного выбора.';
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 5000);
+                setTimeout(() => { errorDiv.style.display = 'none'; }, 5000);
             }
         }
-        
-        // Запускаем блокировку для ВСЕХ пакетов
         blockSelectedServices();
         
         function updateSelection() {
@@ -410,8 +406,10 @@
                 addBtn.disabled = false;
                 errorDiv.style.display = 'none';
             }
+            if (typeof updateSelectAllButtonText === 'function') updateSelectAllButtonText();
         }
         
+        // Обработчики кликов по карточкам
         document.querySelectorAll('.service-card').forEach(card => {
             const checkbox = card.querySelector('.service-checkbox');
             if (checkbox.disabled) return;
@@ -443,6 +441,60 @@
             });
         });
         
+        // Кнопка "Выбрать все / Снять все"
+const selectAllBtn = document.getElementById('selectAllBtn');
+if (selectAllBtn) {
+    function updateSelectAllButtonText() {
+        const availableCheckboxes = document.querySelectorAll('.service-checkbox:not(:disabled)');
+        const availableServiceIds = Array.from(availableCheckboxes).map(cb => parseInt(cb.value));
+        const allAvailableSelected = availableServiceIds.length > 0 && availableServiceIds.every(id => selectedServices.has(id));
+        
+        if (allAvailableSelected && selectedServices.size > 0) {
+            selectAllBtn.textContent = '❌ Снять все выбранные услуги';
+        } else {
+            selectAllBtn.textContent = '✅ Выбрать все доступные услуги';
+        }
+    }
+    
+    updateSelectAllButtonText();
+    
+    selectAllBtn.addEventListener('click', function() {
+        const availableCheckboxes = document.querySelectorAll('.service-checkbox:not(:disabled)');
+        const availableServiceIds = Array.from(availableCheckboxes).map(cb => parseInt(cb.value));
+        
+        // Проверяем, все ли доступные услуги уже выбраны
+        const allAvailableSelected = availableServiceIds.length > 0 && availableServiceIds.every(id => selectedServices.has(id));
+        
+        // Если все уже выбраны → снимаем всё
+        if (allAvailableSelected && selectedServices.size > 0) {
+            selectedServices.clear();
+            updateSelection();
+            updateSelectAllButtonText();
+            return;
+        }
+        
+        // Считаем, сколько услуг ещё НЕ выбрано
+        const notSelectedIds = availableServiceIds.filter(id => !selectedServices.has(id));
+        
+        // Проверяем лимит
+        if (selectedServices.size + notSelectedIds.length > maxServices) {
+            alert(`⚠️ Нельзя выбрать больше ${maxServices} услуг. Вы уже выбрали ${selectedServices.size}.`);
+            return;
+        }
+        
+        // Добавляем только те, которые ещё не выбраны
+        notSelectedIds.forEach(id => {
+            selectedServices.add(id);
+        });
+        
+        if (notSelectedIds.length > 0) {
+            updateSelection();
+        }
+        updateSelectAllButtonText();
+    });
+}
+        
+        // Добавление в корзину
         window.addToCart = async function() {
             const count = selectedServices.size;
             if (count < minServices || count > maxServices) return;
@@ -463,14 +515,11 @@
                     },
                     body: formData
                 });
-                
                 if (response.redirected) {
                     window.location.href = response.url;
                     return;
                 }
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     window.location.href = '/cart/';
                 } else {
