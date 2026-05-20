@@ -522,16 +522,19 @@
         background: #3a3a4a;
         color: white;
     }
-/* Комментарий в тёмной теме */
-body.dark .detail-content .comment-block {
-    background: #3a2a00 !important;
-    border-left-color: #ffc107 !important;
+    /* Комментарий в тёмной теме — принудительные стили */
+body.dark .comment-block {
+    background: #ffffff !important;
+    border-left: 4px solid #ffc107 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
 }
-body.dark .detail-content .comment-block strong {
-    color: #ffc107 !important;
+body.dark .comment-block strong {
+    color: #dc3545 !important;
+    background: transparent !important;
 }
-body.dark .detail-content .comment-block p {
-    color: #e0e0e0 !important;
+body.dark .comment-block p {
+    color: #1a1a1a !important;
+    background: transparent !important;
 }
 </style>
 
@@ -684,9 +687,9 @@ body.dark .detail-content .comment-block p {
             <!-- Состав заказа -->
             <div class="detail-content" id="composition-{{ order.id }}">
                 {% if order.comment %}
-                <div style="margin-bottom: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px;">
-                    <strong style="color: #856404;">💬 Ваш комментарий к заказу:</strong>
-                    <p style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ order.comment }}</p>
+                <div class="comment-block" style="margin-bottom: 15px; padding: 12px; background: #ffffff; border-left: 4px solid #ffc107; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <strong style="color: #dc3545; display: block; margin-bottom: 5px;">💬 Ваш комментарий к заказу:</strong>
+                    <p style="margin: 0; white-space: pre-wrap; color: #1a1a1a;">{{ order.comment }}</p>
                 </div>
                 {% endif %}
                 <div style="font-weight: 600; margin-bottom: 10px; color: var(--red);">📦 Состав заказа:</div>
@@ -698,7 +701,7 @@ body.dark .detail-content .comment-block p {
                     {% if order.services_data.items %}
                         {% for service_item in order.services_data.items %}
                             {% if service_item.type == 'custom' %}
-                                <li><strong>{{ service_item.package_name }}</strong> (конструктор)</li>
+                                <li><strong>{{ service_item.package_name }}</strong></li>
                                 <ul style="margin-left: 20px;">
                                     {% for s in service_item.services %}
                                         <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
