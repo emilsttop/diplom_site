@@ -9,10 +9,7 @@ from .models import Order, OrderItem
 from .utils import assign_manager_to_order
 from users.models import User
 import os
-from datetime import datetime, timedelta
-from users.models import User
-
-
+from chat.models import ChatMessage, SpecialistChatMessage
 
 
 @login_required
@@ -36,17 +33,51 @@ def manager_dashboard(request):
     marketers = User.objects.filter(role='marketer', is_active=True)
     smms = User.objects.filter(role='smm', is_active=True)
     
-    from django.db.models import Sum
-    
     for order in orders:
-        from chat.models import ChatMessage
+        # Непрочитанные сообщения от клиента
         order.has_unread_messages = ChatMessage.objects.filter(
             order=order, 
             sender__role='client', 
             is_read=False
         ).exists()
         
-        # Инициализация переменных перегрузки (на случай, если специалист не назначен)
+        # Непрочитанные сообщения от специалистов
+        order.has_unread_specialist_messages_programmer = False
+        order.has_unread_specialist_messages_marketer = False
+        order.has_unread_specialist_messages_smm = False
+        
+        if order.assigned_programmer:
+            order.has_unread_specialist_messages_programmer = SpecialistChatMessage.objects.filter(
+                order=order,
+                sender=order.assigned_programmer,
+                receiver=request.user,
+                is_read=False
+            ).exists()
+        
+        if order.assigned_marketer:
+            order.has_unread_specialist_messages_marketer = SpecialistChatMessage.objects.filter(
+                order=order,
+                sender=order.assigned_marketer,
+                receiver=request.user,
+                is_read=False
+            ).exists()
+        
+        if order.assigned_smm:
+            order.has_unread_specialist_messages_smm = SpecialistChatMessage.objects.filter(
+                order=order,
+                sender=order.assigned_smm,
+                receiver=request.user,
+                is_read=False
+            ).exists()
+        
+        # Общий флаг для бейджа в шапке
+        order.has_unread_specialist_messages = (
+            order.has_unread_specialist_messages_programmer or 
+            order.has_unread_specialist_messages_marketer or 
+            order.has_unread_specialist_messages_smm
+        )
+        
+        # Инициализация переменных перегрузки
         order.programmer_overload = False
         order.marketer_overload = False
         order.smm_overload = False
@@ -85,6 +116,7 @@ def manager_dashboard(request):
         'marketers': marketers,
         'smms': smms,
     })
+
 
 @login_required
 def manager_update_order_status(request, order_id):
@@ -160,7 +192,6 @@ def manager_analytics(request):
     # Динамика по дням
     orders_by_day = []
     if date_from and date_to:
-        from datetime import datetime
         start = datetime.strptime(date_from, '%Y-%m-%d').date()
         end = datetime.strptime(date_to, '%Y-%m-%d').date()
         delta = (end - start).days + 1
@@ -176,23 +207,22 @@ def manager_analytics(request):
             orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
 
     top_clients = orders.filter(status='completed').values('client__last_name', 'client__first_name').annotate(
-    total_spent=Sum('total_price'),
-    orders_count=Count('id')
-).order_by('-total_spent')[:5]
+        total_spent=Sum('total_price'),
+        orders_count=Count('id')
+    ).order_by('-total_spent')[:5]
 
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 
-        # --- 2. Данные для вкладки "Специалисты" ---
+    # --- 2. Данные для вкладки "Специалисты" ---
     role_filter = request.GET.get('role', '')
     date_from_spec = request.GET.get('date_from_spec')
     date_to_spec = request.GET.get('date_to_spec')
     sort_spec = request.GET.get('sort_spec', '-total_orders')
     
-            # ========== НОВЫЙ ГРАФИК ЗАГРУЖЕННОСТИ СПЕЦИАЛИСТОВ ==========
-    # Параметры для графика
+    # График загруженности специалистов
     workload_period = request.GET.get('workload_period', 'week')
     workload_chart_type = request.GET.get('workload_chart_type', 'hours')
-    workload_status = request.GET.get('workload_status', 'all')  # ← НОВЫЙ ПАРАМЕТР
+    workload_status = request.GET.get('workload_status', 'all')
     
     orders_for_workload = Order.objects.all()
     if date_from_spec:
@@ -200,7 +230,6 @@ def manager_analytics(request):
     if date_to_spec:
         orders_for_workload = orders_for_workload.filter(created_at__date__lte=date_to_spec)
     
-    # ← НОВЫЙ ФИЛЬТР ПО СТАТУСУ ЗАКАЗОВ
     if workload_status == 'completed':
         orders_for_workload = orders_for_workload.filter(status='completed')
     elif workload_status == 'cancelled':
@@ -209,9 +238,7 @@ def manager_analytics(request):
         orders_for_workload = orders_for_workload.filter(status='processing')
     elif workload_status == 'new':
         orders_for_workload = orders_for_workload.filter(status='new')
-    # else 'all' - все заказы, ничего не фильтруем
     
-    # Фильтр по роли для графика
     if role_filter:
         if role_filter == 'programmer':
             workload_orders = orders_for_workload.filter(assigned_programmer__isnull=False)
@@ -232,18 +259,16 @@ def manager_analytics(request):
             Q(assigned_smm__isnull=False)
         )
     
-    # Данные для графика загруженности
     workload_data = []
     today = timezone.now().date()
+    months_ru = {1: 'Янв', 2: 'Фев', 3: 'Мар', 4: 'Апр', 5: 'Май', 6: 'Июн',
+                 7: 'Июл', 8: 'Авг', 9: 'Сен', 10: 'Окт', 11: 'Ноя', 12: 'Дек'}
     
     if workload_period == 'day':
-        # Последние 30 дней
         for i in range(29, -1, -1):
             day = today - timedelta(days=i)
             day_orders = workload_orders.filter(created_at__date=day)
-            
             if workload_chart_type == 'hours':
-                # Суммируем часы всех специалистов
                 day_hours = 0
                 for order in day_orders:
                     day_hours += float(order.programmer_hours or 0)
@@ -251,11 +276,8 @@ def manager_analytics(request):
                     day_hours += float(order.smm_hours or 0)
                 workload_data.append({'period': day.strftime('%d.%m'), 'value': day_hours})
             else:
-                # Количество заказов
                 workload_data.append({'period': day.strftime('%d.%m'), 'value': day_orders.count()})
-    
     elif workload_period == 'week':
-        # Последние 12 недель
         for i in range(11, -1, -1):
             week_start = today - timedelta(days=today.weekday() + 7 * i)
             week_end = week_start + timedelta(days=6)
@@ -263,7 +285,6 @@ def manager_analytics(request):
                 created_at__date__gte=week_start,
                 created_at__date__lte=week_end
             )
-            
             if workload_chart_type == 'hours':
                 week_hours = 0
                 for order in week_orders:
@@ -273,14 +294,7 @@ def manager_analytics(request):
                 workload_data.append({'period': f'{week_start.strftime("%d.%m")}-{week_end.strftime("%d.%m")}', 'value': week_hours})
             else:
                 workload_data.append({'period': f'{week_start.strftime("%d.%m")}-{week_end.strftime("%d.%m")}', 'value': week_orders.count()})
-    
-    else:  # month
-        # Словарь русских названий месяцев
-        months_ru = {
-            1: 'Янв', 2: 'Фев', 3: 'Мар', 4: 'Апр', 5: 'Май', 6: 'Июн',
-            7: 'Июл', 8: 'Авг', 9: 'Сен', 10: 'Окт', 11: 'Ноя', 12: 'Дек'
-        }
-        # Последние 12 месяцев
+    else:
         for i in range(11, -1, -1):
             month = today.replace(day=1) - timedelta(days=30 * i)
             month_start = month.replace(day=1)
@@ -288,44 +302,30 @@ def manager_analytics(request):
                 month_end = month_start.replace(year=month_start.year + 1, month=1, day=1) - timedelta(days=1)
             else:
                 month_end = month_start.replace(month=month_start.month + 1, day=1) - timedelta(days=1)
-            
             month_orders = workload_orders.filter(
                 created_at__date__gte=month_start,
                 created_at__date__lte=month_end
             )
-            
             if workload_chart_type == 'hours':
                 month_hours = 0
                 for order in month_orders:
                     month_hours += float(order.programmer_hours or 0)
                     month_hours += float(order.marketer_hours or 0)
                     month_hours += float(order.smm_hours or 0)
-                month_name = months_ru[month_start.month]
-                workload_data.append({'period': f'{month_name} {month_start.year}', 'value': month_hours})
+                workload_data.append({'period': f'{months_ru[month_start.month]} {month_start.year}', 'value': month_hours})
             else:
-                month_name = months_ru[month_start.month]
-                workload_data.append({'period': f'{month_name} {month_start.year}', 'value': month_orders.count()})
+                workload_data.append({'period': f'{months_ru[month_start.month]} {month_start.year}', 'value': month_orders.count()})
     
-    # Название для графика
     if workload_chart_type == 'hours':
         workload_title = 'Загруженность специалистов (часы)'
     else:
         workload_title = 'Загруженность специалистов (заказы)'
     
-    # Добавляем статус в название, если выбран не "все"
-    status_names = {
-        'new': 'Новые',
-        'processing': 'В обработке',
-        'completed': 'Выполненные',
-        'cancelled': 'Отменённые',
-        'all': ''
-    }
+    status_names = {'new': 'Новые', 'processing': 'В обработке', 'completed': 'Выполненные', 'cancelled': 'Отменённые', 'all': ''}
     if workload_status != 'all':
         workload_title += f' — {status_names.get(workload_status, "")}'
     
-    # ========== КОНЕЦ НОВОГО ГРАФИКА ==========
-    
-    # Данные для таблицы специалистов (оставляем как было)
+    # Данные для таблицы специалистов
     orders_for_spec = Order.objects.all()
     if date_from_spec:
         orders_for_spec = orders_for_spec.filter(created_at__date__gte=date_from_spec)
@@ -377,7 +377,7 @@ def manager_analytics(request):
     else:
         specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
 
-        # --- 3. Данные для вкладки "Услуги" ---
+    # --- 3. Данные для вкладки "Услуги" ---
     date_from_serv = request.GET.get('date_from_serv')
     date_to_serv = request.GET.get('date_to_serv')
     region_serv = request.GET.get('region_serv', '')
@@ -394,7 +394,6 @@ def manager_analytics(request):
     from services.models import Service
     services_stats = {}
     
-    # Собираем статистику с привязкой к региону
     for order in orders_for_services:
         order_region = order.region or 'Не указан'
         for item in order.items.all():
@@ -440,7 +439,6 @@ def manager_analytics(request):
             'total_revenue': data['revenue'],
         })
 
-    # Сортировка
     if sort_services == 'orders_count':
         popular_list.sort(key=lambda x: x['orders_count'], reverse=False)
     elif sort_services == '-orders_count':
@@ -461,14 +459,11 @@ def manager_analytics(request):
         popular_list.sort(key=lambda x: x['orders_count'], reverse=True)
 
     top_services = popular_list[:10]
-    
     regions_for_filter = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 
-    # Активная вкладка
     active_tab = request.GET.get('active_tab', 'orders')
 
     context = {
-        # Вкладка "Заказы"
         'orders_list': orders,
         'total_orders': total_orders,
         'total_revenue': total_revenue,
@@ -486,19 +481,16 @@ def manager_analytics(request):
         'view_type': view_type,
         'title': title,
         'active_tab': active_tab,
-        # Вкладка "Специалисты"
         'specialists': specialist_stats,
         'role_filter': role_filter,
         'date_from_spec': date_from_spec,
         'date_to_spec': date_to_spec,
         'sort_spec': sort_spec,
-        # Для графика загруженности специалистов
         'workload_data': workload_data,
         'workload_title': workload_title,
         'workload_period': workload_period,
         'workload_chart_type': workload_chart_type,
         'workload_status': workload_status,
-        # Вкладка "Услуги"
         'top_services': top_services,
         'date_from_serv': date_from_serv,
         'date_to_serv': date_to_serv,
@@ -528,7 +520,6 @@ def reassign_order(request, order_id):
             order.assigned_manager = new_manager
             order.save()
             
-            from chat.models import ChatMessage
             ChatMessage.objects.create(
                 order=order,
                 sender=request.user,
@@ -537,6 +528,7 @@ def reassign_order(request, order_id):
             )
     
     return redirect('manager_dashboard')
+
 
 @login_required
 def reassign_specialist(request, order_id, role):
@@ -559,15 +551,14 @@ def reassign_specialist(request, order_id, role):
                 order.assigned_smm = new_specialist
             order.save()
             
-            # Уведомление в чат
-            from chat.models import ChatMessage
             ChatMessage.objects.create(
                 order=order,
                 sender=request.user,
                 message=f"🔄 Переназначен {role} на {new_specialist.get_full_name() or new_specialist.username}",
-                is_read=False
+                is_read=False,
+                is_manager_only=True
             )
-    
+
     return redirect('manager_dashboard')
 
 
@@ -581,6 +572,7 @@ def download_contract(request, order_id):
     
     return FileResponse(open(file_path, 'rb'), content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document')
 
+
 @login_required
 def popular_services(request):
     """Страница с самыми популярными услугами с фильтром по дате"""
@@ -588,24 +580,18 @@ def popular_services(request):
         return redirect('catalog')
     
     from services.models import Service
-    from .models import Order
-    from datetime import datetime
     
-    # Получаем параметры фильтрации
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     
-    # Базовый queryset заказов
     orders = Order.objects.all()
     if date_from:
         orders = orders.filter(created_at__date__gte=date_from)
     if date_to:
         orders = orders.filter(created_at__date__lte=date_to)
     
-    # Словарь для сбора статистики
     services_stats = {}
     
-    # 1. Считаем услуги из обычных заказов
     for order in orders:
         for item in order.items.all():
             for service in item.package.available_services.all():
@@ -614,7 +600,6 @@ def popular_services(request):
                 services_stats[service.name]['count'] += item.quantity
                 services_stats[service.name]['revenue'] += float(service.price) * item.quantity
     
-    # 2. Считаем услуги из кастомных заказов
     for order in orders:
         if order.services_data and 'items' in order.services_data:
             for service_item in order.services_data['items']:
@@ -628,7 +613,6 @@ def popular_services(request):
                             services_stats[name]['count'] += 1
                             services_stats[name]['revenue'] += price
     
-    # Преобразуем в список и сортируем
     popular_list = []
     for name, data in services_stats.items():
         popular_list.append({
@@ -643,14 +627,12 @@ def popular_services(request):
     
     context = {
         'top_services': top_services,
-        'date_from_serv': date_from_serv,
-        'date_to_serv': date_to_serv,
-        'sort_services': sort_services,
-        'region_serv': region_serv,          
-        'regions_for_filter': regions_for_filter,  
+        'date_from': date_from,
+        'date_to': date_to,
     }
     
     return render(request, 'orders/popular_services.html', context)
+
 
 @login_required
 def specialists_rating(request):
@@ -658,20 +640,17 @@ def specialists_rating(request):
     if request.user.role not in ['manager', 'admin']:
         return redirect('catalog')
     
-    # Получаем параметры фильтрации
     role_filter = request.GET.get('role', '')
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     sort_by = request.GET.get('sort', '-total_orders')
     
-    # Базовый queryset заказов
     orders = Order.objects.all()
     if date_from:
         orders = orders.filter(created_at__date__gte=date_from)
     if date_to:
         orders = orders.filter(created_at__date__lte=date_to)
     
-    # Специалисты
     if role_filter:
         specialists = User.objects.filter(role=role_filter, is_active=True)
     else:
@@ -708,7 +687,6 @@ def specialists_rating(request):
             'avg_check': avg_check,
         })
     
-    # Сортировка
     if sort_by == 'total_orders':
         specialist_stats.sort(key=lambda x: x['total_orders'], reverse=True)
     elif sort_by == 'completed_orders':
