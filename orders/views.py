@@ -29,6 +29,16 @@ def manager_dashboard(request):
     else:
         orders = Order.objects.filter(assigned_manager=request.user).order_by('-created_at')
     
+    # Подсчёт заказов за сегодня
+    from django.utils import timezone
+    today = timezone.now().date()
+    orders_today_count = orders.filter(created_at__date=today).count()
+    
+
+    # Подсчёт активных заказов (Новые + В обработке)
+    active_orders_count = orders.filter(status__in=['new', 'processing']).count()
+
+
     managers = User.objects.filter(role='manager', is_active=True)
     programmers = User.objects.filter(role='programmer', is_active=True)
     marketers = User.objects.filter(role='marketer', is_active=True)
@@ -112,6 +122,8 @@ def manager_dashboard(request):
     
     return render(request, 'orders/manager_dashboard.html', {
         'orders': orders,
+        'orders_today_count': orders_today_count,
+        'active_orders_count': active_orders_count,  # ← ДОБАВИТЬ
         'managers': managers,
         'programmers': programmers,
         'marketers': marketers,
