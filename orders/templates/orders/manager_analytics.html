@@ -571,7 +571,7 @@
 
         <!-- ГРАФИК ДИНАМИКИ -->
         <div class="chart-container">
-            <div class="card-title">📈 Динамика заказов (последние 30 дней)</div>
+            <div class="card-title">📈 Количество заказов по периоду</div>
             <canvas id="ordersChart" width="800" height="300"></canvas>
         </div>
     </div>
@@ -783,7 +783,34 @@
     new Chart(document.getElementById('ordersChart'), { 
         type: 'line', 
         data: chartData, 
-        options: { responsive: true } 
+        options: { 
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false  // ← УБИРАЕМ ЛЕГЕНДУ
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        precision: 0,  // ← ЦЕЛЫЕ ЧИСЛА
+                        callback: function(value) {
+                            return Number.isInteger(value) ? value : null;
+                        }
+                    },
+                    title: {
+                        display: false
+                    }
+                },
+                x: {
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        } 
     });
 
     // График загруженности специалистов
@@ -830,14 +857,16 @@
                     y: {
                         beginAtZero: true,
                         title: {
-                            display: true,
-                            text: '{% if workload_chart_type == "hours" %}Часы{% else %}Заказы{% endif %}'
+                            display: false  // ← скрываем подпись оси Y
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0
                         }
                     },
                     x: {
                         title: {
-                            display: true,
-                            text: 'Период'
+                            display: false  // ← скрываем подпись оси X
                         }
                     }
                 }
