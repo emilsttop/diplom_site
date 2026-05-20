@@ -246,4 +246,20 @@
         <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Небольшая задержка для гарантии загрузки элементов
+        setTimeout(function() {
+            var phoneInput = document.getElementById('id_phone');
+            if (phoneInput) {
+                $('#id_phone').mask('+7 (000) 000-00-00');
+                console.log('Маска применена к полю телефона');
+            } else {
+                console.log('Поле id_phone не найдено');
+            }
+        }, 100);
+    });
+</script>
 {% endblock %}

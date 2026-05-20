@@ -1,10 +1,22 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.validators import RegexValidator
 from users.models import User
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    phone = forms.CharField(max_length=20, required=True, label='Телефон')
+    phone = forms.CharField(
+    max_length=20, 
+    required=True, 
+    label='Телефон',
+    widget=forms.TextInput(attrs={'placeholder': '+7 (999) 999-99-99'}),
+    validators=[
+        RegexValidator(
+            regex=r'^\+?7\d{10}$',
+            message='Введите номер в формате +7XXXXXXXXXX (10 цифр после +7)'
+        )
+    ]
+)
     last_name = forms.CharField(max_length=150, required=True, label='Фамилия')
     first_name = forms.CharField(max_length=150, required=True, label='Имя')
     patronymic = forms.CharField(max_length=150, required=False, label='Отчество')

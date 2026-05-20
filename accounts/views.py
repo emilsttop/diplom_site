@@ -12,7 +12,24 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            # Очищаем телефон от маски
+            phone_raw = form.cleaned_data.get('phone')
+            # Удаляем все символы, кроме цифр
+            phone_clean = ''.join(filter(str.isdigit, phone_raw))
+            
+            # Приводим к формату +7XXXXXXXXXX
+            if len(phone_clean) == 11:
+                if phone_clean.startswith('8'):
+                    phone_clean = '+7' + phone_clean[1:]
+                elif phone_clean.startswith('7'):
+                    phone_clean = '+' + phone_clean
+            elif len(phone_clean) == 10:
+                phone_clean = '+7' + phone_clean
+            
+            user = form.save(commit=False)
+            user.phone = phone_clean
+            user.save()
+            
             login(request, user)
             
             # Восстанавливаем отложенные услуги
