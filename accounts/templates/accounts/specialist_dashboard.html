@@ -326,7 +326,6 @@
     }
     body.dark .composition-details {
         background: #2a2a3a;
-        color: #e0e0e0;
     }
 
     .orders-scroll {
@@ -338,6 +337,42 @@
         text-align: center;
         padding: 40px;
         color: var(--gray-dark);
+    }
+
+    /* ===== КОММЕНТАРИЙ У СПЕЦИАЛИСТА В ТЁМНОЙ ТЕМЕ ===== */
+    body.dark .specialist-comment-block,
+    body.dark .composition-details .specialist-comment-block {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        border-left: 4px solid #ffc107 !important;
+        border-radius: 8px !important;
+    }
+    body.dark .specialist-comment-block strong,
+    body.dark .composition-details .specialist-comment-block strong {
+        color: #dc3545 !important;
+        background: transparent !important;
+    }
+    body.dark .specialist-comment-block p,
+    body.dark .composition-details .specialist-comment-block p {
+        color: #1a1a1a !important;
+        background: transparent !important;
+    }
+
+    /* ===== УСЛУГИ СПЕЦИАЛИСТА В ТЁМНОЙ ТЕМЕ ===== */
+    body.dark .service-item-custom {
+        background: #2a2a3a !important;
+        border-left: 3px solid #dc3545 !important;
+    }
+    body.dark .service-item-custom strong {
+        color: #e0e0e0 !important;
+    }
+    body.dark .service-item-custom span {
+        color: #aaa !important;
+    }
+    
+    /* Заголовок "Состав заказа (ваши услуги)" в тёмной теме */
+    body.dark .composition-details .services-title {
+        color: #e0e0e0 !important;
     }
 </style>
 
@@ -375,7 +410,6 @@
 <div class="filters-panel">
     <div class="filters-title">📅 Фильтры загрузки</div>
     <form method="get">
-        <!-- Первая строка: поля ввода в 4 колонки -->
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px;">
             <div class="filter-group">
                 <label>📅 Дата от</label>
@@ -404,7 +438,6 @@
             </div>
         </div>
         
-        <!-- Вторая строка: кнопки прижаты к правому краю и растянуты -->
         <div style="display: flex; justify-content: flex-end; gap: 15px;">
             <button type="submit" class="btn-apply" style="flex: 0 1 auto; min-width: 180px;">
                 🔍 Применить фильтры
@@ -428,29 +461,24 @@
     <div class="orders-scroll">
         {% for order in orders %}
         <div class="order-card" data-order-id="{{ order.id }}" data-specialist-id="{{ user.id }}">
-            <!-- ВСЁ В ОДНУ СТРОКУ (flex) -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <!-- Номер заказа -->
                 <div style="min-width: 100px;">
                     <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Заказ</span>
                     <div style="font-size: 16px; font-weight: 700; color: var(--red);">№{{ order.id }}</div>
                 </div>
                 
-                <!-- Клиент -->
                 <div style="min-width: 140px;">
                     <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Клиент</span>
                     <div style="font-size: 14px; font-weight: 500;">{{ order.client.last_name }} {{ order.client.first_name }}</div>
                 </div>
                 
-                <!-- Дата -->
                 <div style="min-width: 110px;">
                     <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Дата</span>
                     <div style="font-size: 13px;">{{ order.created_at|date:"d.m.Y H:i" }}</div>
                 </div>
                 
-                <!-- Статус -->
                 <div>
-                    <span class="order-status status-{{ order.status }}" style="display: inline-block;">
+                    <span class="order-status status-{{ order.status }}">
                         {% if order.status == 'new' %}🆕 Новый
                         {% elif order.status == 'processing' %}⚙️ В обработке
                         {% elif order.status == 'completed' %}✅ Выполнен
@@ -459,7 +487,6 @@
                     </span>
                 </div>
                 
-                <!-- Нагрузка -->
                 <div style="min-width: 80px; text-align: center;">
                     <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Нагрузка</span>
                     <div style="font-size: 16px; font-weight: 700; color: var(--red);">
@@ -470,37 +497,31 @@
                     </div>
                 </div>
                 
-                <!-- Сумма -->
                 <div style="min-width: 90px; text-align: center;">
                     <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Сумма</span>
                     <div style="font-size: 16px; font-weight: 700; color: var(--red);">{{ order.total_price|floatformat:0 }} ₽</div>
                 </div>
                 
-                <!-- Бейдж уведомления -->
                 <div id="unread-badge-{{ order.id }}" class="unread-badge" style="display: none;">📩 Новое</div>
                 
-                <!-- Кнопка состава заказа -->
-                <button onclick="toggleSpecialistComposition({{ order.id }})" class="btn-composition-specialist" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px;">
+                <button onclick="toggleSpecialistComposition({{ order.id }})" class="btn-composition-specialist">
                     📋 Состав
                 </button>
                 
-                <!-- Кнопка чата -->
-                <a href="{% url 'specialist_chat_page' order.id user.id %}" class="btn-chat-specialist" style="background: linear-gradient(135deg, #dc3545, #b02a37); color: white; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;">
+                <a href="{% url 'specialist_chat_page' order.id user.id %}" class="btn-chat-specialist">
                     💬 Чат
                 </a>
             </div>
             
-            <!-- Блок состава заказа (скрыт по умолчанию) -->
-            <div id="specialist-composition-{{ order.id }}" class="composition-details" style="display: none; margin-top: 12px; padding: 10px; background: var(--gray); border-radius: 10px; font-size: 12px;">
+            <div id="specialist-composition-{{ order.id }}" class="composition-details" style="display: none; margin-top: 12px; padding: 10px; border-radius: 10px; font-size: 12px;">
                 {% if order.comment %}
-                <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd;">
-                    <strong style="color: var(--red);">💬 Комментарий клиента:</strong>
-                    <p style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ order.comment }}</p>
+                <div class="specialist-comment-block" style="margin-bottom: 12px; padding: 10px; background: #ffffff; border-left: 4px solid #ffc107; border-radius: 8px;">
+                    <strong style="color: #dc3545; display: block; margin-bottom: 5px;">💬 Комментарий клиента:</strong>
+                    <p style="margin: 0; white-space: pre-wrap; color: #1a1a1a;">{{ order.comment }}</p>
                 </div>
                 {% endif %}
-                <div style="font-weight: 600; margin-bottom: 8px; color: var(--red);">📦 Состав заказа (ваши услуги):</div>
+                <div class="services-title" style="font-weight: 600; margin-bottom: 8px; color: #1a1a1a;">📦 Состав заказа (ваши услуги):</div>
                 <div id="specialist-services-{{ order.id }}">
-                    <!-- Сюда динамически загружаются только услуги специалиста -->
                     <div style="text-align: center; padding: 10px;">⏳ Загрузка...</div>
                 </div>
             </div>
@@ -536,9 +557,7 @@
             responsive: true,
             maintainAspectRatio: true,
             plugins: {
-                legend: {
-                    display: false
-                },
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
@@ -550,21 +569,10 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Количество заказов'
-                    },
-                    ticks: {
-                        stepSize: 1,
-                        precision: 0
-                    }
+                    title: { display: true, text: 'Количество заказов' },
+                    ticks: { stepSize: 1, precision: 0 }
                 },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Период'
-                    }
-                }
+                x: { title: { display: true, text: 'Период' } }
             }
         }
     });
@@ -572,52 +580,30 @@
 <script>
     console.log('Скрипт уведомлений загружен');
     
-    // Проверка наличия непрочитанных сообщений для специалиста
     async function checkUnreadMessages(orderId, specialistId) {
-        console.log(`Проверка уведомлений для заказа ${orderId}, специалист ${specialistId}`);
         try {
             const response = await fetch(`/chat/api/specialist/unread/${orderId}/${specialistId}/`);
             const data = await response.json();
-            console.log(`Ответ API для заказа ${orderId}:`, data);
-            
             const badge = document.getElementById(`unread-badge-${orderId}`);
             if (badge) {
-                if (data.has_unread === true) {
-                    badge.style.display = 'inline-block';
-                    console.log(`✅ Бейдж показан для заказа ${orderId}`);
-                } else {
-                    badge.style.display = 'none';
-                    console.log(`❌ Бейдж скрыт для заказа ${orderId}`);
-                }
-            } else {
-                console.log(`⚠️ Бейдж unread-badge-${orderId} не найден в DOM`);
+                badge.style.display = data.has_unread === true ? 'inline-block' : 'none';
             }
         } catch(e) {
             console.error('Ошибка проверки уведомлений:', e);
         }
     }
 
-    // Проверяем все заказы при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOM загружен, ищем карточки заказов...');
-        const cards = document.querySelectorAll('.order-card');
-        console.log(`Найдено карточек заказов: ${cards.length}`);
-        
-        cards.forEach(card => {
+        document.querySelectorAll('.order-card').forEach(card => {
             const orderId = card.dataset.orderId;
             const specialistId = card.dataset.specialistId;
-            console.log(`Карточка заказа ${orderId}, специалист ${specialistId}`);
             if (orderId && specialistId) {
                 checkUnreadMessages(orderId, specialistId);
-            } else {
-                console.log(`⚠️ У карточки нет data-order-id или data-specialist-id`);
             }
         });
     });
 
-    // Проверяем каждые 10 секунд
     setInterval(() => {
-        console.log('Периодическая проверка уведомлений...');
         document.querySelectorAll('.order-card').forEach(card => {
             const orderId = card.dataset.orderId;
             const specialistId = card.dataset.specialistId;
@@ -628,7 +614,12 @@
     }, 10000);
 </script>
 <script>
-    // Загрузка услуг специалиста
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     async function loadSpecialistServices(orderId, specialistId) {
         const container = document.getElementById(`specialist-services-${orderId}`);
         if (!container) return;
@@ -641,9 +632,9 @@
             
             if (data.services && data.services.length > 0) {
                 container.innerHTML = data.services.map(service => `
-                    <div style="margin-bottom: 8px; padding: 6px; background: rgba(220,53,69,0.05); border-radius: 8px;">
-                        <strong>${escapeHtml(service.name)}</strong><br>
-                        <span style="font-size: 11px;">💰 ${service.price.toLocaleString()} ₽ | ⏱️ ${service.hours} ч</span>
+                    <div class="service-item-custom" style="margin-bottom: 8px; padding: 8px; background: #f8f9fa; border-radius: 8px; border-left: 3px solid #dc3545;">
+                        <strong style="color: #1a1a1a;">${escapeHtml(service.name)}</strong><br>
+                        <span style="font-size: 11px; color: #666;">💰 ${service.price.toLocaleString()} ₽ | ⏱️ ${service.hours} ч</span>
                     </div>
                 `).join('');
             } else {
@@ -654,8 +645,7 @@
             container.innerHTML = '<div style="text-align: center; padding: 10px; color: red;">⚠️ Ошибка загрузки</div>';
         }
     }
-    
-    // Открытие/закрытие состава заказа с загрузкой услуг
+
     function toggleSpecialistComposition(orderId) {
         const div = document.getElementById(`specialist-composition-${orderId}`);
         if (div.style.display === 'none' || div.style.display === '') {
@@ -668,12 +658,6 @@
         } else {
             div.style.display = 'none';
         }
-    }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 </script>
 {% endblock %}
