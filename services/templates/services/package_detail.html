@@ -235,6 +235,28 @@
     body {
         overflow-x: hidden;
     }
+    /* Поиск услуг */
+.search-box {
+    margin-bottom: 20px;
+}
+.search-box input {
+    width: 100%;
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+.search-box input:focus {
+    outline: none;
+    border-color: #dc3545;
+    box-shadow: 0 0 5px rgba(220,53,69,0.3);
+}
+body.dark .search-box input {
+    background: #2a2a3a;
+    color: #e0e0e0;
+    border-color: #dc3545;
+}
 </style>
 
 <div class="package-header">
@@ -254,6 +276,13 @@
     </div>
     <button id="selectAllBtn" class="btn-select-all">✅ Выбрать все доступные услуги</button>
 </div>
+
+<!-- БЛОК ПОИСКА (только для конструктора) -->
+{% if package.name == "Конструктор услуг" or package.id == 39 %}
+<div class="search-box" style="margin-bottom: 20px;">
+    <input type="text" id="searchServices" placeholder="🔍 Поиск услуг по названию..." style="width: 100%; padding: 12px 20px; border-radius: 30px; border: 1px solid #ddd; font-size: 14px;">
+</div>
+{% endif %}
 
 <div class="services-grid" id="servicesGrid">
     {% for service in package.available_services.all %}
@@ -555,5 +584,42 @@ if (selectAllBtn) {
         
         document.getElementById('addToCartBtn').addEventListener('click', addToCart);
     });
+
+    // ПОИСК УСЛУГ (для конструктора)
+const searchInput = document.getElementById('searchServices');
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const serviceCards = document.querySelectorAll('.service-card');
+        let visibleCount = 0;
+        
+        serviceCards.forEach(card => {
+            const serviceName = card.querySelector('.service-name')?.innerText.toLowerCase() || '';
+            if (searchTerm === '' || serviceName.includes(searchTerm)) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Показываем сообщение, если ничего не найдено
+        let noResultsMsg = document.getElementById('no-search-results');
+        if (!noResultsMsg && searchTerm !== '' && visibleCount === 0) {
+            const grid = document.getElementById('servicesGrid');
+            const msg = document.createElement('div');
+            msg.id = 'no-search-results';
+            msg.style.textAlign = 'center';
+            msg.style.padding = '40px';
+            msg.style.color = '#666';
+            msg.style.gridColumn = '1 / -1';
+            msg.innerHTML = '😕 Ничего не найдено. Попробуйте изменить поисковый запрос.';
+            grid.appendChild(msg);
+        } else if (visibleCount > 0) {
+            const msg = document.getElementById('no-search-results');
+            if (msg) msg.remove();
+        }
+    });
+}
 </script>
 {% endblock %}
