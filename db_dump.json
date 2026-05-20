@@ -83,7 +83,7 @@
   "pk": 2,
   "fields": {
     "password": "pbkdf2_sha256$1200000$ycPalIz14yH7CelyuS74bW$sTpHrhKdmatNuy6AzpgpmHz4KZ1nUrndHHYdPZE5bXM=",
-    "last_login": "2026-05-20T14:24:23.928",
+    "last_login": "2026-05-20T21:00:56.478",
     "is_superuser": false,
     "username": "Иванов Иван Иванович",
     "first_name": "Иван",
@@ -149,7 +149,7 @@
   "pk": 5,
   "fields": {
     "password": "pbkdf2_sha256$1200000$HbIL9JjDRXmUuhz46T4EXj$c2CI4OzeSRNstXAbX1WDEWCE253phnnyLKqiwYVn240=",
-    "last_login": "2026-05-20T20:31:02.715",
+    "last_login": "2026-05-20T21:27:30.023",
     "is_superuser": false,
     "username": "Смирнов Алексей Владимирович",
     "first_name": "Алексей",
@@ -303,7 +303,7 @@
   "pk": 12,
   "fields": {
     "password": "pbkdf2_sha256$1200000$LzKcm3BmHPbacRI5NWWrzW$s4RGuxb9dImiFf13EtErFZ1eM7xi+Ig4C1k7mRbmiJU=",
-    "last_login": "2026-05-20T18:17:34.849",
+    "last_login": "2026-05-20T21:01:22.394",
     "is_superuser": false,
     "username": "emilsttop",
     "first_name": "Эмиль",
@@ -1482,227 +1482,39 @@
   "model": "orders.order",
   "pk": 1,
   "fields": {
-    "client": 1,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-16T20:21:53.629",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Одноклассники (OK) Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Астраханская область",
+    "created_at": "2026-02-26T10:30:00",
+    "total_price": "207000.00",
+    "services_data": {},
+    "region": "Екатеринбург",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
-    "assigned_smm": null,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "assigned_programmer": 6,
+    "assigned_marketer": 3,
+    "assigned_smm": 9,
+    "assigned_manager": 10,
+    "programmer_hours": "86.0",
+    "marketer_hours": "36.0",
+    "smm_hours": "4.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 2,
   "fields": {
-    "client": 2,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-18T12:37:40.085",
-    "total_price": "80000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Яндекс.Директ Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Ключевые запросы с минус‑словами",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Ремаркетинг по сценариям",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 25000.0
-        },
-        {
-          "type": "custom",
-          "package_name": "Сайт‑визитка Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Верстка на Webflow",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "SSL-сертификат",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Адаптация под планшеты",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        },
-        {
-          "type": "custom",
-          "package_name": "VK‑клипы Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Редактор тикток‑субтитров",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Подбор трендового аудио",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 25000.0
-        }
-      ]
-    },
-    "region": "Воронежская область",
+    "created_at": "2026-02-25T15:15:00",
+    "total_price": "45000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
     "assigned_smm": null,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
+    "assigned_manager": 5,
+    "programmer_hours": "13.0",
+    "marketer_hours": "15.0",
     "smm_hours": "0.0"
   }
 },
@@ -1710,71 +1522,19 @@
   "model": "orders.order",
   "pk": 3,
   "fields": {
-    "client": 2,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-19T19:00:53.065",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Еврейская АО",
+    "created_at": "2026-02-22T18:19:00",
+    "total_price": "90000.00",
+    "services_data": {},
+    "region": "Казань",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
     "assigned_smm": null,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
+    "programmer_hours": "26.0",
+    "marketer_hours": "30.0",
     "smm_hours": "0.0"
   }
 },
@@ -1782,72 +1542,20 @@
   "model": "orders.order",
   "pk": 4,
   "fields": {
-    "client": 2,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-19T19:01:03.644",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Ингушетия",
+    "created_at": "2026-03-06T14:29:00",
+    "total_price": "156000.00",
+    "services_data": {},
+    "region": "Казань",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
-    "assigned_smm": null,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "assigned_programmer": 11,
+    "assigned_marketer": 3,
+    "assigned_smm": 4,
+    "assigned_manager": 5,
+    "programmer_hours": "28.0",
+    "marketer_hours": "36.0",
+    "smm_hours": "44.0"
   }
 },
 {
@@ -1856,214 +1564,58 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T19:01:11.595",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "ДНР",
+    "created_at": "2026-03-01T10:44:00",
+    "total_price": "101500.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
-    "assigned_smm": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "programmer_hours": "16.0",
+    "marketer_hours": "28.0",
+    "smm_hours": "15.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 6,
   "fields": {
-    "client": 2,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-19T19:01:19.967",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Одноклассники (OK) Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Амурская область",
+    "created_at": "2026-02-23T13:38:00",
+    "total_price": "192000.00",
+    "services_data": {},
+    "region": "Екатеринбург",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": null,
-    "assigned_smm": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 3,
+    "assigned_smm": 9,
     "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "programmer_hours": "32.0",
+    "marketer_hours": "34.0",
+    "smm_hours": "34.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 7,
   "fields": {
-    "client": 2,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-19T19:05:20.240",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Адыгея",
+    "created_at": "2026-02-27T15:39:00",
+    "total_price": "122000.00",
+    "services_data": {},
+    "region": "Казань",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
+    "assigned_smm": null,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "8.0",
-    "smm_hours": "11.0"
+    "programmer_hours": "28.0",
+    "marketer_hours": "42.0",
+    "smm_hours": "0.0"
   }
 },
 {
@@ -2072,142 +1624,38 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T19:05:30.242",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
+    "created_at": "2026-02-26T14:06:00",
+    "total_price": "163000.00",
+    "services_data": {},
+    "region": "Казань",
     "comment": null,
-    "assigned_programmer": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 8,
     "assigned_smm": 9,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "8.0",
-    "smm_hours": "11.0"
+    "assigned_manager": 5,
+    "programmer_hours": "20.0",
+    "marketer_hours": "25.0",
+    "smm_hours": "34.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 9,
   "fields": {
-    "client": 2,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-19T19:05:38.134",
-    "total_price": "30000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "SMM Start",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ конкурентов SMM",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 30000.0
-        }
-      ]
-    },
-    "region": "Алтай",
+    "created_at": "2026-02-25T15:17:00",
+    "total_price": "178000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
     "comment": null,
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "8.0",
-    "smm_hours": "11.0"
+    "programmer_hours": "50.0",
+    "marketer_hours": "30.0",
+    "smm_hours": "30.0"
   }
 },
 {
@@ -2216,70 +1664,18 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T19:47:03.586",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-01T15:55:00",
+    "total_price": "110000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 8,
-    "assigned_smm": 9,
+    "assigned_smm": 4,
     "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "40.0",
+    "marketer_hours": "20.0",
+    "smm_hours": "4.0"
   }
 },
 {
@@ -2288,91 +1684,18 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T20:05:21.271",
-    "total_price": "63000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        },
-        {
-          "type": "custom",
-          "package_name": "Конструктор услуг",
-          "services": [
-            {
-              "name": "Яндекс.Бизнес (Профиль)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 3.0,
-              "smm_hours": 3.0
-            },
-            {
-              "name": "Сбор отзывов на Яндекс.Картах",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 13000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
+    "created_at": "2026-02-20T16:53:00",
+    "total_price": "50500.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
     "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "19.0",
-    "smm_hours": "16.0"
+    "assigned_manager": 10,
+    "programmer_hours": "4.0",
+    "marketer_hours": "13.0",
+    "smm_hours": "21.0"
   }
 },
 {
@@ -2381,142 +1704,38 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T23:13:05.621",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Смоленская область",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "created_at": "2026-03-07T11:22:00",
+    "total_price": "207000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "28.0",
+    "marketer_hours": "58.0",
+    "smm_hours": "42.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 13,
   "fields": {
-    "client": 2,
+    "client": 12,
     "status": "completed",
-    "created_at": "2026-05-19T23:13:14.208",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 8,
-    "assigned_smm": 9,
+    "created_at": "2026-02-27T18:34:00",
+    "total_price": "97000.00",
+    "services_data": {},
+    "region": "Екатеринбург",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 3,
+    "assigned_smm": null,
     "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "46.0",
+    "marketer_hours": "16.0",
+    "smm_hours": "0.0"
   }
 },
 {
@@ -2525,142 +1744,38 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T23:13:25.517",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-02-23T16:31:00",
+    "total_price": "149500.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 3,
     "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "31.0",
+    "marketer_hours": "34.0",
+    "smm_hours": "42.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 15,
   "fields": {
-    "client": 2,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-19T23:24:36.685",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Алтай",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-02T16:51:00",
+    "total_price": "141500.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 8,
     "assigned_smm": 9,
     "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "7.0",
+    "marketer_hours": "30.0",
+    "smm_hours": "45.0"
   }
 },
 {
@@ -2669,214 +1784,58 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-19T23:25:00.903",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-21T14:42:00",
+    "total_price": "103500.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 3,
-    "assigned_smm": 9,
+    "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "14.0",
+    "marketer_hours": "29.0",
+    "smm_hours": "21.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 17,
   "fields": {
-    "client": 2,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-19T23:41:01.437",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-14T13:49:00",
+    "total_price": "122000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 8,
-    "assigned_smm": 4,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_smm": null,
+    "assigned_manager": 5,
+    "programmer_hours": "28.0",
+    "marketer_hours": "42.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 18,
   "fields": {
-    "client": 2,
-    "status": "cancelled",
-    "created_at": "2026-05-20T00:59:01.941",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-03-22T17:38:00",
+    "total_price": "51000.00",
+    "services_data": {},
     "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
     "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "3.0",
+    "marketer_hours": "2.0",
+    "smm_hours": "17.0"
   }
 },
 {
@@ -2885,335 +1844,78 @@
   "fields": {
     "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T00:59:11.185",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Алтай",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-23T16:29:00",
+    "total_price": "141000.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 3,
-    "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_smm": 9,
+    "assigned_manager": 10,
+    "programmer_hours": "29.0",
+    "marketer_hours": "32.0",
+    "smm_hours": "17.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 20,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T03:17:13.205",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-14T10:04:00",
+    "total_price": "129500.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 8,
     "assigned_smm": 9,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_manager": 5,
+    "programmer_hours": "27.0",
+    "marketer_hours": "22.0",
+    "smm_hours": "30.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 21,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T03:17:20.224",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Продвижение ВКонтакте",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-04-14T17:12:00",
+    "total_price": "228000.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
-    "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_smm": null,
+    "assigned_manager": 10,
+    "programmer_hours": "48.0",
+    "marketer_hours": "74.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 22,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T04:07:43.681",
-    "total_price": "95500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Чат-боты",
-          "services": [
-            {
-              "name": "Ретаргетинг",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Продвижение в VK",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 2.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Чат-бот для Telegram",
-              "price": 12000.0,
-              "programmer_hours": 4.0,
-              "marketer_hours": 2.0,
-              "smm_hours": 2.0
-            },
-            {
-              "name": "Яндекс.Бизнес (Профиль)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 3.0,
-              "smm_hours": 3.0
-            },
-            {
-              "name": "Таргет ВКонтакте (расширенный)",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 1.0,
-              "smm_hours": 7.0
-            },
-            {
-              "name": "Сбор отзывов на Яндекс.Картах",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 50500.0
-        },
-        {
-          "type": "custom",
-          "package_name": "Email-маркетинг",
-          "services": [
-            {
-              "name": "Настройка автоворонки",
-              "price": 15000.0,
-              "programmer_hours": 3.0,
-              "marketer_hours": 5.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "A/B тест тем писем",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Тепловая карта переходов",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Персонализация писем",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Восстановление брошенных корзин",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Регистрация домена для писем",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 45000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
-    "assigned_programmer": 6,
+    "created_at": "2026-03-12T10:23:00",
+    "total_price": "51000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 8,
     "assigned_smm": 9,
-    "assigned_manager": 10,
-    "programmer_hours": "7.0",
-    "marketer_hours": "17.0",
-    "smm_hours": "18.0"
+    "assigned_manager": 5,
+    "programmer_hours": "3.0",
+    "marketer_hours": "2.0",
+    "smm_hours": "17.0"
   }
 },
 {
@@ -3222,70 +1924,18 @@
   "fields": {
     "client": 12,
     "status": "completed",
-    "created_at": "2026-05-20T04:15:08.503",
-    "total_price": "40500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Одноклассники (OK)",
-          "services": [
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Видеопост в OK",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Оформление виджетов OK",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Конкурсы и розыгрыши OK",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 40500.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "created_at": "2026-03-21T12:44:00",
+    "total_price": "596000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "programmer_hours": "124.0",
+    "marketer_hours": "126.0",
+    "smm_hours": "105.0"
   }
 },
 {
@@ -3294,69 +1944,17 @@
   "fields": {
     "client": 12,
     "status": "completed",
-    "created_at": "2026-05-20T04:38:00.235",
-    "total_price": "48500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Сайт‑визитка",
-          "services": [
-            {
-              "name": "Верстка на Webflow",
-              "price": 20000.0,
-              "programmer_hours": 10.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "SSL-сертификат",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Адаптация под планшеты",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Форма обратной связи",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Карта проезда",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "SEO-база (3 ключа)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 48500.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
+    "created_at": "2026-04-10T14:45:00",
+    "total_price": "106000.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
     "assigned_programmer": 11,
-    "assigned_marketer": null,
+    "assigned_marketer": 8,
     "assigned_smm": null,
     "assigned_manager": 10,
-    "programmer_hours": "10.0",
-    "marketer_hours": "0.0",
+    "programmer_hours": "20.0",
+    "marketer_hours": "32.0",
     "smm_hours": "0.0"
   }
 },
@@ -3366,69 +1964,17 @@
   "fields": {
     "client": 12,
     "status": "completed",
-    "created_at": "2026-05-20T04:38:07.833",
-    "total_price": "48500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Сайт‑визитка",
-          "services": [
-            {
-              "name": "Верстка на Webflow",
-              "price": 20000.0,
-              "programmer_hours": 10.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "SSL-сертификат",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Адаптация под планшеты",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Форма обратной связи",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Карта проезда",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "SEO-база (3 ключа)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 48500.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
+    "created_at": "2026-04-20T12:17:00",
+    "total_price": "97000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
     "assigned_programmer": 6,
-    "assigned_marketer": null,
+    "assigned_marketer": 8,
     "assigned_smm": null,
-    "assigned_manager": 5,
-    "programmer_hours": "10.0",
-    "marketer_hours": "0.0",
+    "assigned_manager": 10,
+    "programmer_hours": "46.0",
+    "marketer_hours": "16.0",
     "smm_hours": "0.0"
   }
 },
@@ -3438,69 +1984,17 @@
   "fields": {
     "client": 12,
     "status": "completed",
-    "created_at": "2026-05-20T04:43:14.646",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Ингушетия",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-04-18T18:24:00",
+    "total_price": "41500.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
     "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
+    "programmer_hours": "7.0",
+    "marketer_hours": "4.0",
     "smm_hours": "13.0"
   }
 },
@@ -3508,712 +2002,199 @@
   "model": "orders.order",
   "pk": 27,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T04:54:57.634",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Смоленская область",
-    "comment": "",
+    "created_at": "2026-04-16T11:05:00",
+    "total_price": "635500.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
     "assigned_programmer": 6,
-    "assigned_marketer": 3,
-    "assigned_smm": 9,
+    "assigned_marketer": 8,
+    "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "146.0",
+    "marketer_hours": "143.0",
+    "smm_hours": "84.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 28,
   "fields": {
-    "client": 2,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T10:56:02.626",
-    "total_price": "23000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 23000.0
-        }
-      ]
-    },
-    "region": "Смоленская область",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "8.0",
-    "smm_hours": "6.0"
+    "created_at": "2026-03-14T16:48:00",
+    "total_price": "90000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
+    "assigned_smm": null,
+    "assigned_manager": 10,
+    "programmer_hours": "26.0",
+    "marketer_hours": "30.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 29,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T11:16:53.564",
-    "total_price": "62000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        },
-        {
-          "type": "custom",
-          "package_name": "Яндекс.Директ",
-          "services": [
-            {
-              "name": "Автостратегия «Конверсии»",
-              "price": 12000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 12000.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": 6,
-    "assigned_marketer": 3,
+    "created_at": "2026-04-04T12:23:00",
+    "total_price": "101000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
     "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "8.0",
+    "marketer_hours": "26.0",
+    "smm_hours": "42.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 30,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T18:17:43.813",
-    "total_price": "40500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Одноклассники (OK)",
-          "services": [
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Видеопост в OK",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Оформление виджетов OK",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Конкурсы и розыгрыши OK",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 40500.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": null,
-    "assigned_smm": null,
+    "created_at": "2026-04-18T14:04:00",
+    "total_price": "1197000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
-    "smm_hours": "0.0"
+    "programmer_hours": "260.0",
+    "marketer_hours": "258.0",
+    "smm_hours": "168.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 31,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:26:24.558",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
+    "created_at": "2026-04-10T10:27:00",
+    "total_price": "180000.00",
+    "services_data": {},
     "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
     "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "52.0",
+    "marketer_hours": "22.0",
+    "smm_hours": "30.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 32,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:26:31.762",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
+    "created_at": "2026-04-20T13:36:00",
+    "total_price": "133500.00",
+    "services_data": {},
     "region": "Москва",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
     "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_manager": 10,
+    "programmer_hours": "18.0",
+    "marketer_hours": "21.0",
+    "smm_hours": "47.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 33,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:27:48.185",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Кабардино-Балкария",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "created_at": "2026-04-20T11:40:00",
+    "total_price": "48500.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": null,
+    "assigned_manager": 10,
+    "programmer_hours": "23.0",
+    "marketer_hours": "8.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 34,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:29:59.013",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Санкт-Петербург",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "created_at": "2026-03-31T16:42:00",
+    "total_price": "99000.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
+    "assigned_smm": null,
+    "assigned_manager": 10,
+    "programmer_hours": "48.0",
+    "marketer_hours": "8.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 35,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:32:54.779",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Калининградская область",
-    "comment": "",
-    "assigned_programmer": null,
+    "created_at": "2026-03-15T17:49:00",
+    "total_price": "1201000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 3,
     "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "280.0",
+    "marketer_hours": "246.0",
+    "smm_hours": "172.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 36,
   "fields": {
-    "client": 12,
+    "client": 7,
     "status": "completed",
-    "created_at": "2026-05-20T18:34:38.835",
-    "total_price": "40500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Одноклассники (OK)",
-          "services": [
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Видеопост в OK",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Оформление виджетов OK",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Конкурсы и розыгрыши OK",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 40500.0
-        }
-      ]
-    },
-    "region": "Кабардино-Балкария",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": null,
+    "created_at": "2026-05-01T18:45:00",
+    "total_price": "61000.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 3,
     "assigned_smm": null,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "0.0",
+    "programmer_hours": "14.0",
+    "marketer_hours": "21.0",
     "smm_hours": "0.0"
   }
 },
@@ -4221,216 +2202,60 @@
   "model": "orders.order",
   "pk": 37,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T18:35:42.881",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
+    "created_at": "2026-05-04T15:33:00",
+    "total_price": "55000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
     "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_manager": 10,
+    "programmer_hours": "20.0",
+    "marketer_hours": "10.0",
+    "smm_hours": "2.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 38,
   "fields": {
-    "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T18:38:43.230",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Алтай",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 8,
-    "assigned_smm": 9,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-05-01T16:11:00",
+    "total_price": "150000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 3,
+    "assigned_smm": null,
+    "assigned_manager": 5,
+    "programmer_hours": "56.0",
+    "marketer_hours": "32.0",
+    "smm_hours": "0.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 39,
   "fields": {
-    "client": 12,
+    "client": 2,
     "status": "completed",
-    "created_at": "2026-05-20T18:39:46.683",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "Алтай",
-    "comment": "",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "created_at": "2026-05-03T13:29:00",
+    "total_price": "141500.00",
+    "services_data": {},
+    "region": "Москва",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "programmer_hours": "10.0",
+    "marketer_hours": "33.0",
+    "smm_hours": "57.0"
   }
 },
 {
@@ -4438,71 +2263,19 @@
   "pk": 40,
   "fields": {
     "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T18:39:53.798",
-    "total_price": "50000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        }
-      ]
-    },
-    "region": "ДНР",
-    "comment": "",
-    "assigned_programmer": null,
+    "status": "completed",
+    "created_at": "2026-05-01T15:40:00",
+    "total_price": "90000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
     "assigned_marketer": 8,
-    "assigned_smm": 9,
-    "assigned_manager": 10,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_smm": null,
+    "assigned_manager": 5,
+    "programmer_hours": "26.0",
+    "marketer_hours": "30.0",
+    "smm_hours": "0.0"
   }
 },
 {
@@ -4510,178 +2283,39 @@
   "pk": 41,
   "fields": {
     "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T19:23:32.981",
-    "total_price": "50500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Чат-боты",
-          "services": [
-            {
-              "name": "Ретаргетинг",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Продвижение в VK",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 2.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Чат-бот для Telegram",
-              "price": 12000.0,
-              "programmer_hours": 4.0,
-              "marketer_hours": 2.0,
-              "smm_hours": 2.0
-            },
-            {
-              "name": "Яндекс.Бизнес (Профиль)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 3.0,
-              "smm_hours": 3.0
-            },
-            {
-              "name": "Таргет ВКонтакте (расширенный)",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 1.0,
-              "smm_hours": 7.0
-            },
-            {
-              "name": "Сбор отзывов на Яндекс.Картах",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 50500.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
-    "assigned_programmer": 6,
+    "status": "completed",
+    "created_at": "2026-04-22T18:23:00",
+    "total_price": "151500.00",
+    "services_data": {},
+    "region": "Екатеринбург",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
-    "assigned_smm": 4,
+    "assigned_smm": 9,
     "assigned_manager": 5,
-    "programmer_hours": "4.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "18.0"
+    "programmer_hours": "30.0",
+    "marketer_hours": "8.0",
+    "smm_hours": "34.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 42,
   "fields": {
-    "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T20:30:09.896",
-    "total_price": "81000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Вконтакте (ВК)",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Анализ аудитории ВК",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 2.0
-            }
-          ],
-          "total_price": 50000.0
-        },
-        {
-          "type": "custom",
-          "package_name": "Конструктор услуг",
-          "services": [
-            {
-              "name": "Карта проезда",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Сбор ключевых слов для продвижения",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Медийная кампания (баннеры)",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Ремаркетинг по сценариям",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 31000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
-    "assigned_programmer": null,
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-05-11T13:02:00",
+    "total_price": "223000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
     "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "12.0",
-    "smm_hours": "13.0"
+    "assigned_manager": 10,
+    "programmer_hours": "36.0",
+    "marketer_hours": "68.0",
+    "smm_hours": "42.0"
   }
 },
 {
@@ -4689,50 +2323,19 @@
   "pk": 43,
   "fields": {
     "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T20:32:09.658",
-    "total_price": "24000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Конструктор услуг",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            }
-          ],
-          "total_price": 24000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "Побыстрее",
-    "assigned_programmer": null,
-    "assigned_marketer": 3,
-    "assigned_smm": 9,
+    "status": "completed",
+    "created_at": "2026-05-01T10:26:00",
+    "total_price": "1201000.00",
+    "services_data": {},
+    "region": "Екатеринбург",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
+    "assigned_smm": 4,
     "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "4.0",
-    "smm_hours": "11.0"
+    "programmer_hours": "280.0",
+    "marketer_hours": "246.0",
+    "smm_hours": "172.0"
   }
 },
 {
@@ -4740,215 +2343,899 @@
   "pk": 44,
   "fields": {
     "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T20:52:50.973",
-    "total_price": "45000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Email-маркетинг",
-          "services": [
-            {
-              "name": "Настройка автоворонки",
-              "price": 15000.0,
-              "programmer_hours": 3.0,
-              "marketer_hours": 5.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "A/B тест тем писем",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Тепловая карта переходов",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Персонализация писем",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Восстановление брошенных корзин",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Регистрация домена для писем",
-              "price": 5000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 45000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "",
+    "status": "completed",
+    "created_at": "2026-05-04T17:27:00",
+    "total_price": "164000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
     "assigned_programmer": 11,
-    "assigned_marketer": 8,
-    "assigned_smm": null,
-    "assigned_manager": 10,
-    "programmer_hours": "3.0",
-    "marketer_hours": "5.0",
-    "smm_hours": "0.0"
+    "assigned_marketer": 3,
+    "assigned_smm": 9,
+    "assigned_manager": 5,
+    "programmer_hours": "18.0",
+    "marketer_hours": "22.0",
+    "smm_hours": "56.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 45,
   "fields": {
-    "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T20:53:21.209",
-    "total_price": "43000.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Конструктор услуг",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Создание группы OK с нуля",
-              "price": 6000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Парсинг участников групп",
-              "price": 6500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Оформление виджетов OK",
-              "price": 5500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 0.0
-            }
-          ],
-          "total_price": 43000.0
-        }
-      ]
-    },
-    "region": "Москва",
-    "comment": "Качественно",
-    "assigned_programmer": null,
+    "client": 2,
+    "status": "completed",
+    "created_at": "2026-04-26T16:40:00",
+    "total_price": "55000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
+    "assigned_programmer": 11,
     "assigned_marketer": 3,
     "assigned_smm": 4,
-    "assigned_manager": 5,
-    "programmer_hours": "0.0",
-    "marketer_hours": "4.0",
-    "smm_hours": "5.0"
+    "assigned_manager": 10,
+    "programmer_hours": "20.0",
+    "marketer_hours": "10.0",
+    "smm_hours": "2.0"
   }
 },
 {
   "model": "orders.order",
   "pk": 46,
   "fields": {
-    "client": 12,
-    "status": "new",
-    "created_at": "2026-05-20T20:56:33.267",
-    "total_price": "48500.00",
-    "services_data": {
-      "items": [
-        {
-          "type": "custom",
-          "package_name": "Конструктор услуг",
-          "services": [
-            {
-              "name": "Таргет ВКонтакте",
-              "price": 8000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 5.0
-            },
-            {
-              "name": "Контент-план (1 месяц)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Дизайн постов (4 шт)",
-              "price": 9000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 0.0,
-              "smm_hours": 6.0
-            },
-            {
-              "name": "Написание постов (4 шт)",
-              "price": 7000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 4.0,
-              "smm_hours": 0.0
-            },
-            {
-              "name": "Целевая страница ВК",
-              "price": 10000.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 1.0,
-              "smm_hours": 3.0
-            },
-            {
-              "name": "Таргет OK (до 18+)",
-              "price": 7500.0,
-              "programmer_hours": 0.0,
-              "marketer_hours": 1.0,
-              "smm_hours": 3.0
-            }
-          ],
-          "total_price": 48500.0
-        }
-      ]
-    },
-    "region": "Адыгея",
-    "comment": "Быстрее",
+    "client": 2,
+    "status": "completed",
+    "created_at": "2026-05-13T15:29:00",
+    "total_price": "1193000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 6,
+    "assigned_marketer": 3,
+    "assigned_smm": 4,
+    "assigned_manager": 5,
+    "programmer_hours": "246.0",
+    "marketer_hours": "230.0",
+    "smm_hours": "202.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 47,
+  "fields": {
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-05-08T16:39:00",
+    "total_price": "53000.00",
+    "services_data": {},
+    "region": "Казань",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 3,
+    "assigned_smm": null,
+    "assigned_manager": 5,
+    "programmer_hours": "10.0",
+    "marketer_hours": "16.0",
+    "smm_hours": "0.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 48,
+  "fields": {
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-05-05T15:01:00",
+    "total_price": "50000.00",
+    "services_data": {},
+    "region": "Екатеринбург",
+    "comment": null,
     "assigned_programmer": null,
     "assigned_marketer": 8,
     "assigned_smm": 4,
+    "assigned_manager": 5,
+    "programmer_hours": "0.0",
+    "marketer_hours": "13.0",
+    "smm_hours": "16.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 49,
+  "fields": {
+    "client": 2,
+    "status": "completed",
+    "created_at": "2026-05-13T11:09:00",
+    "total_price": "100000.00",
+    "services_data": {},
+    "region": "Новосибирск",
+    "comment": null,
+    "assigned_programmer": null,
+    "assigned_marketer": 3,
+    "assigned_smm": 4,
     "assigned_manager": 10,
     "programmer_hours": "0.0",
-    "marketer_hours": "10.0",
-    "smm_hours": "17.0"
+    "marketer_hours": "26.0",
+    "smm_hours": "32.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 50,
+  "fields": {
+    "client": 7,
+    "status": "completed",
+    "created_at": "2026-04-29T18:56:00",
+    "total_price": "83000.00",
+    "services_data": {},
+    "region": "Санкт-Петербург",
+    "comment": null,
+    "assigned_programmer": 11,
+    "assigned_marketer": 8,
+    "assigned_smm": 4,
+    "assigned_manager": 10,
+    "programmer_hours": "14.0",
+    "marketer_hours": "8.0",
+    "smm_hours": "26.0"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 1,
+  "fields": {
+    "order": 1,
+    "package": 33,
+    "quantity": 2,
+    "price": "110000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 2,
+  "fields": {
+    "order": 1,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 3,
+  "fields": {
+    "order": 2,
+    "package": 29,
+    "quantity": 1,
+    "price": "45000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 4,
+  "fields": {
+    "order": 3,
+    "package": 29,
+    "quantity": 2,
+    "price": "90000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 5,
+  "fields": {
+    "order": 4,
+    "package": 37,
+    "quantity": 1,
+    "price": "50500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 6,
+  "fields": {
+    "order": 4,
+    "package": 33,
+    "quantity": 1,
+    "price": "55000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 7,
+  "fields": {
+    "order": 5,
+    "package": 35,
+    "quantity": 1,
+    "price": "61000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 8,
+  "fields": {
+    "order": 5,
+    "package": 28,
+    "quantity": 1,
+    "price": "40500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 9,
+  "fields": {
+    "order": 6,
+    "package": 29,
+    "quantity": 2,
+    "price": "90000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 10,
+  "fields": {
+    "order": 6,
+    "package": 36,
+    "quantity": 2,
+    "price": "102000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 11,
+  "fields": {
+    "order": 7,
+    "package": 35,
+    "quantity": 2,
+    "price": "122000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 12,
+  "fields": {
+    "order": 8,
+    "package": 36,
+    "quantity": 1,
+    "price": "51000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 13,
+  "fields": {
+    "order": 8,
+    "package": 35,
+    "quantity": 1,
+    "price": "61000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 14,
+  "fields": {
+    "order": 9,
+    "package": 28,
+    "quantity": 2,
+    "price": "81000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 15,
+  "fields": {
+    "order": 9,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 16,
+  "fields": {
+    "order": 10,
+    "package": 33,
+    "quantity": 2,
+    "price": "110000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 17,
+  "fields": {
+    "order": 11,
+    "package": 37,
+    "quantity": 1,
+    "price": "50500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 18,
+  "fields": {
+    "order": 12,
+    "package": 31,
+    "quantity": 2,
+    "price": "106000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 19,
+  "fields": {
+    "order": 12,
+    "package": 37,
+    "quantity": 2,
+    "price": "101000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 20,
+  "fields": {
+    "order": 13,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 21,
+  "fields": {
+    "order": 14,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 22,
+  "fields": {
+    "order": 14,
+    "package": 37,
+    "quantity": 2,
+    "price": "101000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 23,
+  "fields": {
+    "order": 15,
+    "package": 27,
+    "quantity": 1,
+    "price": "50000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 24,
+  "fields": {
+    "order": 15,
+    "package": 32,
+    "quantity": 1,
+    "price": "41500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 25,
+  "fields": {
+    "order": 16,
+    "package": 31,
+    "quantity": 1,
+    "price": "53000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 26,
+  "fields": {
+    "order": 16,
+    "package": 37,
+    "quantity": 1,
+    "price": "50500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 27,
+  "fields": {
+    "order": 17,
+    "package": 35,
+    "quantity": 2,
+    "price": "122000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 28,
+  "fields": {
+    "order": 18,
+    "package": 36,
+    "quantity": 1,
+    "price": "51000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 29,
+  "fields": {
+    "order": 19,
+    "package": 29,
+    "quantity": 1,
+    "price": "45000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 30,
+  "fields": {
+    "order": 19,
+    "package": 36,
+    "quantity": 1,
+    "price": "51000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 31,
+  "fields": {
+    "order": 20,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 32,
+  "fields": {
+    "order": 20,
+    "package": 28,
+    "quantity": 2,
+    "price": "81000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 33,
+  "fields": {
+    "order": 21,
+    "package": 35,
+    "quantity": 2,
+    "price": "122000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 34,
+  "fields": {
+    "order": 21,
+    "package": 31,
+    "quantity": 2,
+    "price": "106000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 35,
+  "fields": {
+    "order": 22,
+    "package": 36,
+    "quantity": 1,
+    "price": "51000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 36,
+  "fields": {
+    "order": 23,
+    "package": 37,
+    "quantity": 1,
+    "price": "50500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 37,
+  "fields": {
+    "order": 23,
+    "package": 39,
+    "quantity": 1,
+    "price": "545500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 38,
+  "fields": {
+    "order": 24,
+    "package": 31,
+    "quantity": 2,
+    "price": "106000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 39,
+  "fields": {
+    "order": 25,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 40,
+  "fields": {
+    "order": 26,
+    "package": 32,
+    "quantity": 1,
+    "price": "41500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 41,
+  "fields": {
+    "order": 27,
+    "package": 29,
+    "quantity": 1,
+    "price": "45000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 42,
+  "fields": {
+    "order": 27,
+    "package": 39,
+    "quantity": 1,
+    "price": "545500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 43,
+  "fields": {
+    "order": 28,
+    "package": 29,
+    "quantity": 2,
+    "price": "90000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 44,
+  "fields": {
+    "order": 29,
+    "package": 37,
+    "quantity": 2,
+    "price": "101000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 45,
+  "fields": {
+    "order": 30,
+    "package": 31,
+    "quantity": 2,
+    "price": "106000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 46,
+  "fields": {
+    "order": 30,
+    "package": 39,
+    "quantity": 2,
+    "price": "1091000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 47,
+  "fields": {
+    "order": 31,
+    "package": 34,
+    "quantity": 2,
+    "price": "99000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 48,
+  "fields": {
+    "order": 31,
+    "package": 28,
+    "quantity": 2,
+    "price": "81000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 49,
+  "fields": {
+    "order": 32,
+    "package": 32,
+    "quantity": 1,
+    "price": "41500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 50,
+  "fields": {
+    "order": 32,
+    "package": 37,
+    "quantity": 1,
+    "price": "50500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 51,
+  "fields": {
+    "order": 33,
+    "package": 30,
+    "quantity": 1,
+    "price": "48500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 52,
+  "fields": {
+    "order": 34,
+    "package": 34,
+    "quantity": 2,
+    "price": "99000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 53,
+  "fields": {
+    "order": 35,
+    "package": 33,
+    "quantity": 2,
+    "price": "110000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 54,
+  "fields": {
+    "order": 35,
+    "package": 39,
+    "quantity": 2,
+    "price": "1091000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 55,
+  "fields": {
+    "order": 36,
+    "package": 35,
+    "quantity": 1,
+    "price": "61000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 56,
+  "fields": {
+    "order": 37,
+    "package": 33,
+    "quantity": 1,
+    "price": "55000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 57,
+  "fields": {
+    "order": 38,
+    "package": 31,
+    "quantity": 2,
+    "price": "106000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 58,
+  "fields": {
+    "order": 38,
+    "package": 30,
+    "quantity": 2,
+    "price": "97000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 59,
+  "fields": {
+    "order": 39,
+    "package": 28,
+    "quantity": 2,
+    "price": "81000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 60,
+  "fields": {
+    "order": 39,
+    "package": 37,
+    "quantity": 2,
+    "price": "101000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 61,
+  "fields": {
+    "order": 40,
+    "package": 29,
+    "quantity": 2,
+    "price": "90000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 62,
+  "fields": {
+    "order": 41,
+    "package": 36,
+    "quantity": 1,
+    "price": "51000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 63,
+  "fields": {
+    "order": 41,
+    "package": 34,
+    "quantity": 1,
+    "price": "49500.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 64,
+  "fields": {
+    "order": 42,
+    "package": 37,
+    "quantity": 2,
+    "price": "101000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 65,
+  "fields": {
+    "order": 42,
+    "package": 35,
+    "quantity": 2,
+    "price": "122000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 66,
+  "fields": {
+    "order": 43,
+    "package": 39,
+    "quantity": 2,
+    "price": "1091000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 67,
+  "fields": {
+    "order": 43,
+    "package": 33,
+    "quantity": 2,
+    "price": "110000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 68,
+  "fields": {
+    "order": 44,
+    "package": 32,
+    "quantity": 2,
+    "price": "83000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 69,
+  "fields": {
+    "order": 44,
+    "package": 28,
+    "quantity": 2,
+    "price": "81000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 70,
+  "fields": {
+    "order": 45,
+    "package": 33,
+    "quantity": 1,
+    "price": "55000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 71,
+  "fields": {
+    "order": 46,
+    "package": 39,
+    "quantity": 2,
+    "price": "1091000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 72,
+  "fields": {
+    "order": 46,
+    "package": 36,
+    "quantity": 2,
+    "price": "102000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 73,
+  "fields": {
+    "order": 47,
+    "package": 31,
+    "quantity": 1,
+    "price": "53000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 74,
+  "fields": {
+    "order": 48,
+    "package": 27,
+    "quantity": 1,
+    "price": "50000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 75,
+  "fields": {
+    "order": 49,
+    "package": 27,
+    "quantity": 2,
+    "price": "100000.00"
+  }
+},
+{
+  "model": "orders.orderitem",
+  "pk": 76,
+  "fields": {
+    "order": 50,
+    "package": 32,
+    "quantity": 2,
+    "price": "83000.00"
   }
 }
 ]

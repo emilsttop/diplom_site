@@ -859,47 +859,29 @@
     
     // AJAX-обновление фильтров специалистов
     async function updateWorkloadAjax() {
-        const url = new URL(window.location.href);
-        url.searchParams.set('active_tab', 'specialists');
-        
-        // Получаем значения из select
-        const period = document.getElementById('workloadPeriod')?.value;
-        const chartType = document.getElementById('workloadChartType')?.value;
-        const status = document.getElementById('workloadStatus')?.value;
-        
-        if (period) url.searchParams.set('workload_period', period);
-        if (chartType) url.searchParams.set('workload_chart_type', chartType);
-        if (status) url.searchParams.set('workload_status', status);
-        
-        const scrollPosition = window.scrollY;
-        
-        try {
-            const response = await fetch(url.toString());
-            const html = await response.text();
-            
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Обновляем график
-            const newCanvas = doc.getElementById('workloadChart');
-            if (newCanvas) {
-                const newLabels = [...newCanvas.closest('.chart-container').querySelectorAll('script')];
-                const oldContainer = document.querySelector('#workloadChart').closest('.chart-container');
-                
-                // Обновляем данные графика через пересоздание
-                const newWorkloadLabels = doc.querySelectorAll('#workloadChart').length > 0 ? 
-                    [...doc.querySelectorAll('#workloadChart')][0].getAttribute('data-labels') : null;
-                
-                location.reload(); // Временное решение — перезагрузка страницы
-                return;
-            }
-            
-            window.scrollTo(0, scrollPosition);
-        } catch(e) {
-            console.error('Ошибка обновления:', e);
-            location.reload();
-        }
-    }
+    const url = new URL(window.location.href);
+    url.searchParams.set('active_tab', 'specialists');
+    
+    // Получаем значения из select
+    const period = document.getElementById('workloadPeriod')?.value;
+    const chartType = document.getElementById('workloadChartType')?.value;
+    const status = document.getElementById('workloadStatus')?.value;
+    
+    if (period) url.searchParams.set('workload_period', period);
+    if (chartType) url.searchParams.set('workload_chart_type', chartType);
+    if (status) url.searchParams.set('workload_status', status);
+    
+    // Сохраняем текущую позицию прокрутки
+    const scrollPosition = window.scrollY;
+    
+    // Перезагружаем страницу с новыми параметрами
+    window.location.href = url.toString();
+    
+    // Восстанавливаем прокрутку после загрузки
+    setTimeout(function() {
+        window.scrollTo(0, scrollPosition);
+    }, 100);
+}
     
     // Обработчики для select с AJAX
     document.getElementById('workloadPeriod')?.addEventListener('change', function(e) {
