@@ -614,16 +614,16 @@
             <div class="card-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                 <span>📊 {{ workload_title }}</span>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select name="workload_period" id="workloadPeriod" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+                    <select name="workload_period" id="workloadPeriod" class="ajax-filter" data-param="workload_period" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
                         <option value="day" {% if workload_period == 'day' %}selected{% endif %}>По дням</option>
                         <option value="week" {% if workload_period == 'week' %}selected{% endif %}>По неделям</option>
                         <option value="month" {% if workload_period == 'month' %}selected{% endif %}>По месяцам</option>
                     </select>
-                    <select name="workload_chart_type" id="workloadChartType" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+                    <select name="workload_chart_type" id="workloadChartType" class="ajax-filter" data-param="workload_chart_type" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
                         <option value="hours" {% if workload_chart_type == 'hours' %}selected{% endif %}>Часы</option>
                         <option value="orders" {% if workload_chart_type == 'orders' %}selected{% endif %}>Количество заказов</option>
                     </select>
-                    <select name="workload_status" id="workloadStatus" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
+                    <select name="workload_status" id="workloadStatus" class="ajax-filter" data-param="workload_status" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #ddd;">
                         <option value="all" {% if workload_status == 'all' %}selected{% endif %}>Все заказы</option>
                         <option value="new" {% if workload_status == 'new' %}selected{% endif %}>🆕 Новые</option>
                         <option value="processing" {% if workload_status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
@@ -787,55 +787,65 @@
     });
 
     // График загруженности специалистов
-    const workloadLabels = [{% for item in workload_data %}'{{ item.period }}',{% endfor %}];
-    const workloadValues = [{% for item in workload_data %}{{ item.value }},{% endfor %}];
+    let workloadChart = null;
     
-    const workloadCtx = document.getElementById('workloadChart').getContext('2d');
-    let workloadChart = new Chart(workloadCtx, {
-        type: 'bar',
-        data: {
-            labels: workloadLabels,
-            datasets: [{
-                label: '{{ workload_title }}',
-                data: workloadValues,
-                backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                borderColor: '#dc3545',
-                borderWidth: 1,
-                borderRadius: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let value = context.raw;
-                            let unit = '{% if workload_chart_type == "hours" %}часов{% else %}заказов{% endif %}';
-                            return value + ' ' + unit;
+    function initWorkloadChart() {
+        const workloadLabels = [{% for item in workload_data %}'{{ item.period }}',{% endfor %}];
+        const workloadValues = [{% for item in workload_data %}{{ item.value }},{% endfor %}];
+        const workloadCtx = document.getElementById('workloadChart').getContext('2d');
+        
+        if (workloadChart) {
+            workloadChart.destroy();
+        }
+        
+        workloadChart = new Chart(workloadCtx, {
+            type: 'bar',
+            data: {
+                labels: workloadLabels,
+                datasets: [{
+                    label: '{{ workload_title }}',
+                    data: workloadValues,
+                    backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                    borderColor: '#dc3545',
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let value = context.raw;
+                                let unit = '{% if workload_chart_type == "hours" %}часов{% else %}заказов{% endif %}';
+                                return value + ' ' + unit;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '{% if workload_chart_type == "hours" %}Часы{% else %}Заказы{% endif %}'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Период'
                         }
                     }
                 }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: '{% if workload_chart_type == "hours" %}Часы{% else %}Заказы{% endif %}'
-                    }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Период'
-                    }
-                }
             }
-        }
-    });
+        });
+    }
+    
+    initWorkloadChart();
     
     // Функция для отображения/скрытия состава заказа
     function toggleComposition(orderId) {
@@ -847,35 +857,79 @@
         }
     }
     
-    // Функция обновления фильтров
-    function updateWorkloadFilter(param, value) {
+    // AJAX-обновление фильтров специалистов
+    async function updateWorkloadAjax() {
         const url = new URL(window.location.href);
-        url.searchParams.set(param, value);
         url.searchParams.set('active_tab', 'specialists');
-        window.location.href = url.toString();
+        
+        // Получаем значения из select
+        const period = document.getElementById('workloadPeriod')?.value;
+        const chartType = document.getElementById('workloadChartType')?.value;
+        const status = document.getElementById('workloadStatus')?.value;
+        
+        if (period) url.searchParams.set('workload_period', period);
+        if (chartType) url.searchParams.set('workload_chart_type', chartType);
+        if (status) url.searchParams.set('workload_status', status);
+        
+        const scrollPosition = window.scrollY;
+        
+        try {
+            const response = await fetch(url.toString());
+            const html = await response.text();
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Обновляем график
+            const newCanvas = doc.getElementById('workloadChart');
+            if (newCanvas) {
+                const newLabels = [...newCanvas.closest('.chart-container').querySelectorAll('script')];
+                const oldContainer = document.querySelector('#workloadChart').closest('.chart-container');
+                
+                // Обновляем данные графика через пересоздание
+                const newWorkloadLabels = doc.querySelectorAll('#workloadChart').length > 0 ? 
+                    [...doc.querySelectorAll('#workloadChart')][0].getAttribute('data-labels') : null;
+                
+                location.reload(); // Временное решение — перезагрузка страницы
+                return;
+            }
+            
+            window.scrollTo(0, scrollPosition);
+        } catch(e) {
+            console.error('Ошибка обновления:', e);
+            location.reload();
+        }
     }
     
-    // Обработчики для всех трёх select
-    const periodSelect = document.getElementById('workloadPeriod');
-    const chartTypeSelect = document.getElementById('workloadChartType');
-    const statusSelect = document.getElementById('workloadStatus');
+    // Обработчики для select с AJAX
+    document.getElementById('workloadPeriod')?.addEventListener('change', function(e) {
+        e.preventDefault();
+        updateWorkloadAjax();
+    });
     
-    if (periodSelect) {
-        periodSelect.addEventListener('change', function() {
-            updateWorkloadFilter('workload_period', this.value);
+    document.getElementById('workloadChartType')?.addEventListener('change', function(e) {
+        e.preventDefault();
+        updateWorkloadAjax();
+    });
+    
+    document.getElementById('workloadStatus')?.addEventListener('change', function(e) {
+        e.preventDefault();
+        updateWorkloadAjax();
+    });
+    
+    // Сохраняем позицию прокрутки для обычных ссылок
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.sort-btn, .filter-group button, .btn-clear, .main-tab, .sub-tab').forEach(link => {
+            link.addEventListener('click', function() {
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+            });
         });
-    }
-    
-    if (chartTypeSelect) {
-        chartTypeSelect.addEventListener('change', function() {
-            updateWorkloadFilter('workload_chart_type', this.value);
-        });
-    }
-    
-    if (statusSelect) {
-        statusSelect.addEventListener('change', function() {
-            updateWorkloadFilter('workload_status', this.value);
-        });
-    }
+        
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            window.scrollTo(0, parseInt(savedPosition));
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
 </script>
 {% endblock %}
