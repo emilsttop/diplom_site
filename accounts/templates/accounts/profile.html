@@ -445,15 +445,19 @@ body.dark .detail-tab:not(.active) {
 }
 </style>
 
-<div class="profile-header">
-    <div class="profile-avatar">👤</div>
-    <div class="profile-info">
-        <h1>Личный кабинет</h1>
-        <p class="profile-name">{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</p>
-        <p class="profile-username">Логин: {{ user.username }}</p>
-        <p class="profile-phone">📞 {{ user.phone|default:"Телефон не указан" }}</p>
-        <p class="profile-email">📧 {{ user.email }}</p>
-        <p class="profile-role">Клиент</p>
+<div class="profile-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="profile-avatar">👤</div>
+        <div>
+            <h1 style="margin: 0; font-size: 24px;">Личный кабинет</h1>
+            <p style="margin: 5px 0 0; font-size: 14px;">Клиент</p>
+        </div>
+    </div>
+    <div style="text-align: right;">
+        <p style="margin: 0; font-size: 18px; font-weight: 600;">{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</p>
+        <p style="margin: 5px 0 0; font-size: 13px;">📧 {{ user.email }}</p>
+        <p style="margin: 5px 0 0; font-size: 13px;">📞 {{ user.phone|default:"Телефон не указан" }}</p>
+        <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.7;">Логин: {{ user.username }}</p>
     </div>
 </div>
 
