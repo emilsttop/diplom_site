@@ -16,6 +16,7 @@
     "role": "client",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -37,6 +38,7 @@
     "role": "client",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -58,6 +60,7 @@
     "role": "marketer",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -79,6 +82,7 @@
     "role": "smm",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -100,6 +104,7 @@
     "role": "manager",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -121,6 +126,7 @@
     "role": "programmer",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -142,6 +148,7 @@
     "role": "client",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -163,6 +170,7 @@
     "role": "marketer",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -184,6 +192,7 @@
     "role": "smm",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -205,6 +214,7 @@
     "role": "manager",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }
@@ -226,8 +236,85 @@
     "role": "programmer",
     "max_hours": 45,
     "phone": null,
+    "role_link": null,
     "groups": [],
     "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$LzKcm3BmHPbacRI5NWWrzW$s4RGuxb9dImiFf13EtErFZ1eM7xi+Ig4C1k7mRbmiJU=",
+    "last_login": "2026-05-20T03:20:40.824",
+    "is_superuser": false,
+    "username": "emilsttop",
+    "first_name": "Эмиль",
+    "last_name": "Борисов",
+    "email": "publik.emil@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-20T03:16:53.753",
+    "role": "client",
+    "max_hours": 45,
+    "phone": "+79956834730",
+    "role_link": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.role",
+  "pk": 1,
+  "fields": {
+    "name": "Администратор",
+    "code": "admin",
+    "description": "Полный доступ"
+  }
+},
+{
+  "model": "users.role",
+  "pk": 2,
+  "fields": {
+    "name": "Менеджер",
+    "code": "manager",
+    "description": "Управление заказами и аналитика"
+  }
+},
+{
+  "model": "users.role",
+  "pk": 3,
+  "fields": {
+    "name": "Клиент",
+    "code": "client",
+    "description": "Просмотр и создание заказов"
+  }
+},
+{
+  "model": "users.role",
+  "pk": 4,
+  "fields": {
+    "name": "Программист",
+    "code": "programmer",
+    "description": "Выполнение технических задач"
+  }
+},
+{
+  "model": "users.role",
+  "pk": 5,
+  "fields": {
+    "name": "Маркетолог",
+    "code": "marketer",
+    "description": "Маркетинговые задачи"
+  }
+},
+{
+  "model": "users.role",
+  "pk": 6,
+  "fields": {
+    "name": "SMM-менеджер",
+    "code": "smm",
+    "description": "Ведение социальных сетей"
   }
 },
 {
@@ -2810,6 +2897,150 @@
       ]
     },
     "region": "Алтай",
+    "comment": "",
+    "assigned_programmer": null,
+    "assigned_marketer": 3,
+    "assigned_smm": 4,
+    "assigned_manager": 5,
+    "programmer_hours": "0.0",
+    "marketer_hours": "12.0",
+    "smm_hours": "13.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 20,
+  "fields": {
+    "client": 12,
+    "status": "new",
+    "created_at": "2026-05-20T03:17:13.205",
+    "total_price": "50000.00",
+    "services_data": {
+      "items": [
+        {
+          "type": "custom",
+          "package_name": "Продвижение ВКонтакте",
+          "services": [
+            {
+              "name": "Таргет ВКонтакте",
+              "price": 8000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 5.0
+            },
+            {
+              "name": "Контент-план (1 месяц)",
+              "price": 7000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Дизайн постов (4 шт)",
+              "price": 9000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 6.0
+            },
+            {
+              "name": "Написание постов (4 шт)",
+              "price": 7000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Целевая страница ВК",
+              "price": 10000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Анализ аудитории ВК",
+              "price": 9000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 2.0
+            }
+          ],
+          "total_price": 50000.0
+        }
+      ]
+    },
+    "region": "Санкт-Петербург",
+    "comment": "",
+    "assigned_programmer": null,
+    "assigned_marketer": 8,
+    "assigned_smm": 9,
+    "assigned_manager": 10,
+    "programmer_hours": "0.0",
+    "marketer_hours": "12.0",
+    "smm_hours": "13.0"
+  }
+},
+{
+  "model": "orders.order",
+  "pk": 21,
+  "fields": {
+    "client": 12,
+    "status": "new",
+    "created_at": "2026-05-20T03:17:20.224",
+    "total_price": "50000.00",
+    "services_data": {
+      "items": [
+        {
+          "type": "custom",
+          "package_name": "Продвижение ВКонтакте",
+          "services": [
+            {
+              "name": "Таргет ВКонтакте",
+              "price": 8000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 5.0
+            },
+            {
+              "name": "Контент-план (1 месяц)",
+              "price": 7000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Дизайн постов (4 шт)",
+              "price": 9000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 6.0
+            },
+            {
+              "name": "Написание постов (4 шт)",
+              "price": 7000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Целевая страница ВК",
+              "price": 10000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 0.0,
+              "smm_hours": 0.0
+            },
+            {
+              "name": "Анализ аудитории ВК",
+              "price": 9000.0,
+              "programmer_hours": 0.0,
+              "marketer_hours": 4.0,
+              "smm_hours": 2.0
+            }
+          ],
+          "total_price": 50000.0
+        }
+      ]
+    },
+    "region": "Санкт-Петербург",
     "comment": "",
     "assigned_programmer": null,
     "assigned_marketer": 3,
