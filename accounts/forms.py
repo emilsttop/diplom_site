@@ -10,12 +10,6 @@ class RegistrationForm(UserCreationForm):
     required=True, 
     label='Телефон',
     widget=forms.TextInput(attrs={'placeholder': '+7 (999) 999-99-99'}),
-    validators=[
-        RegexValidator(
-            regex=r'^\+?7\d{10}$',
-            message='Введите номер в формате +7XXXXXXXXXX (10 цифр после +7)'
-        )
-    ]
 )
     last_name = forms.CharField(max_length=150, required=True, label='Фамилия')
     first_name = forms.CharField(max_length=150, required=True, label='Имя')

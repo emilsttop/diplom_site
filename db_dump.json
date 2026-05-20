@@ -237,7 +237,7 @@
   "pk": 9,
   "fields": {
     "password": "pbkdf2_sha256$1200000$FSDpjNSkxxaHJM2yJgYtX9$+iYj1sUr4Vp3YRTFVLmntkakRdkiUfcddq29Q85CPUg=",
-    "last_login": null,
+    "last_login": "2026-05-20T22:04:41.362",
     "is_superuser": false,
     "username": "Волкова Анастасия Романовна",
     "first_name": "Анастасия",
@@ -259,7 +259,7 @@
   "pk": 10,
   "fields": {
     "password": "pbkdf2_sha256$1200000$jjYh9ACShxlwo96fhrsZIU$IvEhfpimpe0caZw8p7MYoFPCGsugkvhb6ebYEtiZ7pA=",
-    "last_login": "2026-05-20T18:37:16.237",
+    "last_login": "2026-05-20T22:07:58.121",
     "is_superuser": false,
     "username": "Новиков Павел Андреевич",
     "first_name": "Павел",
@@ -316,6 +316,28 @@
     "max_hours": 45,
     "phone": "+79956834730",
     "role_link": 3,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$eWpXcC1J1mnX168YDM0VRN$hmnHSSgu7KZjKtjaurdH4TfJx8WV5/6M0pX3tXPoj74=",
+    "last_login": "2026-05-20T22:11:26.263",
+    "is_superuser": false,
+    "username": "client1",
+    "first_name": "Илья",
+    "last_name": "Тестовов",
+    "email": "testovov@mail.ru",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-20T22:11:24.748",
+    "role": "client",
+    "max_hours": 45,
+    "phone": "+79525164894",
+    "role_link": null,
     "groups": [],
     "user_permissions": []
   }

@@ -210,8 +210,8 @@ def specialist_dashboard(request):
     else:  # 'all'
         filtered_orders = base_orders
 
-    # Общая статистика (часы только по активным заказам, не отменённым)
-    hours_queryset = base_orders.exclude(status='cancelled')
+    # Общая статистика (часы только по заказам со статусом 'new' или 'processing')
+    hours_queryset = base_orders.filter(status__in=['new', 'processing'])
     total_hours = hours_queryset.aggregate(total=Sum(hours_field))['total'] or 0
     
     # Статистика по статусам (для карточек сверху)
