@@ -150,8 +150,8 @@
         transition: all 0.3s;
     }
     .filter-group button:hover {
-    background: #bb2d3b;
-    transform: translateY(-2px);
+        background: #bb2d3b;
+        transform: translateY(-2px);
     }
     .btn-clear {
         background: #6c757d;
@@ -164,9 +164,10 @@
         display: inline-block;
     }
     .btn-clear:hover {
-    background: #5a6268;
-    transform: translateY(-2px);
+        background: #5a6268;
+        transform: translateY(-2px);
     }
+
     /* Кнопки фильтров */
     .btn-apply, .btn-reset {
         padding: 12px 32px;
@@ -231,12 +232,14 @@
         background: var(--black-light);
         border-color: #3a3a4a;
     }
+
+    /* Компактная карточка заказа в одну строку */
     .order-card {
         background: var(--white);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-radius: 16px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         border-left: 4px solid var(--red);
         transition: all 0.2s;
     }
@@ -247,20 +250,85 @@
         transform: translateX(5px);
         box-shadow: 0 4px 12px rgba(220,53,69,0.15);
     }
-    .order-card h3 {
-        margin: 0 0 10px 0;
-        font-size: 18px;
-        color: var(--red);
-    }
-    .hours-badge {
-        background: var(--red);
+
+    /* Кнопка состава заказа */
+    .btn-composition-specialist {
+        background: #6c757d;
         color: white;
-        padding: 4px 12px;
+        border: none;
+        padding: 6px 12px;
         border-radius: 20px;
-        display: inline-block;
-        font-size: 14px;
-        font-weight: 500;
+        cursor: pointer;
+        font-size: 11px;
+        transition: all 0.3s;
     }
+    .btn-composition-specialist:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+    }
+
+    /* Кнопка чата */
+    .btn-chat-specialist {
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        color: white;
+        text-decoration: none;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: inline-block;
+        text-align: center;
+    }
+    .btn-chat-specialist:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220,53,69,0.3);
+    }
+
+    /* Бейдж уведомления */
+    .unread-badge {
+        background: #ffc107;
+        color: black;
+        border-radius: 20px;
+        padding: 3px 8px;
+        font-size: 10px;
+        font-weight: 500;
+        display: inline-block;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+
+    /* Статус заказа */
+    .order-status {
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .status-new { background: #007bff; color: white; }
+    .status-processing { background: #ffc107; color: black; }
+    .status-completed { background: #28a745; color: white; }
+    .status-cancelled { background: var(--red); color: white; }
+
+    /* Блок состава заказа */
+    .composition-details {
+        margin-top: 12px;
+        padding: 10px;
+        background: var(--gray);
+        border-radius: 10px;
+        font-size: 12px;
+    }
+    body.dark .composition-details {
+        background: #2a2a3a;
+        color: #e0e0e0;
+    }
+
     .orders-scroll {
         max-height: 500px;
         overflow-y: auto;
@@ -270,40 +338,6 @@
         text-align: center;
         padding: 40px;
         color: var(--gray-dark);
-    }
-    /* Кнопка чата специалиста */
-    .btn-chat-specialist {
-        display: inline-block;
-        padding: 8px 20px;
-        background: linear-gradient(135deg, #dc3545, #b02a37);
-        color: white;
-        text-decoration: none;
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s;
-        border: none;
-        cursor: pointer;
-    }
-    .btn-chat-specialist:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-    }
-
-    /* Бейдж уведомления */
-    .unread-badge {
-        background: #dc3545;
-        color: white;
-        border-radius: 20px;
-        padding: 4px 12px;
-        font-size: 12px;
-        font-weight: 500;
-        animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.7; }
-        100% { opacity: 1; }
     }
 </style>
 
@@ -394,34 +428,84 @@
     <div class="orders-scroll">
         {% for order in orders %}
         <div class="order-card" data-order-id="{{ order.id }}" data-specialist-id="{{ user.id }}">
+            <!-- ВСЁ В ОДНУ СТРОКУ (flex) -->
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <h3 style="margin: 0;">Заказ №{{ order.id }}</h3>
-                <div id="unread-badge-{{ order.id }}" class="unread-badge" style="display: none;">
-                    📩 Новое сообщение
+                <!-- Номер заказа -->
+                <div style="min-width: 100px;">
+                    <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Заказ</span>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--red);">№{{ order.id }}</div>
                 </div>
-            </div>
-            <p><strong>Клиент:</strong> {{ order.client.last_name }} {{ order.client.first_name }}</p>
-            <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
-            <p><strong>Статус:</strong> 
-                {% if order.status == 'new' %}🆕 Новый
-                {% elif order.status == 'processing' %}⚙️ В обработке
-                {% elif order.status == 'completed' %}✅ Выполнен
-                {% elif order.status == 'cancelled' %}❌ Отменён
-                {% endif %}
-            </p>
-            <p><strong>Ваши часы:</strong> 
-                <span class="hours-badge">
-                    {% if role == 'programmer' %}{{ order.programmer_hours|floatformat:0 }}
-                    {% elif role == 'marketer' %}{{ order.marketer_hours|floatformat:0 }}
-                    {% elif role == 'smm' %}{{ order.smm_hours|floatformat:0 }}
-                    {% endif %} ч
-                </span>
-            </p>
-            <p><strong>Сумма заказа:</strong> {{ order.total_price|floatformat:0 }} ₽</p>
-            <div style="margin-top: 15px;">
-                <a href="{% url 'specialist_chat_page' order.id user.id %}" class="btn-chat-specialist">
-                    💬 Чат с менеджером
+                
+                <!-- Клиент -->
+                <div style="min-width: 140px;">
+                    <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Клиент</span>
+                    <div style="font-size: 14px; font-weight: 500;">{{ order.client.last_name }} {{ order.client.first_name }}</div>
+                </div>
+                
+                <!-- Дата -->
+                <div style="min-width: 110px;">
+                    <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Дата</span>
+                    <div style="font-size: 13px;">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                </div>
+                
+                <!-- Статус -->
+                <div>
+                    <span class="order-status status-{{ order.status }}" style="display: inline-block;">
+                        {% if order.status == 'new' %}🆕 Новый
+                        {% elif order.status == 'processing' %}⚙️ В обработке
+                        {% elif order.status == 'completed' %}✅ Выполнен
+                        {% elif order.status == 'cancelled' %}❌ Отменён
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <!-- Нагрузка -->
+                <div style="min-width: 80px; text-align: center;">
+                    <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Нагрузка</span>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--red);">
+                        {% if role == 'programmer' %}{{ order.programmer_hours|floatformat:0 }}
+                        {% elif role == 'marketer' %}{{ order.marketer_hours|floatformat:0 }}
+                        {% elif role == 'smm' %}{{ order.smm_hours|floatformat:0 }}
+                        {% endif %} ч
+                    </div>
+                </div>
+                
+                <!-- Сумма -->
+                <div style="min-width: 90px; text-align: center;">
+                    <span style="font-size: 10px; color: var(--gray-dark); text-transform: uppercase;">Сумма</span>
+                    <div style="font-size: 16px; font-weight: 700; color: var(--red);">{{ order.total_price|floatformat:0 }} ₽</div>
+                </div>
+                
+                <!-- Бейдж уведомления -->
+                <div id="unread-badge-{{ order.id }}" class="unread-badge" style="display: none;">📩 Новое</div>
+                
+                <!-- Кнопка состава заказа -->
+                <button onclick="toggleSpecialistComposition({{ order.id }})" class="btn-composition-specialist" style="background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px;">
+                    📋 Состав
+                </button>
+                
+                <!-- Кнопка чата -->
+                <a href="{% url 'specialist_chat_page' order.id user.id %}" class="btn-chat-specialist" style="background: linear-gradient(135deg, #dc3545, #b02a37); color: white; text-decoration: none; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;">
+                    💬 Чат
                 </a>
+            </div>
+            
+            <!-- Блок состава заказа (скрыт по умолчанию) -->
+            <div id="specialist-composition-{{ order.id }}" class="composition-details" style="display: none; margin-top: 12px; padding: 10px; background: var(--gray); border-radius: 10px; font-size: 12px;">
+                <div style="font-weight: 600; margin-bottom: 6px; color: var(--red);">📦 Состав заказа:</div>
+                {% for item in order.items.all %}
+                    <div style="margin-bottom: 3px;">• {{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
+                {% endfor %}
+                {% if order.services_data.items %}
+                    {% for service_item in order.services_data.items %}
+                        {% if service_item.type == 'custom' %}
+                            <div style="margin-top: 6px;"><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
+                            {% for s in service_item.services %}
+                                <div style="margin-left: 12px; margin-bottom: 2px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
         </div>
         {% empty %}
@@ -545,5 +629,15 @@
             }
         });
     }, 10000);
+</script>
+<script>
+    function toggleSpecialistComposition(orderId) {
+        const div = document.getElementById('specialist-composition-' + orderId);
+        if (div.style.display === 'none' || div.style.display === '') {
+            div.style.display = 'block';
+        } else {
+            div.style.display = 'none';
+        }
+    }
 </script>
 {% endblock %}
