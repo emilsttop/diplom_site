@@ -5,18 +5,20 @@
 {% block content %}
 <style>
     .package-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    .package-header h1 {
-        font-size: 32px;
-        color: white;
-    }
-    .package-description {
-        text-align: center;
-        color: white;
-        margin-bottom: 30px;
-    }
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    padding-bottom: 20px;
+}
+.package-header h1 {
+    font-size: 32px;
+    color: white;
+    margin-bottom: 20px;
+}
+.package-description {
+    color: white;
+    margin-top: 15px;
+}
     .services-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -237,7 +239,6 @@
 
 <div class="package-header">
     <h1>{{ package.icon }} {{ package.name }}</h1>
-    <div style="height: 3px; background: #dc3545; width: 60px; margin: 15px auto;"></div>
     <div class="package-description">
         <p>{{ package.description }}</p>
     </div>
