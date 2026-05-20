@@ -479,6 +479,20 @@
         margin: 5px 0;
         opacity: 0.9;
     }
+.filter-btn {
+    padding: 8px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+.filter-btn.active {
+    background: #dc3545;
+    color: white;
+}
+.filter-btn:hover:not(.active) {
+    background: rgba(220,53,69,0.1);
+}
 </style>
 
 <div class="profile-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
@@ -495,6 +509,25 @@
         <p style="margin: 5px 0 0; font-size: 13px;">📞 {{ user.phone|default:"Телефон не указан" }}</p>
         <p style="margin: 5px 0 0; font-size: 12px; opacity: 0.7;">Логин: {{ user.username }}</p>
     </div>
+</div>
+
+<!-- Фильтр по статусу заказа -->
+<div class="filter-bar" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; background: var(--gray); padding: 8px; border-radius: 50px;">
+    <a href="?status=all" class="filter-btn {% if status_filter == 'all' %}active{% endif %}" style="padding: 8px 20px; border-radius: 30px; text-decoration: none; color: {% if status_filter == 'all' %}white{% else %}#1a1a1a{% endif %}; background: {% if status_filter == 'all' %}#dc3545{% else %}transparent{% endif %};">
+        📋 Все
+    </a>
+    <a href="?status=new" class="filter-btn {% if status_filter == 'new' %}active{% endif %}" style="padding: 8px 20px; border-radius: 30px; text-decoration: none; color: {% if status_filter == 'new' %}white{% else %}#1a1a1a{% endif %}; background: {% if status_filter == 'new' %}#dc3545{% else %}transparent{% endif %};">
+        🆕 Новые
+    </a>
+    <a href="?status=processing" class="filter-btn {% if status_filter == 'processing' %}active{% endif %}" style="padding: 8px 20px; border-radius: 30px; text-decoration: none; color: {% if status_filter == 'processing' %}white{% else %}#1a1a1a{% endif %}; background: {% if status_filter == 'processing' %}#dc3545{% else %}transparent{% endif %};">
+        ⚙️ В обработке
+    </a>
+    <a href="?status=completed" class="filter-btn {% if status_filter == 'completed' %}active{% endif %}" style="padding: 8px 20px; border-radius: 30px; text-decoration: none; color: {% if status_filter == 'completed' %}white{% else %}#1a1a1a{% endif %}; background: {% if status_filter == 'completed' %}#dc3545{% else %}transparent{% endif %};">
+        ✅ Выполненные
+    </a>
+    <a href="?status=cancelled" class="filter-btn {% if status_filter == 'cancelled' %}active{% endif %}" style="padding: 8px 20px; border-radius: 30px; text-decoration: none; color: {% if status_filter == 'cancelled' %}white{% else %}#1a1a1a{% endif %}; background: {% if status_filter == 'cancelled' %}#dc3545{% else %}transparent{% endif %};">
+        ❌ Отменённые
+    </a>
 </div>
 
 <div class="orders-grid">

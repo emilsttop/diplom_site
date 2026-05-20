@@ -129,6 +129,8 @@ def user_logout(request):
     logout(request)
     return redirect('catalog')
 
+
+
 @login_required
 def profile(request):
     # Если пользователь менеджер или админ — отправляем в панель менеджера
@@ -142,6 +144,12 @@ def profile(request):
     # Для клиента показываем личный кабинет
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
     
+    # Получаем фильтр статуса из GET-параметров
+    status_filter = request.GET.get('status', 'all')
+    
+    if status_filter != 'all':
+        orders = orders.filter(status=status_filter)
+    
     # Добавляем флаг о непрочитанных сообщениях от менеджера
     for order in orders:
         order.has_unread_manager_messages = ChatMessage.objects.filter(
@@ -150,7 +158,10 @@ def profile(request):
             is_read=False
         ).exists()
     
-    return render(request, 'accounts/profile.html', {'orders': orders})
+    return render(request, 'accounts/profile.html', {
+        'orders': orders,
+        'status_filter': status_filter,
+    })
 
 @login_required
 def specialist_dashboard(request):
