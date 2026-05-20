@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count, Q
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, HttpResponse, JsonResponse
 from django.conf import settings
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -10,6 +10,7 @@ from .utils import assign_manager_to_order
 from users.models import User
 import os
 from chat.models import ChatMessage, SpecialistChatMessage
+from services.models import Service
 
 
 @login_required
@@ -709,3 +710,52 @@ def specialists_rating(request):
     }
     
     return render(request, 'orders/specialists_rating.html', context)
+
+@login_required
+def get_specialist_services(request, order_id, specialist_id):
+    """Возвращает услуги, в которых есть нагрузка на специалиста"""
+    from users.models import User
+    from .models import Order
+    
+    order = get_object_or_404(Order, id=order_id)
+    specialist = get_object_or_404(User, id=specialist_id)
+    
+    # Проверка доступа
+    if request.user != specialist:
+        return JsonResponse({'error': 'Нет доступа'}, status=403)
+    
+    services_list = []
+    
+    # Определяем поле часов в зависимости от роли
+    if specialist.role == 'programmer':
+        hour_field = 'programmer_hours'
+    elif specialist.role == 'marketer':
+        hour_field = 'marketer_hours'
+    else:  # smm
+        hour_field = 'smm_hours'
+    
+    # Собираем услуги из заказа
+    for item in order.items.all():
+        for service in item.package.available_services.all():
+            hours = getattr(service, hour_field, 0)
+            if hours > 0:
+                services_list.append({
+                    'name': service.name,
+                    'price': float(service.price),
+                    'hours': float(hours)
+                })
+    
+    # Добавляем кастомные услуги (из конструктора)
+    if order.services_data and 'items' in order.services_data:
+        for service_item in order.services_data['items']:
+            if service_item.get('type') == 'custom':
+                for service in service_item.get('services', []):
+                    hours = float(service.get(hour_field, 0))
+                    if hours > 0:
+                        services_list.append({
+                            'name': service.get('name'),
+                            'price': float(service.get('price', 0)),
+                            'hours': hours
+                        })
+    
+    return JsonResponse({'services': services_list})

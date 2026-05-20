@@ -522,6 +522,17 @@
         background: #3a3a4a;
         color: white;
     }
+/* Комментарий в тёмной теме */
+body.dark .detail-content .comment-block {
+    background: #3a2a00 !important;
+    border-left-color: #ffc107 !important;
+}
+body.dark .detail-content .comment-block strong {
+    color: #ffc107 !important;
+}
+body.dark .detail-content .comment-block p {
+    color: #e0e0e0 !important;
+}
 </style>
 
 <div class="profile-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
@@ -672,6 +683,13 @@
             
             <!-- Состав заказа -->
             <div class="detail-content" id="composition-{{ order.id }}">
+                {% if order.comment %}
+                <div style="margin-bottom: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 8px;">
+                    <strong style="color: #856404;">💬 Ваш комментарий к заказу:</strong>
+                    <p style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ order.comment }}</p>
+                </div>
+                {% endif %}
+                <div style="font-weight: 600; margin-bottom: 10px; color: var(--red);">📦 Состав заказа:</div>
                 <ul style="margin: 0; padding-left: 20px;">
                     {% for item in order.items.all %}
                         <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
@@ -680,7 +698,7 @@
                     {% if order.services_data.items %}
                         {% for service_item in order.services_data.items %}
                             {% if service_item.type == 'custom' %}
-                                <li><strong>{{ service_item.package_name }}</strong></li>
+                                <li><strong>{{ service_item.package_name }}</strong> (конструктор)</li>
                                 <ul style="margin-left: 20px;">
                                     {% for s in service_item.services %}
                                         <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
