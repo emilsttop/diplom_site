@@ -183,7 +183,6 @@
         border-radius: 8px;
         cursor: pointer;
     }
-    /* Визуальная карта движения */
     .tracking-container {
         padding: 15px 10px;
     }
@@ -243,36 +242,26 @@
         background: #dc3545;
     }
     .tracking-step-tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #1a1a1a;
-    color: white;  /* ← убедитесь, что цвет белый */
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s;
-    margin-bottom: 10px;
-    z-index: 100;
-    pointer-events: none;
-}
-.tracking-step-tooltip strong {
-    color: #ff9999;  /* светло-красный для выделения */
-}
-.tracking-step-tooltip:after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1a1a1a transparent transparent transparent;
-}
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #1a1a1a;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        white-space: nowrap;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+        margin-bottom: 10px;
+        z-index: 100;
+        pointer-events: none;
+    }
+    .tracking-step-tooltip strong {
+        color: #ff9999;
+    }
     .tracking-step-tooltip:after {
         content: '';
         position: absolute;
@@ -294,190 +283,202 @@
             text-align: center;
         }
     }
-   
-/* Договор — три равные колонки */
-.contract-wrapper {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 15px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    transition: all 0.3s;
-}
-.contract-wrapper:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-}
-.contract-block {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-.contract-icon {
-    font-size: 36px;
-}
-.contract-label {
-    font-size: 10px;
-    color: #999;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-.contract-value {
-    font-size: 14px;
-    color: #1a1a1a;
-    font-weight: 500;
-}
-.contract-value-large {
-    font-size: 20px;
-    font-weight: bold;
-    color: #dc3545;
-}
-.contract-center {
-    display: flex;
-    gap: 40px;
-    text-align: center;
-}
-.contract-btn {
-    display: inline-block;
-    background: #dc3545;
-    color: white;
-    padding: 10px 24px;
-    text-decoration: none;
-    border-radius: 40px;
-    font-weight: bold;
-    font-size: 14px;
-    transition: all 0.3s;
-    white-space: nowrap;
-}
-.contract-btn:hover {
-    background: #bb2d3b;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
-}
 
-/* Тёмная тема — чёрный текст */
-body.dark .detail-content ul,
-body.dark .detail-content li,
-body.dark .detail-content .order-card,
-body.dark .detail-content p,
-body.dark .detail-content strong,
-body.dark .order-details,
-body.dark .order-summary,
-body.dark .order-info p,
-body.dark .order-card h3,
-body.dark .order-info h3,
-body.dark .contract-card,
-body.dark .contract-card p,
-body.dark .contract-card strong,
-body.dark .contract-card .contract-label,
-body.dark .contract-card .contract-value,
-body.dark .contract-card .contract-value-large,
-body.dark .tracking-step .step-text,
-body.dark .tracking-step .step-text strong,
-/* Чат в тёмной теме */
-body.dark .message {
-    background: #2a2a3a;
-    color: white;
-}
-body.dark .message-client {
-    background: #3a1a1a;
-    border-left: 3px solid #dc3545;
-}
-body.dark .message-manager {
-    background: #1e1e2e;
-    border-left: 3px solid #666;
-}
-body.dark .message strong {
-    color: #ff9999;
-}
-body.dark .chat-input input {
-    background: #2a2a3a;
-    color: white;
-    border-color: #dc3545;
-}
-body.dark .chat-input input::placeholder {
-    color: #aaa;
-}
-body.dark .chat-input button {
-    background: #dc3545;
-    color: white;
-}
-body.dark .detail-tab,
-body.dark .order-price {
-    color: #1a1a1a !important;
-}
+    .contract-wrapper {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s;
+    }
+    .contract-wrapper:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .contract-block {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .contract-icon {
+        font-size: 36px;
+    }
+    .contract-label {
+        font-size: 10px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .contract-value {
+        font-size: 14px;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    .contract-value-large {
+        font-size: 20px;
+        font-weight: bold;
+        color: #dc3545;
+    }
+    .contract-center {
+        display: flex;
+        gap: 40px;
+        text-align: center;
+    }
+    .contract-btn {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        padding: 10px 24px;
+        text-decoration: none;
+        border-radius: 40px;
+        font-weight: bold;
+        font-size: 14px;
+        transition: all 0.3s;
+        white-space: nowrap;
+    }
+    .contract-btn:hover {
+        background: #bb2d3b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
 
-/* Состав заказа — заголовок */
-body.dark summary {
-    color: #dc3545 !important;
-}
+    /* Бейдж уведомления */
+    .unread-badge {
+        background: #ffc107;
+        color: black;
+        border-radius: 20px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: 500;
+        display: inline-block;
+        margin-left: 8px;
+        animation: pulse 1s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
 
-/* Кнопки в тёмной теме */
-body.dark .btn-card,
-body.dark .contract-btn,
-body.dark .chat-input button,
-body.dark .detail-tab.active {
-    background: #dc3545 !important;
-    color: white !important;
-}
-
-body.dark .detail-tab:not(.active) {
-    background: #e0e0e0 !important;
-    color: #1a1a1a !important;
-}
-.order-summary {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
-}
-.order-info {
-    flex: 2;
-    min-width: 150px;
-}
-.order-status-wrapper {
-    flex: 1;
-    text-align: center;
-    min-width: 120px;
-}
-.order-price {
-    flex: 1;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
-    background: #dc3545;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 30px;
-    min-width: 120px;
-    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-}
-.expand-icon {
-    font-size: 24px;
-    color: #dc3545;
-    transition: transform 0.3s;
-    width: 40px;
-    text-align: center;
-}
-.order-status {
-    padding: 6px 16px;
-    border-radius: 30px;
-    font-size: 13px;
-    font-weight: bold;
-    display: inline-block;
-}
+    /* Тёмная тема */
+    body.dark .detail-content ul,
+    body.dark .detail-content li,
+    body.dark .detail-content .order-card,
+    body.dark .detail-content p,
+    body.dark .detail-content strong,
+    body.dark .order-details,
+    body.dark .order-summary,
+    body.dark .order-info p,
+    body.dark .order-card h3,
+    body.dark .order-info h3,
+    body.dark .contract-card,
+    body.dark .contract-card p,
+    body.dark .contract-card strong,
+    body.dark .contract-card .contract-label,
+    body.dark .contract-card .contract-value,
+    body.dark .contract-card .contract-value-large,
+    body.dark .tracking-step .step-text,
+    body.dark .tracking-step .step-text strong,
+    body.dark .message {
+        background: #2a2a3a;
+        color: white;
+    }
+    body.dark .message-client {
+        background: #3a1a1a;
+        border-left: 3px solid #dc3545;
+    }
+    body.dark .message-manager {
+        background: #1e1e2e;
+        border-left: 3px solid #666;
+    }
+    body.dark .message strong {
+        color: #ff9999;
+    }
+    body.dark .chat-input input {
+        background: #2a2a3a;
+        color: white;
+        border-color: #dc3545;
+    }
+    body.dark .chat-input input::placeholder {
+        color: #aaa;
+    }
+    body.dark .chat-input button {
+        background: #dc3545;
+        color: white;
+    }
+    body.dark .detail-tab,
+    body.dark .order-price {
+        color: #1a1a1a !important;
+    }
+    body.dark summary {
+        color: #dc3545 !important;
+    }
+    body.dark .btn-card,
+    body.dark .contract-btn,
+    body.dark .chat-input button,
+    body.dark .detail-tab.active {
+        background: #dc3545 !important;
+        color: white !important;
+    }
+    body.dark .detail-tab:not(.active) {
+        background: #e0e0e0 !important;
+        color: #1a1a1a !important;
+    }
+    .order-summary {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+    }
+    .order-info {
+        flex: 2;
+        min-width: 150px;
+    }
+    .order-status-wrapper {
+        flex: 1;
+        text-align: center;
+        min-width: 120px;
+    }
+    .order-price {
+        flex: 1;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 30px;
+        min-width: 120px;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    .expand-icon {
+        font-size: 24px;
+        color: #dc3545;
+        transition: transform 0.3s;
+        width: 40px;
+        text-align: center;
+    }
+    .order-status {
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: bold;
+        display: inline-block;
+    }
     .profile-phone {
-    font-size: 14px;
-    margin: 5px 0;
-    opacity: 0.9;
-}
+        font-size: 14px;
+        margin: 5px 0;
+        opacity: 0.9;
+    }
 </style>
 
 <div class="profile-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
@@ -500,27 +501,35 @@ body.dark .detail-tab:not(.active) {
     {% for order in orders %}
     <div class="order-card" data-order-id="{{ order.id }}">
         <div class="order-summary" onclick="toggleOrder({{ order.id }})">
-    <div class="order-info">
-        <h3>Заказ №{{ order.id }}</h3>
-        <p>📅 {{ order.created_at|date:"d.m.Y H:i" }}</p>
-    </div>
-    <div class="order-status-wrapper">
-        <span class="order-status status-{{ order.status }}">
-            {% if order.status == 'new' %}🆕 Новый
-            {% elif order.status == 'processing' %}⚙️ В обработке
-            {% elif order.status == 'completed' %}✅ Выполнен
-            {% elif order.status == 'cancelled' %}❌ Отменён
-            {% endif %}
-        </span>
-    </div>
-    <div class="order-price">{{ order.total_price|floatformat:0 }} ₽</div>
-    <div class="expand-icon">▼</div>
-</div>
+            <div class="order-info">
+                <h3>Заказ №{{ order.id }}</h3>
+                <p>📅 {{ order.created_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            <div class="order-status-wrapper">
+                <span class="order-status status-{{ order.status }}">
+                    {% if order.status == 'new' %}🆕 Новый
+                    {% elif order.status == 'processing' %}⚙️ В обработке
+                    {% elif order.status == 'completed' %}✅ Выполнен
+                    {% elif order.status == 'cancelled' %}❌ Отменён
+                    {% endif %}
+                </span>
+                {% if order.has_unread_manager_messages %}
+                    <div class="unread-badge" style="margin-top: 5px;">📩 Новое сообщение</div>
+                {% endif %}
+            </div>
+            <div class="order-price">{{ order.total_price|floatformat:0 }} ₽</div>
+            <div class="expand-icon">▼</div>
+        </div>
         
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-tabs">
                 <button class="detail-tab active" onclick="switchTab({{ order.id }}, 'tracking')">🗺️ Карта движения</button>
-                <button class="detail-tab" onclick="switchTab({{ order.id }}, 'chat')">💬 Чат с менеджером</button>
+                <button class="detail-tab" onclick="switchTab({{ order.id }}, 'chat')">
+                    💬 Чат с менеджером
+                    {% if order.has_unread_manager_messages %}
+                        <span class="unread-badge">📩</span>
+                    {% endif %}
+                </button>
                 <button class="detail-tab" onclick="switchTab({{ order.id }}, 'contract')">📄 Договор</button>
                 <button class="detail-tab" onclick="switchTab({{ order.id }}, 'composition')">📦 Состав заказа</button>
             </div>
@@ -572,62 +581,63 @@ body.dark .detail-tab:not(.active) {
                 </div>
             </div>
             
-        <!-- Договор -->
-<div class="detail-content" id="contract-{{ order.id }}">
-    <div class="contract-wrapper">
-        <div class="contract-block">
-            <div class="contract-icon">📄</div>
-            <div>
-                <div class="contract-label">Дата</div>
-                <div class="contract-value">{{ order.created_at|date:"d.m.Y" }}</div>
-            </div>
-        </div>
-        
-        <div class="contract-center">
-            <div>
-                <div class="contract-label">Сумма</div>
-                <div class="contract-value-large">{{ order.total_price|floatformat:0 }} ₽</div>
-            </div>
-            <div>
-                <div class="contract-label">Менеджер</div>
-                <div class="contract-value">
-                    {% if order.assigned_manager %}
-                        {{ order.assigned_manager.get_full_name|default:order.assigned_manager.username }}
-                    {% else %}
-                        Назначается
-                    {% endif %}
+            <!-- Договор -->
+            <div class="detail-content" id="contract-{{ order.id }}">
+                <div class="contract-wrapper">
+                    <div class="contract-block">
+                        <div class="contract-icon">📄</div>
+                        <div>
+                            <div class="contract-label">Дата</div>
+                            <div class="contract-value">{{ order.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="contract-center">
+                        <div>
+                            <div class="contract-label">Сумма</div>
+                            <div class="contract-value-large">{{ order.total_price|floatformat:0 }} ₽</div>
+                        </div>
+                        <div>
+                            <div class="contract-label">Менеджер</div>
+                            <div class="contract-value">
+                                {% if order.assigned_manager %}
+                                    {{ order.assigned_manager.get_full_name|default:order.assigned_manager.username }}
+                                {% else %}
+                                    Назначается
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <a href="{% url 'download_contract' order.id %}" class="contract-btn">📥 Скачать шаблон договора</a>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div>
-            <a href="{% url 'download_contract' order.id %}" class="contract-btn">📥 Скачать шаблон договора</a>
-        </div>
-    </div>
-</div>            
+            
             <!-- Состав заказа -->
-<div class="detail-content" id="composition-{{ order.id }}">
-    <ul style="margin: 0; padding-left: 20px;">
-        {% for item in order.items.all %}
-            <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
-        {% endfor %}
-        
-        {% if order.services_data.items %}
-            {% for service_item in order.services_data.items %}
-                {% if service_item.type == 'custom' %}
-                    <li><strong>{{ service_item.package_name }}</strong></li>
-                    <ul style="margin-left: 20px;">
-                        {% for s in service_item.services %}
-                            <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
+            <div class="detail-content" id="composition-{{ order.id }}">
+                <ul style="margin: 0; padding-left: 20px;">
+                    {% for item in order.items.all %}
+                        <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
+                    {% endfor %}
+                    
+                    {% if order.services_data.items %}
+                        {% for service_item in order.services_data.items %}
+                            {% if service_item.type == 'custom' %}
+                                <li><strong>{{ service_item.package_name }}</strong></li>
+                                <ul style="margin-left: 20px;">
+                                    {% for s in service_item.services %}
+                                        <li>{{ s.name }} — {{ s.price|floatformat:0 }} ₽</li>
+                                    {% endfor %}
+                                </ul>
+                            {% elif service_item.type == 'package' %}
+                                <li>{{ service_item.package_name }} x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</li>
+                            {% endif %}
                         {% endfor %}
-                    </ul>
-                {% elif service_item.type == 'package' %}
-                    <li>{{ service_item.package_name }} x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</li>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    </ul>
-</div>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </div>
     {% empty %}
@@ -642,21 +652,21 @@ body.dark .detail-tab:not(.active) {
     let chatIntervals = {};
     
     function toggleOrder(orderId) {
-    const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
-    card.classList.toggle('expanded');
-    if (card.classList.contains('expanded')) {
-        loadChatMessages(orderId);
-        setupEnterHandler(orderId);  // ← добавить эту строку
-        if (!chatIntervals[orderId]) {
-            chatIntervals[orderId] = setInterval(() => loadChatMessages(orderId), 5000);
-        }
-    } else {
-        if (chatIntervals[orderId]) {
-            clearInterval(chatIntervals[orderId]);
-            delete chatIntervals[orderId];
+        const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+        card.classList.toggle('expanded');
+        if (card.classList.contains('expanded')) {
+            loadChatMessages(orderId);
+            setupEnterHandler(orderId);
+            if (!chatIntervals[orderId]) {
+                chatIntervals[orderId] = setInterval(() => loadChatMessages(orderId), 5000);
+            }
+        } else {
+            if (chatIntervals[orderId]) {
+                clearInterval(chatIntervals[orderId]);
+                delete chatIntervals[orderId];
+            }
         }
     }
-}
     
     function switchTab(orderId, tab) {
         const btns = document.querySelectorAll(`#details-${orderId} .detail-tab`);
@@ -673,64 +683,100 @@ body.dark .detail-tab:not(.active) {
         }
     }
     
-    async function loadChatMessages(orderId) {
+    let lastMessageCount = {};
+let initialLoadDone = {};
+
+async function loadChatMessages(orderId) {
     const container = document.getElementById(`chat-messages-${orderId}`);
     if (!container) return;
-
+    
     try {
         const response = await fetch(`/chat/api/messages/${orderId}/`);
         const data = await response.json();
-
+        
         if (data.messages && data.messages.length > 0) {
-            container.innerHTML = data.messages.map(msg => `
-                <div class="message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}">
-                    <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${msg.message}<br>
-                    <small style="color:#999;">${msg.created_at}</small>
-                </div>
-            `).join('');
+            // Первая загрузка — очищаем и заполняем всё
+            if (!initialLoadDone[orderId]) {
+                container.innerHTML = '';
+                for (const msg of data.messages) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}`;
+                    messageDiv.innerHTML = `
+                        <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${escapeHtml(msg.message)}<br>
+                        <small style="color:#999;">${msg.created_at}</small>
+                    `;
+                    container.appendChild(messageDiv);
+                }
+                lastMessageCount[orderId] = data.messages.length;
+                initialLoadDone[orderId] = true;
+            } 
+            // Последующие загрузки — добавляем только новые сообщения
+            else if (data.messages.length > lastMessageCount[orderId]) {
+                const newMessages = data.messages.slice(lastMessageCount[orderId]);
+                for (const msg of newMessages) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}`;
+                    messageDiv.innerHTML = `
+                        <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${escapeHtml(msg.message)}<br>
+                        <small style="color:#999;">${msg.created_at}</small>
+                    `;
+                    container.appendChild(messageDiv);
+                }
+                lastMessageCount[orderId] = data.messages.length;
+            }
             container.scrollTop = container.scrollHeight;
         } else {
-            container.innerHTML = '<div style="text-align: center; padding: 20px; color:#999;">Нет сообщений. Напишите менеджеру!</div>';
+            if (!initialLoadDone[orderId]) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color:#999;">Нет сообщений. Напишите менеджеру!</div>';
+                initialLoadDone[orderId] = true;
+            }
         }
     } catch(e) {
         console.error('Ошибка загрузки чата:', e);
-        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #dc3545;">⚠️ Ошибка загрузки сообщений. Попробуйте позже.</div>';
-    }
-}
-    
-    async function sendMessage(orderId) {
-    const input = document.getElementById(`chat-input-${orderId}`);
-    const message = input.value.trim();
-    if (!message) return;
-    
-    try {
-        const formData = new FormData();
-        formData.append('message', message);
-        
-        await fetch(`/chat/api/send/${orderId}/`, {
-            method: 'POST',
-            body: formData,
-            headers: { 'X-CSRFToken': getCookie('csrftoken') }
-        });
-        input.value = '';
-        await loadChatMessages(orderId);
-    } catch(e) {
-        alert('Ошибка при отправке');
+        if (!initialLoadDone[orderId]) {
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color: #dc3545;">⚠️ Ошибка загрузки сообщений. Попробуйте позже.</div>';
+        }
     }
 }
 
-// Добавляем обработчик Enter для поля ввода
-function setupEnterHandler(orderId) {
-    const input = document.getElementById(`chat-input-${orderId}`);
-    if (input) {
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage(orderId);
-            }
-        });
-    }
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
+    
+    async function sendMessage(orderId) {
+        const input = document.getElementById(`chat-input-${orderId}`);
+        const message = input.value.trim();
+        if (!message) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('message', message);
+            
+            await fetch(`/chat/api/send/${orderId}/`, {
+                method: 'POST',
+                body: formData,
+                headers: { 'X-CSRFToken': getCookie('csrftoken') }
+            });
+            input.value = '';
+            await loadChatMessages(orderId);
+        } catch(e) {
+            alert('Ошибка при отправке');
+        }
+    }
+    
+    function setupEnterHandler(orderId) {
+        const input = document.getElementById(`chat-input-${orderId}`);
+        if (input) {
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    sendMessage(orderId);
+                }
+            });
+        }
+    }
     
     function getCookie(name) {
         let value = null;

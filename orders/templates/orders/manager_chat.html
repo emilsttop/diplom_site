@@ -190,16 +190,47 @@
 <script>
     const orderId = {{ order.id }};
     let lastMessageCount = 0;
-    
+    let initialLoadDone = false;
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
     async function loadMessages() {
         const container = document.getElementById('chat-messages');
+        if (!container) return;
+        
         try {
             const response = await fetch(`/chat/api/messages/${orderId}/`);
             const data = await response.json();
             
             if (data.messages && data.messages.length > 0) {
-                // Проверяем, появились ли новые сообщения
-                if (data.messages.length > lastMessageCount) {
+                // Первая загрузка — очищаем и заполняем всё
+                if (!initialLoadDone) {
+                    container.innerHTML = '';
+                    for (const msg of data.messages) {
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message message-${msg.sender_role}`;
+                        let senderName = '';
+                        if (msg.sender_role === 'client') {
+                            senderName = msg.sender_name || msg.sender;
+                        } else {
+                            senderName = 'Вы (Менеджер)';
+                        }
+                        messageDiv.innerHTML = `
+                            <strong>${escapeHtml(senderName)}:</strong> ${escapeHtml(msg.message)}
+                            <div class="message-meta">${msg.created_at}</div>
+                        `;
+                        container.appendChild(messageDiv);
+                    }
+                    lastMessageCount = data.messages.length;
+                    initialLoadDone = true;
+                    container.scrollTop = container.scrollHeight;
+                } 
+                // Последующие загрузки — добавляем только новые сообщения
+                else if (data.messages.length > lastMessageCount) {
                     const newMessages = data.messages.slice(lastMessageCount);
                     for (const msg of newMessages) {
                         const messageDiv = document.createElement('div');
@@ -216,26 +247,23 @@
                         `;
                         container.appendChild(messageDiv);
                     }
+                    lastMessageCount = data.messages.length;
                     container.scrollTop = container.scrollHeight;
                 }
-                lastMessageCount = data.messages.length;
             } else {
-                if (container.children.length === 0 || container.innerHTML === '<div style="text-align: center; padding: 20px;">Загрузка сообщений...</div>') {
+                if (!initialLoadDone) {
                     container.innerHTML = '<div class="empty-messages">💬 Нет сообщений. Напишите что-нибудь клиенту!</div>';
+                    initialLoadDone = true;
                 }
             }
         } catch (error) {
             console.error('Ошибка загрузки чата:', error);
-            container.innerHTML = '<div class="empty-messages" style="color: red;">❌ Ошибка загрузки сообщений</div>';
+            if (!initialLoadDone) {
+                container.innerHTML = '<div class="empty-messages" style="color: red;">❌ Ошибка загрузки сообщений</div>';
+            }
         }
     }
-    
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-    
+
     async function sendMessage() {
         const input = document.getElementById('message-input');
         const message = input.value.trim();
@@ -246,7 +274,7 @@
             const formData = new FormData();
             formData.append('message', message);
             
-            await fetch(`/chat/api/send/${orderId}/`, {
+            const response = await fetch(`/chat/api/send/${orderId}/`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -254,15 +282,21 @@
                 }
             });
             
-            input.value = '';
-            lastMessageCount = 0;
-            await loadMessages();
+            if (response.ok) {
+                input.value = '';
+                // После отправки сбрасываем флаги, чтобы перезагрузить всё
+                lastMessageCount = 0;
+                initialLoadDone = false;
+                await loadMessages();
+            } else {
+                alert('Ошибка при отправке сообщения');
+            }
         } catch (error) {
             console.error('Ошибка отправки:', error);
             alert('Ошибка при отправке сообщения');
         }
     }
-    
+
     function getCookie(name) {
         let value = null;
         if (document.cookie) {
@@ -273,11 +307,11 @@
         }
         return value;
     }
-    
+
     // Загружаем сообщения при открытии страницы
     loadMessages();
     
-    // Обновляем каждые 3 секунды
+    // Обновляем каждые 3 секунды (только новые сообщения)
     setInterval(loadMessages, 3000);
     
     // Отправка по Enter

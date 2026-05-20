@@ -14,6 +14,8 @@ def get_messages(request, order_id):
         # Проверка доступа
         if request.user.role == 'client' and order.client != request.user:
             return JsonResponse({'messages': [], 'error': 'Нет доступа'}, status=200)
+        if request.user.role in ['manager', 'admin'] and order.assigned_manager != request.user:
+            return JsonResponse({'messages': [], 'error': 'Нет доступа'}, status=200)
         
         # Получаем все сообщения
         messages = ChatMessage.objects.filter(order=order).order_by('created_at')
@@ -46,6 +48,8 @@ def get_messages(request, order_id):
         
     except Exception as e:
         print(f"Ошибка в get_messages: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({'messages': [], 'error': str(e)}, status=200)
 
 
