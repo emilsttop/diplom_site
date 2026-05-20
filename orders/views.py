@@ -175,10 +175,10 @@ def manager_analytics(request):
             count = orders.filter(created_at__date=day).count()
             orders_by_day.append({'date': day.strftime('%d.%m'), 'count': count})
 
-    top_clients = orders.filter(status='completed').values('client__username').annotate(
-        total_spent=Sum('total_price'),
-        orders_count=Count('id')
-    ).order_by('-total_spent')[:5]
+    top_clients = orders.filter(status='completed').values('client__last_name', 'client__first_name').annotate(
+    total_spent=Sum('total_price'),
+    orders_count=Count('id')
+).order_by('-total_spent')[:5]
 
     regions = Order.objects.exclude(region__isnull=True).exclude(region='').values_list('region', flat=True).distinct()
 

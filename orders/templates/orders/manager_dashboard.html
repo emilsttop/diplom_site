@@ -380,7 +380,7 @@
         <div class="order-header" onclick="toggleOrder({{ order.id }})">
             <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
                 <span class="order-id">Заказ №{{ order.id }}</span>
-                <span class="order-client">{{ order.client.username }}</span>
+                <span class="order-client">{{ order.client.last_name }} {{ order.client.first_name }}</span>
                 <span class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</span>
                 <span class="order-status status-{{ order.status }}">
                     {% if order.status == 'new' %}🆕 Новый
@@ -400,10 +400,11 @@
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-grid">
                 <div class="detail-card">
-                    <div class="detail-label">👤 Клиент</div>
-                    <div class="detail-value">{{ order.client.username }}</div>
-                    <div style="font-size:12px; color:#888;">{{ order.client.email }}</div>
-                </div>
+    <div class="detail-label">👤 Клиент</div>
+    <div class="detail-value">{{ order.client.last_name }} {{ order.client.first_name }}</div>
+    <div style="font-size:12px; color:#888;">📧 {{ order.client.email }}</div>
+    <div style="font-size:12px; color:#888; margin-top: 5px;">📞 {{ order.client.phone|default:"Телефон не указан" }}</div>
+</div>
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
                     <div class="detail-value" style="max-height:150px; overflow-y:auto;">

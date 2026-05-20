@@ -499,7 +499,7 @@
                 <tr>
                     <td style="text-align: center;">#{{ order.id }}</td>
                     <td style="text-align: center;">{{ order.created_at|date:"d.m.Y" }}</td>
-                    <td style="text-align: left;">{{ order.client.username }}</td>
+                    <td style="text-align: left;">{{ order.client.last_name }} {{ order.client.first_name }}</td>
                     <td style="text-align: center;">{{ order.region|default:"—" }}</td>
                     <td style="text-align: center;">{{ order.total_price|floatformat:0 }} ₽</td>
                     <td style="text-align: center;">

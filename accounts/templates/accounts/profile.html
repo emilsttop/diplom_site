@@ -449,8 +449,10 @@ body.dark .detail-tab:not(.active) {
     <div class="profile-avatar">👤</div>
     <div class="profile-info">
         <h1>Личный кабинет</h1>
-        <p class="profile-name">{{ user.username }}</p>
-        <p class="profile-phone">📞 {{ user.phone|default:"Телефон не указан" }}</p
+        <p class="profile-name">{{ user.last_name }} {{ user.first_name }} {{ user.patronymic }}</p>
+        <p class="profile-username">Логин: {{ user.username }}</p>
+        <p class="profile-phone">📞 {{ user.phone|default:"Телефон не указан" }}</p>
+        <p class="profile-email">📧 {{ user.email }}</p>
         <p class="profile-role">Клиент</p>
     </div>
 </div>
