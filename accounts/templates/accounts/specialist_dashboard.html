@@ -492,20 +492,17 @@
             
             <!-- Блок состава заказа (скрыт по умолчанию) -->
             <div id="specialist-composition-{{ order.id }}" class="composition-details" style="display: none; margin-top: 12px; padding: 10px; background: var(--gray); border-radius: 10px; font-size: 12px;">
-                <div style="font-weight: 600; margin-bottom: 6px; color: var(--red);">📦 Состав заказа:</div>
-                {% for item in order.items.all %}
-                    <div style="margin-bottom: 3px;">• {{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
-                {% endfor %}
-                {% if order.services_data.items %}
-                    {% for service_item in order.services_data.items %}
-                        {% if service_item.type == 'custom' %}
-                            <div style="margin-top: 6px;"><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
-                            {% for s in service_item.services %}
-                                <div style="margin-left: 12px; margin-bottom: 2px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endfor %}
+                {% if order.comment %}
+                <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd;">
+                    <strong style="color: var(--red);">💬 Комментарий клиента:</strong>
+                    <p style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ order.comment }}</p>
+                </div>
                 {% endif %}
+                <div style="font-weight: 600; margin-bottom: 8px; color: var(--red);">📦 Состав заказа (ваши услуги):</div>
+                <div id="specialist-services-{{ order.id }}">
+                    <!-- Сюда динамически загружаются только услуги специалиста -->
+                    <div style="text-align: center; padding: 10px;">⏳ Загрузка...</div>
+                </div>
             </div>
         </div>
         {% empty %}
@@ -631,13 +628,52 @@
     }, 10000);
 </script>
 <script>
+    // Загрузка услуг специалиста
+    async function loadSpecialistServices(orderId, specialistId) {
+        const container = document.getElementById(`specialist-services-${orderId}`);
+        if (!container) return;
+        
+        container.innerHTML = '<div style="text-align: center; padding: 10px;">⏳ Загрузка...</div>';
+        
+        try {
+            const response = await fetch(`/orders/api/specialist/services/${orderId}/${specialistId}/`);
+            const data = await response.json();
+            
+            if (data.services && data.services.length > 0) {
+                container.innerHTML = data.services.map(service => `
+                    <div style="margin-bottom: 8px; padding: 6px; background: rgba(220,53,69,0.05); border-radius: 8px;">
+                        <strong>${escapeHtml(service.name)}</strong><br>
+                        <span style="font-size: 11px;">💰 ${service.price.toLocaleString()} ₽ | ⏱️ ${service.hours} ч</span>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div style="text-align: center; padding: 10px; color: #999;">Нет услуг с вашей нагрузкой</div>';
+            }
+        } catch(e) {
+            console.error('Ошибка загрузки услуг:', e);
+            container.innerHTML = '<div style="text-align: center; padding: 10px; color: red;">⚠️ Ошибка загрузки</div>';
+        }
+    }
+    
+    // Открытие/закрытие состава заказа с загрузкой услуг
     function toggleSpecialistComposition(orderId) {
-        const div = document.getElementById('specialist-composition-' + orderId);
+        const div = document.getElementById(`specialist-composition-${orderId}`);
         if (div.style.display === 'none' || div.style.display === '') {
             div.style.display = 'block';
+            const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+            const specialistId = card?.dataset.specialistId;
+            if (specialistId) {
+                loadSpecialistServices(orderId, specialistId);
+            }
         } else {
             div.style.display = 'none';
         }
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 </script>
 {% endblock %}
