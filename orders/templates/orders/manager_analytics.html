@@ -787,26 +787,25 @@
             responsive: true,
             plugins: {
                 legend: {
-                    display: false  // ← УБИРАЕМ ЛЕГЕНДУ
+                    display: false
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Количество заказов'
+                    },
                     ticks: {
                         stepSize: 1,
-                        precision: 0,  // ← ЦЕЛЫЕ ЧИСЛА
-                        callback: function(value) {
-                            return Number.isInteger(value) ? value : null;
-                        }
-                    },
-                    title: {
-                        display: false
+                        precision: 0
                     }
                 },
                 x: {
                     title: {
-                        display: false
+                        display: true,
+                        text: 'Период'
                     }
                 }
             }
