@@ -437,7 +437,12 @@ body.dark .detail-tab:not(.active) {
     font-size: 13px;
     font-weight: bold;
     display: inline-block;
-
+}
+    .profile-phone {
+    font-size: 14px;
+    margin: 5px 0;
+    opacity: 0.9;
+}
 </style>
 
 <div class="profile-header">
@@ -445,6 +450,7 @@ body.dark .detail-tab:not(.active) {
     <div class="profile-info">
         <h1>Личный кабинет</h1>
         <p class="profile-name">{{ user.username }}</p>
+        <p class="profile-phone">📞 {{ user.phone|default:"Телефон не указан" }}</p
         <p class="profile-role">Клиент</p>
     </div>
 </div>
