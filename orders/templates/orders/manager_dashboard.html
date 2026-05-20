@@ -492,11 +492,13 @@
             <form method="post" action="{% url 'reassign_specialist' order.id 'programmer' %}">
                 {% csrf_token %}
                 <select name="new_specialist" class="specialist-select">
-                    <option value="">Переназначить</option>
-                    {% for prog in programmers %}
-                        <option value="{{ prog.id }}">{{ prog.get_full_name|default:prog.username }}</option>
-                    {% endfor %}
-                </select>
+    <option value="">Переназначить</option>
+    {% for prog in programmers %}
+        {% if prog != order.assigned_programmer %}
+            <option value="{{ prog.id }}">{{ prog.get_full_name|default:prog.username }}</option>
+        {% endif %}
+    {% endfor %}
+</select>
                 <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
             </form>
         </div>
@@ -524,11 +526,13 @@
             <form method="post" action="{% url 'reassign_specialist' order.id 'marketer' %}">
                 {% csrf_token %}
                 <select name="new_specialist" class="specialist-select">
-                    <option value="">Переназначить</option>
-                    {% for mark in marketers %}
-                        <option value="{{ mark.id }}">{{ mark.get_full_name|default:mark.username }}</option>
-                    {% endfor %}
-                </select>
+    <option value="">Переназначить</option>
+    {% for mark in marketers %}   {# ← именно marketers, НЕ programmers #}
+        {% if mark != order.assigned_marketer %}
+            <option value="{{ mark.id }}">{{ mark.get_full_name|default:mark.username }}</option>
+        {% endif %}
+    {% endfor %}
+</select>
                 <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
             </form>
         </div>
@@ -556,11 +560,13 @@
             <form method="post" action="{% url 'reassign_specialist' order.id 'smm' %}">
                 {% csrf_token %}
                 <select name="new_specialist" class="specialist-select">
-                    <option value="">Переназначить</option>
-                    {% for s in smms %}
-                        <option value="{{ s.id }}">{{ s.get_full_name|default:s.username }}</option>
-                    {% endfor %}
-                </select>
+    <option value="">Переназначить</option>
+    {% for s in smms %}   {# ← именно smms, НЕ programmers #}
+        {% if s != order.assigned_smm %}
+            <option value="{{ s.id }}">{{ s.get_full_name|default:s.username }}</option>
+        {% endif %}
+    {% endfor %}
+</select>
                 <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
             </form>
         </div>
