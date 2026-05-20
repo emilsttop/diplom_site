@@ -162,11 +162,13 @@ def specialist_dashboard(request):
     if date_to:
         base_orders = base_orders.filter(created_at__date__lte=date_to)
 
-    # ========== ФИЛЬТРАЦИЯ ДЛЯ ГРАФИКА И СПИСКА В ЗАВИСИМОСТИ ОТ chart_type ==========
+        # ========== ФИЛЬТРАЦИЯ ДЛЯ ГРАФИКА И СПИСКА В ЗАВИСИМОСТИ ОТ chart_type ==========
     if chart_type == 'completed':
         filtered_orders = base_orders.filter(status='completed')
     elif chart_type == 'cancelled':
         filtered_orders = base_orders.filter(status='cancelled')
+    elif chart_type == 'new':
+        filtered_orders = base_orders.filter(status='new')
     else:  # 'all'
         filtered_orders = base_orders
 
@@ -216,11 +218,13 @@ def specialist_dashboard(request):
     # ========== СПИСОК ЗАКАЗОВ (используем ТЕ ЖЕ filtered_orders, что и для графика) ==========
     orders_list = filtered_orders.order_by('-created_at')
 
-    # Название для графика
+        # Название для графика
     if chart_type == 'completed':
         chart_title = 'Выполненные заказы'
     elif chart_type == 'cancelled':
         chart_title = 'Отменённые заказы'
+    elif chart_type == 'new':
+        chart_title = 'Новые заказы'
     else:
         chart_title = 'Полученные заказы'
 
