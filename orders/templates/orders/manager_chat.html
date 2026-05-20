@@ -137,35 +137,35 @@
         font-style: italic;
     }
     /* Тёмная тема для страницы чата */
-body.dark .chat-container {
-    background: #1e1e2e;
-}
-body.dark .chat-messages {
-    background: #2a2a3a;
-}
-body.dark .message-client {
-    background: #3a1a1a !important;
-    color: #e0e0e0 !important;
-}
-body.dark .message-client .message-meta {
-    color: #aaa !important;
-}
-body.dark .message-manager {
-    background: #1a1a1a !important;
-    color: white !important;
-}
-body.dark .chat-input {
-    background: #1e1e2e;
-    border-top-color: #3a3a4a;
-}
-body.dark .chat-input input {
-    background: #2a2a3a;
-    color: #e0e0e0;
-    border-color: #dc3545;
-}
-body.dark .chat-input input::placeholder {
-    color: #888;
-}
+    body.dark .chat-container {
+        background: #1e1e2e;
+    }
+    body.dark .chat-messages {
+        background: #2a2a3a;
+    }
+    body.dark .message-client {
+        background: #3a1a1a !important;
+        color: #e0e0e0 !important;
+    }
+    body.dark .message-client .message-meta {
+        color: #aaa !important;
+    }
+    body.dark .message-manager {
+        background: #1a1a1a !important;
+        color: white !important;
+    }
+    body.dark .chat-input {
+        background: #1e1e2e;
+        border-top-color: #3a3a4a;
+    }
+    body.dark .chat-input input {
+        background: #2a2a3a;
+        color: #e0e0e0;
+        border-color: #dc3545;
+    }
+    body.dark .chat-input input::placeholder {
+        color: #888;
+    }
 </style>
 
 <a href="{% url 'manager_dashboard' %}" class="back-btn">← Назад к заказам</a>
@@ -173,7 +173,7 @@ body.dark .chat-input input::placeholder {
 <div class="chat-container">
     <div class="chat-header">
         <h3>💬 Чат с клиентом: {{ order.client.last_name }} {{ order.client.first_name }}</h3>
-        <p>Заказ №{{ order.id }} | Сумма: {{ order.total_price }} ₽</p>
+        <p>Заказ №{{ order.id }} | Сумма: {{ order.total_price|floatformat:0 }} ₽</p>
     </div>
     <div class="chat-messages" id="chat-messages">
         <div style="text-align: center; padding: 20px;">Загрузка сообщений...</div>
@@ -205,13 +205,13 @@ body.dark .chat-input input::placeholder {
                         const messageDiv = document.createElement('div');
                         messageDiv.className = `message message-${msg.sender_role}`;
                         let senderName = '';
-                            if (msg.sender_role === 'client') {
-                                senderName = msg.sender_name || msg.sender;
-                            } else {
-                                senderName = 'Вы (Менеджер)';
-                            }
+                        if (msg.sender_role === 'client') {
+                            senderName = msg.sender_name || msg.sender;
+                        } else {
+                            senderName = 'Вы (Менеджер)';
+                        }
                         messageDiv.innerHTML = `
-                            <strong>${senderName}:</strong> ${escapeHtml(msg.message)}
+                            <strong>${escapeHtml(senderName)}:</strong> ${escapeHtml(msg.message)}
                             <div class="message-meta">${msg.created_at}</div>
                         `;
                         container.appendChild(messageDiv);
@@ -225,6 +225,7 @@ body.dark .chat-input input::placeholder {
                 }
             }
         } catch (error) {
+            console.error('Ошибка загрузки чата:', error);
             container.innerHTML = '<div class="empty-messages" style="color: red;">❌ Ошибка загрузки сообщений</div>';
         }
     }
@@ -257,6 +258,7 @@ body.dark .chat-input input::placeholder {
             lastMessageCount = 0;
             await loadMessages();
         } catch (error) {
+            console.error('Ошибка отправки:', error);
             alert('Ошибка при отправке сообщения');
         }
     }
@@ -281,6 +283,7 @@ body.dark .chat-input input::placeholder {
     // Отправка по Enter
     document.getElementById('message-input').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             sendMessage();
         }
     });

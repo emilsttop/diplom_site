@@ -161,6 +161,15 @@
         justify-content: flex-start;
         align-items: center;
         text-align: center;
+        transition: all 0.3s;
+    }
+    .detail-card.highlight {
+        border: 2px solid #ffc107;
+        background: #fff8e0;
+    }
+    body.dark .detail-card.highlight {
+        background: #3a2a00;
+        border-color: #ffc107;
     }
     .detail-label {
         font-size: 11px;
@@ -246,9 +255,11 @@
         background: #ffc107;
         color: black;
         border-radius: 20px;
-        padding: 2px 10px;
+        padding: 4px 12px;
         font-size: 11px;
+        font-weight: 500;
         margin-left: 8px;
+        display: inline-block;
     }
     select {
         padding: 6px 12px;
@@ -276,6 +287,14 @@
     body.dark .specialist-card {
         background: var(--black-light);
         border-color: #3a3a4a;
+    }
+    .specialist-card.highlight {
+        border: 2px solid #ffc107;
+        background: #fff8e0;
+    }
+    body.dark .specialist-card.highlight {
+        background: #3a2a00;
+        border-color: #ffc107;
     }
     .specialist-header {
         display: flex;
@@ -397,7 +416,7 @@
 
 <div class="orders-list">
     {% for order in orders %}
-    <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
+    <div class="order-card" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
         <div class="order-header" onclick="toggleOrder({{ order.id }})">
             <div style="flex: 1;">
                 <div style="font-size: 11px; color: #666;">№ заказа</div>
@@ -420,19 +439,30 @@
                     {% elif order.status == 'cancelled' %}❌ Отменён
                     {% endif %}
                 </span>
-                {% if order.has_unread_messages %}<span class="unread-badge">📩 Новое сообщение</span>{% endif %}
+                {% if order.has_unread_messages or order.has_unread_specialist_messages %}
+                    <span class="unread-badge" style="margin-top: 5px;">📩 Есть новые сообщения</span>
+                {% endif %}
             </div>
             <div class="expand-icon">▼</div>
         </div>
 
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-grid">
-                <div class="detail-card">
+                <!-- Карточка клиента с подсветкой если есть непрочитанные сообщения -->
+                <div class="detail-card {% if order.has_unread_messages %}highlight{% endif %}">
                     <div class="detail-label">👤 Клиент</div>
                     <div class="detail-value">{{ order.client.last_name }} {{ order.client.first_name }}</div>
                     <div style="font-size:12px; color:#888; margin-top: 5px;">📧 {{ order.client.email }}</div>
                     <div style="font-size:12px; color:#888; margin-top: 3px;">📞 {{ order.client.phone|default:"Телефон не указан" }}</div>
                     <div style="font-size:12px; color:#888; margin-top: 3px;">🌍 Регион: {{ order.region|default:"Не указан" }}</div>
+                    <div style="margin-top: 12px;">
+                        <a href="{% url 'manager_chat' order.id %}" class="btn-sm btn-chat" style="display: inline-block; text-align: center;">
+                            💬 Чат с клиентом
+                            {% if order.has_unread_messages %}
+                                <span class="unread-badge" style="margin-left: 5px;">📩</span>
+                            {% endif %}
+                        </a>
+                    </div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
@@ -473,7 +503,7 @@
             <!-- Специалисты с индикацией перегрузки -->
             <div class="specialists-grid">
                 <!-- Программист -->
-                <div class="specialist-card">
+                <div class="specialist-card {% if order.has_unread_specialist_messages_programmer %}highlight{% endif %}">
                     <div class="specialist-header">
                         <span class="specialist-icon">👨💻</span>
                         <span class="specialist-label">Программист</span>
@@ -491,6 +521,14 @@
                         {% endif %}
                     </div>
                     <div class="specialist-actions">
+                        {% if order.assigned_programmer %}
+                            <a href="{% url 'manager_specialist_chat_page' order.id order.assigned_programmer.id %}" class="btn-sm btn-chat" style="margin-bottom: 10px; display: block; text-align: center;">
+                                💬 Чат с программистом
+                                {% if order.has_unread_specialist_messages_programmer %}
+                                    <span class="unread-badge" style="margin-left: 5px;">📩</span>
+                                {% endif %}
+                            </a>
+                        {% endif %}
                         <form method="post" action="{% url 'reassign_specialist' order.id 'programmer' %}">
                             {% csrf_token %}
                             <select name="new_specialist" class="specialist-select">
@@ -507,7 +545,7 @@
                 </div>
 
                 <!-- Маркетолог -->
-                <div class="specialist-card">
+                <div class="specialist-card {% if order.has_unread_specialist_messages_marketer %}highlight{% endif %}">
                     <div class="specialist-header">
                         <span class="specialist-icon">📊</span>
                         <span class="specialist-label">Маркетолог</span>
@@ -525,6 +563,14 @@
                         {% endif %}
                     </div>
                     <div class="specialist-actions">
+                        {% if order.assigned_marketer %}
+                            <a href="{% url 'manager_specialist_chat_page' order.id order.assigned_marketer.id %}" class="btn-sm btn-chat" style="margin-bottom: 10px; display: block; text-align: center;">
+                                💬 Чат с маркетологом
+                                {% if order.has_unread_specialist_messages_marketer %}
+                                    <span class="unread-badge" style="margin-left: 5px;">📩</span>
+                                {% endif %}
+                            </a>
+                        {% endif %}
                         <form method="post" action="{% url 'reassign_specialist' order.id 'marketer' %}">
                             {% csrf_token %}
                             <select name="new_specialist" class="specialist-select">
@@ -541,7 +587,7 @@
                 </div>
 
                 <!-- SMM -->
-                <div class="specialist-card">
+                <div class="specialist-card {% if order.has_unread_specialist_messages_smm %}highlight{% endif %}">
                     <div class="specialist-header">
                         <span class="specialist-icon">📱</span>
                         <span class="specialist-label">SMM-менеджер</span>
@@ -559,6 +605,14 @@
                         {% endif %}
                     </div>
                     <div class="specialist-actions">
+                        {% if order.assigned_smm %}
+                            <a href="{% url 'manager_specialist_chat_page' order.id order.assigned_smm.id %}" class="btn-sm btn-chat" style="margin-bottom: 10px; display: block; text-align: center;">
+                                💬 Чат с SMM
+                                {% if order.has_unread_specialist_messages_smm %}
+                                    <span class="unread-badge" style="margin-left: 5px;">📩</span>
+                                {% endif %}
+                            </a>
+                        {% endif %}
                         <form method="post" action="{% url 'reassign_specialist' order.id 'smm' %}">
                             {% csrf_token %}
                             <select name="new_specialist" class="specialist-select">
@@ -581,7 +635,6 @@
                     <a href="{% url 'download_contract' order.id %}" class="btn-sm btn-danger">📥 Скачать шаблон договора</a>
                 </div>
                 <div class="btn-group-right">
-                    <a href="{% url 'manager_chat' order.id %}" class="btn-sm btn-chat">💬 Чат с клиентом</a>
                     <form method="post" action="{% url 'reassign_order' order.id %}" style="display:inline;">
                         {% csrf_token %}
                         <select name="new_manager">

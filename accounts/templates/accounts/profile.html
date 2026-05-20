@@ -642,20 +642,21 @@ body.dark .detail-tab:not(.active) {
     let chatIntervals = {};
     
     function toggleOrder(orderId) {
-        const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
-        card.classList.toggle('expanded');
-        if (card.classList.contains('expanded')) {
-            loadChatMessages(orderId);
-            if (!chatIntervals[orderId]) {
-                chatIntervals[orderId] = setInterval(() => loadChatMessages(orderId), 5000);
-            }
-        } else {
-            if (chatIntervals[orderId]) {
-                clearInterval(chatIntervals[orderId]);
-                delete chatIntervals[orderId];
-            }
+    const card = document.querySelector(`.order-card[data-order-id="${orderId}"]`);
+    card.classList.toggle('expanded');
+    if (card.classList.contains('expanded')) {
+        loadChatMessages(orderId);
+        setupEnterHandler(orderId);  // ← добавить эту строку
+        if (!chatIntervals[orderId]) {
+            chatIntervals[orderId] = setInterval(() => loadChatMessages(orderId), 5000);
+        }
+    } else {
+        if (chatIntervals[orderId]) {
+            clearInterval(chatIntervals[orderId]);
+            delete chatIntervals[orderId];
         }
     }
+}
     
     function switchTab(orderId, tab) {
         const btns = document.querySelectorAll(`#details-${orderId} .detail-tab`);
@@ -673,49 +674,63 @@ body.dark .detail-tab:not(.active) {
     }
     
     async function loadChatMessages(orderId) {
-        const container = document.getElementById(`chat-messages-${orderId}`);
-        if (!container) return;
-        
-        try {
-            const response = await fetch(`/chat/api/messages/${orderId}/`);
-            const data = await response.json();
-            
-            if (data.messages && data.messages.length > 0) {
-                container.innerHTML = data.messages.map(msg => `
-                    <div class="message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}">
-                        <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${msg.message}<br>
-                        <small style="color:#999;">${msg.created_at}</small>
-                    </div>
-                `).join('');
-                container.scrollTop = container.scrollHeight;
-            } else {
-                container.innerHTML = '<div style="text-align: center; padding: 20px; color:#999;">Нет сообщений. Напишите менеджеру!</div>';
-            }
-        } catch(e) {
-            container.innerHTML = '<div style="text-align: center; padding: 20px; color: red;">Ошибка загрузки</div>';
+    const container = document.getElementById(`chat-messages-${orderId}`);
+    if (!container) return;
+
+    try {
+        const response = await fetch(`/chat/api/messages/${orderId}/`);
+        const data = await response.json();
+
+        if (data.messages && data.messages.length > 0) {
+            container.innerHTML = data.messages.map(msg => `
+                <div class="message ${msg.sender_role === 'client' ? 'message-client' : 'message-manager'}">
+                    <strong>${msg.sender_role === 'client' ? 'Вы' : 'Менеджер'}:</strong> ${msg.message}<br>
+                    <small style="color:#999;">${msg.created_at}</small>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        } else {
+            container.innerHTML = '<div style="text-align: center; padding: 20px; color:#999;">Нет сообщений. Напишите менеджеру!</div>';
         }
+    } catch(e) {
+        console.error('Ошибка загрузки чата:', e);
+        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #dc3545;">⚠️ Ошибка загрузки сообщений. Попробуйте позже.</div>';
     }
+}
     
     async function sendMessage(orderId) {
-        const input = document.getElementById(`chat-input-${orderId}`);
-        const message = input.value.trim();
-        if (!message) return;
+    const input = document.getElementById(`chat-input-${orderId}`);
+    const message = input.value.trim();
+    if (!message) return;
+    
+    try {
+        const formData = new FormData();
+        formData.append('message', message);
         
-        try {
-            const formData = new FormData();
-            formData.append('message', message);
-            
-            await fetch(`/chat/api/send/${orderId}/`, {
-                method: 'POST',
-                body: formData,
-                headers: { 'X-CSRFToken': getCookie('csrftoken') }
-            });
-            input.value = '';
-            await loadChatMessages(orderId);
-        } catch(e) {
-            alert('Ошибка при отправке');
-        }
+        await fetch(`/chat/api/send/${orderId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-CSRFToken': getCookie('csrftoken') }
+        });
+        input.value = '';
+        await loadChatMessages(orderId);
+    } catch(e) {
+        alert('Ошибка при отправке');
     }
+}
+
+// Добавляем обработчик Enter для поля ввода
+function setupEnterHandler(orderId) {
+    const input = document.getElementById(`chat-input-${orderId}`);
+    if (input) {
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage(orderId);
+            }
+        });
+    }
+}
     
     function getCookie(name) {
         let value = null;

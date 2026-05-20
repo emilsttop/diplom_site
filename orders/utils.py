@@ -46,7 +46,7 @@ def get_manager_name(manager):
     return "Не назначен"
 
 def assign_specialist(role, new_hours, current_order_id=None):
-    """Назначает специалиста с наименьшей текущей загрузкой (без учёта выполненных заказов)"""
+    """Назначает специалиста с НАИМЕНЬШЕЙ текущей загрузкой"""
     if new_hours == 0:
         return None
     
@@ -56,32 +56,35 @@ def assign_specialist(role, new_hours, current_order_id=None):
     
     specialist_load = []
     for specialist in specialists:
-        # Исключаем выполненные заказы и текущий заказ
         if role == 'programmer':
             total = Order.objects.filter(
                 assigned_programmer=specialist
-            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
+            ).exclude(status='completed').exclude(status='cancelled').exclude(id=current_order_id).aggregate(
                 total=Sum('programmer_hours')
             )['total'] or 0
         elif role == 'marketer':
             total = Order.objects.filter(
                 assigned_marketer=specialist
-            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
+            ).exclude(status='completed').exclude(status='cancelled').exclude(id=current_order_id).aggregate(
                 total=Sum('marketer_hours')
             )['total'] or 0
         else:  # smm
             total = Order.objects.filter(
                 assigned_smm=specialist
-            ).exclude(status='completed').exclude(id=current_order_id).aggregate(
+            ).exclude(status='completed').exclude(status='cancelled').exclude(id=current_order_id).aggregate(
                 total=Sum('smm_hours')
             )['total'] or 0
         
+        total = float(total)
         specialist_load.append((specialist, total))
-        print(f"Специалист {specialist.username}: загрузка {total} ч")
+        print(f"DEBUG: {specialist.get_full_name() or specialist.username} - {total} ч")
     
-    specialist_load.sort(key=lambda x: x[1])
+    # ✅ СОРТИРУЕМ ОТ МЕНЬШЕЙ ЗАГРУЗКИ К БОЛЬШЕЙ (возрастание)
+    specialist_load.sort(key=lambda x: x[1])  # ← без reverse=True
+    
     best = specialist_load[0][0]
-    print(f"✅ Выбран {best.username} с загрузкой {specialist_load[0][1]} ч")
+    best_load = specialist_load[0][1]
+    print(f"✅ Назначен {best.get_full_name() or best.username} (загрузка {best_load} ч)")
     return best
 
 def is_specialist_available(role, required_hours):

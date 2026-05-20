@@ -271,6 +271,40 @@
         padding: 40px;
         color: var(--gray-dark);
     }
+    /* Кнопка чата специалиста */
+    .btn-chat-specialist {
+        display: inline-block;
+        padding: 8px 20px;
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 500;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-chat-specialist:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+
+    /* Бейдж уведомления */
+    .unread-badge {
+        background: #dc3545;
+        color: white;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
 </style>
 
 <!-- ШАПКА как у менеджера -->
@@ -329,6 +363,7 @@
                 <label>📊 Тип заказов</label>
                 <select name="chart_type">
                     <option value="all" {% if chart_type == 'all' %}selected{% endif %}>Все заказы</option>
+                    <option value="new" {% if chart_type == 'new' %}selected{% endif %}>Новые</option>
                     <option value="completed" {% if chart_type == 'completed' %}selected{% endif %}>Выполненные</option>
                     <option value="cancelled" {% if chart_type == 'cancelled' %}selected{% endif %}>Отменённые</option>
                 </select>
@@ -358,9 +393,14 @@
     <div class="section-title">📋 Заказы</div>
     <div class="orders-scroll">
         {% for order in orders %}
-        <div class="order-card">
-            <h3>Заказ №{{ order.id }}</h3>
-            <p><strong>Клиент:</strong> {{ order.client.username }}</p>
+        <div class="order-card" data-order-id="{{ order.id }}" data-specialist-id="{{ user.id }}">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h3 style="margin: 0;">Заказ №{{ order.id }}</h3>
+                <div id="unread-badge-{{ order.id }}" class="unread-badge" style="display: none;">
+                    📩 Новое сообщение
+                </div>
+            </div>
+            <p><strong>Клиент:</strong> {{ order.client.last_name }} {{ order.client.first_name }}</p>
             <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
             <p><strong>Статус:</strong> 
                 {% if order.status == 'new' %}🆕 Новый
@@ -378,6 +418,11 @@
                 </span>
             </p>
             <p><strong>Сумма заказа:</strong> {{ order.total_price|floatformat:0 }} ₽</p>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'specialist_chat_page' order.id user.id %}" class="btn-chat-specialist">
+                    💬 Чат с менеджером
+                </a>
+            </div>
         </div>
         {% empty %}
         <div class="no-data">
@@ -411,7 +456,7 @@
             maintainAspectRatio: true,
             plugins: {
                 legend: {
-                    display: false  // ← ЭТА СТРОЧКА УБИРАЕТ ЛЕГЕНДУ
+                    display: false
                 },
                 tooltip: {
                     callbacks: {
@@ -442,5 +487,63 @@
             }
         }
     });
+</script>
+<script>
+    console.log('Скрипт уведомлений загружен');
+    
+    // Проверка наличия непрочитанных сообщений для специалиста
+    async function checkUnreadMessages(orderId, specialistId) {
+        console.log(`Проверка уведомлений для заказа ${orderId}, специалист ${specialistId}`);
+        try {
+            const response = await fetch(`/chat/api/specialist/unread/${orderId}/${specialistId}/`);
+            const data = await response.json();
+            console.log(`Ответ API для заказа ${orderId}:`, data);
+            
+            const badge = document.getElementById(`unread-badge-${orderId}`);
+            if (badge) {
+                if (data.has_unread === true) {
+                    badge.style.display = 'inline-block';
+                    console.log(`✅ Бейдж показан для заказа ${orderId}`);
+                } else {
+                    badge.style.display = 'none';
+                    console.log(`❌ Бейдж скрыт для заказа ${orderId}`);
+                }
+            } else {
+                console.log(`⚠️ Бейдж unread-badge-${orderId} не найден в DOM`);
+            }
+        } catch(e) {
+            console.error('Ошибка проверки уведомлений:', e);
+        }
+    }
+
+    // Проверяем все заказы при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM загружен, ищем карточки заказов...');
+        const cards = document.querySelectorAll('.order-card');
+        console.log(`Найдено карточек заказов: ${cards.length}`);
+        
+        cards.forEach(card => {
+            const orderId = card.dataset.orderId;
+            const specialistId = card.dataset.specialistId;
+            console.log(`Карточка заказа ${orderId}, специалист ${specialistId}`);
+            if (orderId && specialistId) {
+                checkUnreadMessages(orderId, specialistId);
+            } else {
+                console.log(`⚠️ У карточки нет data-order-id или data-specialist-id`);
+            }
+        });
+    });
+
+    // Проверяем каждые 10 секунд
+    setInterval(() => {
+        console.log('Периодическая проверка уведомлений...');
+        document.querySelectorAll('.order-card').forEach(card => {
+            const orderId = card.dataset.orderId;
+            const specialistId = card.dataset.specialistId;
+            if (orderId && specialistId) {
+                checkUnreadMessages(orderId, specialistId);
+            }
+        });
+    }, 10000);
 </script>
 {% endblock %}
