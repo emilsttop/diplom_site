@@ -243,23 +243,36 @@
         background: #dc3545;
     }
     .tracking-step-tooltip {
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #1a1a1a;
-        color: white;
-        padding: 8px 12px;
-        border-radius: 8px;
-        font-size: 12px;
-        white-space: nowrap;
-        opacity: 0;
-        visibility: hidden;
-        transition: all 0.3s;
-        margin-bottom: 10px;
-        z-index: 100;
-        pointer-events: none;
-    }
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a1a;
+    color: white;  /* ← убедитесь, что цвет белый */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    margin-bottom: 10px;
+    z-index: 100;
+    pointer-events: none;
+}
+.tracking-step-tooltip strong {
+    color: #ff9999;  /* светло-красный для выделения */
+}
+.tracking-step-tooltip:after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #1a1a1a transparent transparent transparent;
+}
     .tracking-step-tooltip:after {
         content: '';
         position: absolute;
@@ -365,12 +378,34 @@ body.dark .contract-card .contract-value,
 body.dark .contract-card .contract-value-large,
 body.dark .tracking-step .step-text,
 body.dark .tracking-step .step-text strong,
-body.dark .message,
-body.dark .message strong,
-body.dark .message-client,
-body.dark .message-manager,
-body.dark .chat-input input,
-body.dark .chat-input input::placeholder,
+/* Чат в тёмной теме */
+body.dark .message {
+    background: #2a2a3a;
+    color: white;
+}
+body.dark .message-client {
+    background: #3a1a1a;
+    border-left: 3px solid #dc3545;
+}
+body.dark .message-manager {
+    background: #1e1e2e;
+    border-left: 3px solid #666;
+}
+body.dark .message strong {
+    color: #ff9999;
+}
+body.dark .chat-input input {
+    background: #2a2a3a;
+    color: white;
+    border-color: #dc3545;
+}
+body.dark .chat-input input::placeholder {
+    color: #aaa;
+}
+body.dark .chat-input button {
+    background: #dc3545;
+    color: white;
+}
 body.dark .detail-tab,
 body.dark .order-price {
     color: #1a1a1a !important;
