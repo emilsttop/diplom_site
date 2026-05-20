@@ -7,6 +7,7 @@ from datetime import timedelta, datetime
 from .forms import RegistrationForm
 from orders.models import Order
 from users.models import User
+from chat.models import ChatMessage
 
 def register(request):
     if request.method == 'POST':
@@ -140,6 +141,15 @@ def profile(request):
     
     # Для клиента показываем личный кабинет
     orders = Order.objects.filter(client=request.user).order_by('-created_at')
+    
+    # Добавляем флаг о непрочитанных сообщениях от менеджера
+    for order in orders:
+        order.has_unread_manager_messages = ChatMessage.objects.filter(
+            order=order,
+            sender__role='manager',
+            is_read=False
+        ).exists()
+    
     return render(request, 'accounts/profile.html', {'orders': orders})
 
 @login_required
