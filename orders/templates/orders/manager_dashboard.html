@@ -498,6 +498,12 @@
                         </select>
                     </form>
                 </div>
+                {% if order.comment %}
+                    <div class="detail-card">
+                        <div class="detail-label">💬 Комментарий клиента</div>
+                        <div class="detail-value" style="white-space: pre-wrap; word-break: break-word;">{{ order.comment }}</div>
+                    </div>
+                    {% endif %}
             </div>
 
             <!-- Специалисты с индикацией перегрузки -->
