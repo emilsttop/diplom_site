@@ -15,8 +15,8 @@ class ChatMessage(models.Model):
     
     class Meta:
         ordering = ['created_at']
-        verbose_name = 'Сообщение чата'
-        verbose_name_plural = 'Сообщения чата'
+        verbose_name = 'Сообщение чата Клиент-Менеджер'
+        verbose_name_plural = 'Сообщение чата Клиент-Менеджер'
     
 class SpecialistChatMessage(models.Model):
     order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, related_name='specialist_chat_messages')
@@ -28,5 +28,5 @@ class SpecialistChatMessage(models.Model):
 
     class Meta:
         ordering = ['created_at']
-        verbose_name = "Сообщение чата специалиста"
-        verbose_name_plural = "Сообщения чата специалистов"
+        verbose_name = "Сообщения чата Специалист-Менеджер"
+        verbose_name_plural = "Сообщения чата Специалист-Менеджер"

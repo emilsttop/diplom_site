@@ -121,10 +121,11 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
-
-# Добавляем русский язык в админку
-from django.utils.translation import gettext_lazy as _
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Куда перенаправлять неавторизованных пользователей
 LOGIN_URL = '/accounts/register/'
