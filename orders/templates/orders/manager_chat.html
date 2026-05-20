@@ -136,13 +136,43 @@
         font-size: 12px;
         font-style: italic;
     }
+    /* Тёмная тема для страницы чата */
+body.dark .chat-container {
+    background: #1e1e2e;
+}
+body.dark .chat-messages {
+    background: #2a2a3a;
+}
+body.dark .message-client {
+    background: #3a1a1a !important;
+    color: #e0e0e0 !important;
+}
+body.dark .message-client .message-meta {
+    color: #aaa !important;
+}
+body.dark .message-manager {
+    background: #1a1a1a !important;
+    color: white !important;
+}
+body.dark .chat-input {
+    background: #1e1e2e;
+    border-top-color: #3a3a4a;
+}
+body.dark .chat-input input {
+    background: #2a2a3a;
+    color: #e0e0e0;
+    border-color: #dc3545;
+}
+body.dark .chat-input input::placeholder {
+    color: #888;
+}
 </style>
 
 <a href="{% url 'manager_dashboard' %}" class="back-btn">← Назад к заказам</a>
 
 <div class="chat-container">
     <div class="chat-header">
-        <h3>💬 Чат с клиентом: {{ order.client.username }}</h3>
+        <h3>💬 Чат с клиентом: {{ order.client.last_name }} {{ order.client.first_name }}</h3>
         <p>Заказ №{{ order.id }} | Сумма: {{ order.total_price }} ₽</p>
     </div>
     <div class="chat-messages" id="chat-messages">
@@ -174,7 +204,12 @@
                     for (const msg of newMessages) {
                         const messageDiv = document.createElement('div');
                         messageDiv.className = `message message-${msg.sender_role}`;
-                        const senderName = msg.sender_role === 'client' ? msg.sender : 'Вы (Менеджер)';
+                        let senderName = '';
+                            if (msg.sender_role === 'client') {
+                                senderName = msg.sender_name || msg.sender;
+                            } else {
+                                senderName = 'Вы (Менеджер)';
+                            }
                         messageDiv.innerHTML = `
                             <strong>${senderName}:</strong> ${escapeHtml(msg.message)}
                             <div class="message-meta">${msg.created_at}</div>
