@@ -398,28 +398,31 @@
     {% for order in orders %}
     <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
         <div class="order-header" onclick="toggleOrder({{ order.id }})">
-            <div style="flex: 2;">
-                <div style="font-size: 11px; color: #666;">Клиент</div>
-                <div class="order-client" style="font-weight: bold;">{{ order.client.last_name }} {{ order.client.first_name }}</div>
-            </div>
-            <div style="flex: 1;">
-                <div style="font-size: 11px; color: #666;">Сумма</div>
-                <div class="order-price" style="font-size: 18px; font-weight: bold; color: var(--red); margin: 0;">{{ order.total_price|floatformat:0 }} ₽</div>
-            </div>
-            <div style="flex: 1.5;">
-                <div style="font-size: 11px; color: #666;">Статус</div>
-                <span class="order-status status-{{ order.status }}">
-                    {% if order.status == 'new' %}🆕 Новый
-                    {% elif order.status == 'processing' %}⚙️ В обработке
-                    {% elif order.status == 'completed' %}✅ Выполнен
-                    {% elif order.status == 'cancelled' %}❌ Отменён
-                    {% endif %}
-                </span>
-                {% if order.has_unread_messages %}<span class="unread-badge">📩 Новое сообщение</span>{% endif %}
-            </div>
-            <div class="expand-icon">▼</div>
-        </div>
-
+    <div style="flex: 1;">
+        <div style="font-size: 11px; color: #666;">№ заказа</div>
+        <div class="order-id" style="font-weight: bold;">{{ order.id }}</div>
+    </div>
+    <div style="flex: 2;">
+        <div style="font-size: 11px; color: #666;">Клиент</div>
+        <div class="order-client" style="font-weight: bold;">{{ order.client.last_name }} {{ order.client.first_name }}</div>
+    </div>
+    <div style="flex: 1;">
+        <div style="font-size: 11px; color: #666;">Сумма</div>
+        <div class="order-price" style="font-size: 18px; font-weight: bold; color: var(--red); margin: 0;">{{ order.total_price|floatformat:0 }} ₽</div>
+    </div>
+    <div style="flex: 1.5;">
+        <div style="font-size: 11px; color: #666;">Статус</div>
+        <span class="order-status status-{{ order.status }}">
+            {% if order.status == 'new' %}🆕 Новый
+            {% elif order.status == 'processing' %}⚙️ В обработке
+            {% elif order.status == 'completed' %}✅ Выполнен
+            {% elif order.status == 'cancelled' %}❌ Отменён
+            {% endif %}
+        </span>
+        {% if order.has_unread_messages %}<span class="unread-badge">📩 Новое сообщение</span>{% endif %}
+    </div>
+    <div class="expand-icon">▼</div>
+</div>
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-grid">
                 <div class="detail-card">
@@ -427,6 +430,7 @@
                     <div class="detail-value">{{ order.client.last_name }} {{ order.client.first_name }}</div>
                     <div style="font-size:12px; color:#888; margin-top: 5px;">📧 {{ order.client.email }}</div>
                     <div style="font-size:12px; color:#888; margin-top: 3px;">📞 {{ order.client.phone|default:"Телефон не указан" }}</div>
+                    <div style="font-size:12px; color:#888; margin-top: 3px;">🌍 Регион: {{ order.region|default:"Не указан" }}</div>
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
