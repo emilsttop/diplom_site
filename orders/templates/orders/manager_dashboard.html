@@ -104,6 +104,13 @@
         flex-wrap: wrap;
         gap: 15px;
     }
+    .order-header > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
     .order-id {
         font-weight: 700;
         color: var(--red);
@@ -121,6 +128,10 @@
         font-size: 20px;
         color: var(--red);
         transition: transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
     }
     .order-card.expanded .expand-icon {
         transform: rotate(180deg);
@@ -142,16 +153,22 @@
     .detail-card {
         background: var(--white);
         border-radius: 16px;
-        padding: 16px;
+        padding: 20px;
         border: 1px solid #eee;
         box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        text-align: center;
     }
     .detail-label {
         font-size: 11px;
         color: var(--gray-dark);
         text-transform: uppercase;
         letter-spacing: 0.5px;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
+        font-weight: 600;
     }
     .detail-value {
         font-size: 15px;
@@ -219,6 +236,7 @@
         border-radius: 30px;
         font-size: 12px;
         font-weight: 600;
+        display: inline-block;
     }
     .status-new { background: #007bff; color: white; }
     .status-processing { background: #ffc107; color: black; }
@@ -243,7 +261,7 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
-        margin-top: 20px;
+        margin-bottom: 20px;
     }
     .specialist-card {
         background: var(--white);
@@ -279,7 +297,7 @@
         font-weight: 600;
         margin-bottom: 12px;
         word-break: break-word;
-        flex: 1;
+        min-height: 40px;
     }
     .specialist-badge {
         margin-bottom: 12px;
@@ -299,6 +317,11 @@
         width: 100%;
         padding: 6px;
         font-size: 12px;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
     }
     .overload-badge {
         background: #dc3545;
@@ -348,13 +371,10 @@
 </style>
 
 <div class="dashboard-header" style="background: linear-gradient(135deg, #1a1a1a 0%, #dc3545 100%); border-radius: 20px; padding: 25px 30px; position: relative; min-height: 110px;">
-    <!-- Текст слева -->
     <div>
         <h1 style="margin: 0 0 10px 0; font-size: 28px; color: white;">👨💼 Панель менеджера</h1>
         <p style="margin: 0; font-size: 15px; color: rgba(255,255,255,0.9);">Добро пожаловать, {{ user.get_full_name|default:user.username }}!</p>
     </div>
-    
-    <!-- Кнопка по центру красного прямоугольника (по вертикали) -->
     <a href="{% url 'manager_analytics' %}" style="position: absolute; top: 50%; right: 30px; transform: translateY(-50%); background: #1a1a1a; color: white; padding: 12px 28px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; border: none;">
         📊 Аналитика
     </a>
@@ -378,10 +398,16 @@
     {% for order in orders %}
     <div class="order-card {% if order.has_unread_messages %}has-unread{% endif %}" data-status="{{ order.status }}" data-order-id="{{ order.id }}">
         <div class="order-header" onclick="toggleOrder({{ order.id }})">
-            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-                <span class="order-id">Заказ №{{ order.id }}</span>
-                <span class="order-client">{{ order.client.last_name }} {{ order.client.first_name }}</span>
-                <span class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+            <div style="flex: 2;">
+                <div style="font-size: 11px; color: #666;">Клиент</div>
+                <div class="order-client" style="font-weight: bold;">{{ order.client.last_name }} {{ order.client.first_name }}</div>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-size: 11px; color: #666;">Сумма</div>
+                <div class="order-price" style="font-size: 18px; font-weight: bold; color: var(--red); margin: 0;">{{ order.total_price|floatformat:0 }} ₽</div>
+            </div>
+            <div style="flex: 1.5;">
+                <div style="font-size: 11px; color: #666;">Статус</div>
                 <span class="order-status status-{{ order.status }}">
                     {% if order.status == 'new' %}🆕 Новый
                     {% elif order.status == 'processing' %}⚙️ В обработке
@@ -391,25 +417,22 @@
                 </span>
                 {% if order.has_unread_messages %}<span class="unread-badge">📩 Новое сообщение</span>{% endif %}
             </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <span class="order-price">{{ order.total_price|floatformat:0 }} ₽</span>
-                <span class="expand-icon">▼</span>
-            </div>
+            <div class="expand-icon">▼</div>
         </div>
 
         <div class="order-details" id="details-{{ order.id }}">
             <div class="detail-grid">
                 <div class="detail-card">
-    <div class="detail-label">👤 Клиент</div>
-    <div class="detail-value">{{ order.client.last_name }} {{ order.client.first_name }}</div>
-    <div style="font-size:12px; color:#888;">📧 {{ order.client.email }}</div>
-    <div style="font-size:12px; color:#888; margin-top: 5px;">📞 {{ order.client.phone|default:"Телефон не указан" }}</div>
-</div>
+                    <div class="detail-label">👤 Клиент</div>
+                    <div class="detail-value">{{ order.client.last_name }} {{ order.client.first_name }}</div>
+                    <div style="font-size:12px; color:#888; margin-top: 5px;">📧 {{ order.client.email }}</div>
+                    <div style="font-size:12px; color:#888; margin-top: 3px;">📞 {{ order.client.phone|default:"Телефон не указан" }}</div>
+                </div>
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
-                    <div class="detail-value" style="max-height:150px; overflow-y:auto;">
+                    <div class="detail-value" style="max-height:150px; overflow-y:auto; width: 100%;">
                         {% for item in order.items.all %}
-                            <div>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
+                            <div style="margin-bottom: 5px;">{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
                         {% endfor %}
                         {% if order.services_data.items %}
                             {% for service_item in order.services_data.items %}
@@ -428,9 +451,10 @@
                     <div class="detail-value-large">{{ order.total_price|floatformat:0 }} ₽</div>
                 </div>
                 <div class="detail-card">
-                    <form method="post" action="{% url 'manager_update_status' order.id %}">
+                    <div class="detail-label">📊 Статус заказа</div>
+                    <form method="post" action="{% url 'manager_update_status' order.id %}" style="width: 100%;">
                         {% csrf_token %}
-                        <select name="status" onchange="this.form.submit()" class="status-select" style="background:var(--red); color:white;">
+                        <select name="status" onchange="this.form.submit()" class="status-select" style="background:var(--red); color:white; width: 100%;">
                             <option value="new" {% if order.status == 'new' %}selected{% endif %}>🆕 Новый</option>
                             <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>⚙️ В обработке</option>
                             <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>✅ Выполнен</option>
@@ -440,6 +464,106 @@
                 </div>
             </div>
 
+            <!-- Специалисты с индикацией перегрузки -->
+<div class="specialists-grid">
+    <!-- Программист -->
+    <div class="specialist-card">
+        <div class="specialist-header">
+            <span class="specialist-icon">👨💻</span>
+            <span class="specialist-label">Программист</span>
+        </div>
+        <div class="specialist-name">
+            {% if order.assigned_programmer %}
+                {{ order.assigned_programmer.get_full_name|default:order.assigned_programmer.username }}
+            {% else %}
+                Не назначен
+            {% endif %}
+        </div>
+        <div class="specialist-badge">
+            {% if order.programmer_overload %}
+                <span class="overload-badge">⚠️ перегружен</span>
+            {% endif %}
+        </div>
+        <div class="specialist-actions">
+            <form method="post" action="{% url 'reassign_specialist' order.id 'programmer' %}">
+                {% csrf_token %}
+                <select name="new_specialist" class="specialist-select">
+                    <option value="">Переназначить</option>
+                    {% for prog in programmers %}
+                        <option value="{{ prog.id }}">{{ prog.get_full_name|default:prog.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Маркетолог -->
+    <div class="specialist-card">
+        <div class="specialist-header">
+            <span class="specialist-icon">📊</span>
+            <span class="specialist-label">Маркетолог</span>
+        </div>
+        <div class="specialist-name">
+            {% if order.assigned_marketer %}
+                {{ order.assigned_marketer.get_full_name|default:order.assigned_marketer.username }}
+            {% else %}
+                Не назначен
+            {% endif %}
+        </div>
+        <div class="specialist-badge">
+            {% if order.marketer_overload %}
+                <span class="overload-badge">⚠️ перегружен</span>
+            {% endif %}
+        </div>
+        <div class="specialist-actions">
+            <form method="post" action="{% url 'reassign_specialist' order.id 'marketer' %}">
+                {% csrf_token %}
+                <select name="new_specialist" class="specialist-select">
+                    <option value="">Переназначить</option>
+                    {% for mark in marketers %}
+                        <option value="{{ mark.id }}">{{ mark.get_full_name|default:mark.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SMM -->
+    <div class="specialist-card">
+        <div class="specialist-header">
+            <span class="specialist-icon">📱</span>
+            <span class="specialist-label">SMM-менеджер</span>
+        </div>
+        <div class="specialist-name">
+            {% if order.assigned_smm %}
+                {{ order.assigned_smm.get_full_name|default:order.assigned_smm.username }}
+            {% else %}
+                Не назначен
+            {% endif %}
+        </div>
+        <div class="specialist-badge">
+            {% if order.smm_overload %}
+                <span class="overload-badge">⚠️ перегружен</span>
+            {% endif %}
+        </div>
+        <div class="specialist-actions">
+            <form method="post" action="{% url 'reassign_specialist' order.id 'smm' %}">
+                {% csrf_token %}
+                <select name="new_specialist" class="specialist-select">
+                    <option value="">Переназначить</option>
+                    {% for s in smms %}
+                        <option value="{{ s.id }}">{{ s.get_full_name|default:s.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn-sm btn-warning specialist-btn">🔄 Переназначить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+            <!-- Кнопки действий -->
             <div class="action-buttons">
                 <div class="btn-group-left">
                     <a href="{% url 'download_contract' order.id %}" class="btn-sm btn-danger">📥 Скачать шаблон договора</a>
@@ -458,117 +582,6 @@
                         </select>
                         <button type="submit" class="btn-sm btn-warning">Передать</button>
                     </form>
-                </div>
-            </div>
-
-            <!-- Специалисты с индикацией перегрузки -->
-            <div class="specialists-grid">
-                <!-- Программист -->
-                <div class="specialist-card">
-                    <div class="specialist-header">
-                        <span class="specialist-icon">👨‍💻</span>
-                        <span class="specialist-label">Программист</span>
-                    </div>
-                    <div class="specialist-name">
-                        {% if order.assigned_programmer %}
-                            {{ order.assigned_programmer.get_full_name|default:order.assigned_programmer.username }}
-                        {% else %}
-                            Не назначен
-                        {% endif %}
-                    </div>
-                    <div class="specialist-badge">
-                        {% if order.assigned_programmer and order.programmer_overload %}
-                            <span class="overload-badge">⚠️ перегружен</span>
-                        {% endif %}
-                    </div>
-                    <div class="specialist-actions">
-                        {% if order.assigned_programmer %}
-                        <form method="post" action="{% url 'reassign_specialist' order.id 'programmer' %}">
-                            {% csrf_token %}
-                            <select name="new_specialist" class="specialist-select">
-                                <option value="">Переназначить</option>
-                                {% for prog in programmers %}
-                                    {% if prog != order.assigned_programmer %}
-                                        <option value="{{ prog.id }}">{{ prog.get_full_name|default:prog.username }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn-sm btn-warning specialist-btn">🔄</button>
-                        </form>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Маркетолог -->
-                <div class="specialist-card">
-                    <div class="specialist-header">
-                        <span class="specialist-icon">📊</span>
-                        <span class="specialist-label">Маркетолог</span>
-                    </div>
-                    <div class="specialist-name">
-                        {% if order.assigned_marketer %}
-                            {{ order.assigned_marketer.get_full_name|default:order.assigned_marketer.username }}
-                        {% else %}
-                            Не назначен
-                        {% endif %}
-                    </div>
-                    <div class="specialist-badge">
-                        {% if order.assigned_marketer and order.marketer_overload %}
-                            <span class="overload-badge">⚠️ перегружен</span>
-                        {% endif %}
-                    </div>
-                    <div class="specialist-actions">
-                        {% if order.assigned_marketer %}
-                        <form method="post" action="{% url 'reassign_specialist' order.id 'marketer' %}">
-                            {% csrf_token %}
-                            <select name="new_specialist" class="specialist-select">
-                                <option value="">Переназначить</option>
-                                {% for mark in marketers %}
-                                    {% if mark != order.assigned_marketer %}
-                                        <option value="{{ mark.id }}">{{ mark.get_full_name|default:mark.username }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn-sm btn-warning specialist-btn">🔄</button>
-                        </form>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- SMM -->
-                <div class="specialist-card">
-                    <div class="specialist-header">
-                        <span class="specialist-icon">📱</span>
-                        <span class="specialist-label">SMM-менеджер</span>
-                    </div>
-                    <div class="specialist-name">
-                        {% if order.assigned_smm %}
-                            {{ order.assigned_smm.get_full_name|default:order.assigned_smm.username }}
-                        {% else %}
-                            Не назначен
-                        {% endif %}
-                    </div>
-                    <div class="specialist-badge">
-                        {% if order.assigned_smm and order.smm_overload %}
-                            <span class="overload-badge">⚠️ перегружен</span>
-                        {% endif %}
-                    </div>
-                    <div class="specialist-actions">
-                        {% if order.assigned_smm %}
-                        <form method="post" action="{% url 'reassign_specialist' order.id 'smm' %}">
-                            {% csrf_token %}
-                            <select name="new_specialist" class="specialist-select">
-                                <option value="">Переназначить</option>
-                                {% for s in smms %}
-                                    {% if s != order.assigned_smm %}
-                                        <option value="{{ s.id }}">{{ s.get_full_name|default:s.username }}</option>
-                                    {% endif %}
-                                {% endfor %}
-                            </select>
-                            <button type="submit" class="btn-sm btn-warning specialist-btn">🔄</button>
-                        </form>
-                        {% endif %}
-                    </div>
                 </div>
             </div>
         </div>
