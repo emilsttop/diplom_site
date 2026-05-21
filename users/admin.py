@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from .models import User
 
-# Убираем модель Group из админки
+# Убирается модель Group из админки
 admin.site.unregister(Group)
 
 @admin.register(User)
