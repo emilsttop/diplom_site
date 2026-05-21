@@ -686,39 +686,38 @@ body.dark .comment-block p {
             
             <!-- Состав заказа -->
             <div class="detail-content" id="composition-{{ order.id }}">
-                <div style="font-weight: 600; margin-bottom: 10px;">📦 Состав заказа:</div>
-                
-                <div style="background: #f0f0f0; padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 12px;">
-                    <strong>🔧 ДИАГНОСТИКА - services_data:</strong>
-                    <pre style="overflow-x: auto; white-space: pre-wrap;">{{ order.services_data|pprint }}</pre>
+                {% if order.comment %}
+                <div class="comment-block" style="margin-bottom: 15px; padding: 12px; background: #ffffff; border-left: 4px solid #ffc107; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <strong style="color: #dc3545; display: block; margin-bottom: 5px;">💬 Ваш комментарий к заказу:</strong>
+                    <p style="margin: 0; white-space: pre-wrap; color: #1a1a1a;">{{ order.comment }}</p>
                 </div>
+                {% endif %}
                 
-                <div style="background: #e8f4f8; padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 12px;">
-                    <strong>🔧 ДИАГНОСТИКА - order.items.all:</strong>
-                    <ul>
-                    {% for item in order.items.all %}
-                        <li><strong>{{ item.package.name }}</strong> - количество: {{ item.quantity }}, цена: {{ item.price }} ₽</li>
-                    {% endfor %}
-                    </ul>
-                </div>
+                <div style="font-weight: 600; margin-bottom: 10px; color: var(--red);">📦 Состав заказа:</div>
                 
-                <hr>
-                <strong>✅ ВЫБРАННЫЕ УСЛУГИ:</strong>
                 {% if order.services_data.items %}
                     {% for service_item in order.services_data.items %}
                         {% if service_item.type == 'custom' %}
-                            <div style="margin-top: 10px;">
-                                <strong>Пакет: {{ service_item.package_name }}</strong>
-                                <ul>
-                                {% for service in service_item.services %}
-                                    <li>{{ service.name }} — {{ service.price }} ₽</li>
-                                {% endfor %}
+                            <div style="margin-bottom: 15px;">
+                                <strong>{{ service_item.package_name }}</strong>
+                                <ul style="margin-top: 8px; margin-bottom: 5px; padding-left: 20px;">
+                                    {% for service in service_item.services %}
+                                        <li>{{ service.name }} — {{ service.price|floatformat:0 }} ₽</li>
+                                    {% endfor %}
                                 </ul>
+                            </div>
+                        {% elif service_item.type == 'package' %}
+                            <div style="margin-bottom: 10px;">
+                                <strong>{{ service_item.package_name }}</strong> x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽
                             </div>
                         {% endif %}
                     {% endfor %}
                 {% else %}
-                    <p style="color: red;">❌ НЕТ ДАННЫХ В services_data.items</p>
+                    <ul>
+                        {% for item in order.items.all %}
+                            <li>{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             </div>
         </div>
