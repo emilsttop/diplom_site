@@ -475,20 +475,17 @@
                 </div>
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
-                    <div class="detail-value" style="max-height:150px; overflow-y:auto; width: 100%;">
+                    <div class="detail-value" style="max-height:250px; overflow-y:auto; width: 100%;">
                         {% for item in order.items.all %}
-                            <div style="margin-bottom: 5px;">{{ item.package.name }} x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
-                        {% endfor %}
-                        {% if order.services_data.items %}
-                            {% for service_item in order.services_data.items %}
-                                {% if service_item.type == 'custom' %}
-                                    <div><strong>{{ service_item.package_name }}</strong> (конструктор)</div>
-                                    {% for s in service_item.services %}
-                                        <div style="margin-left:15px;">• {{ s.name }} — {{ s.price|floatformat:0 }} ₽</div>
+                            <div style="margin-bottom: 10px; padding: 8px; background: rgba(220,53,69,0.05); border-radius: 8px;">
+                                <strong>{{ item.package.name }}</strong> x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽
+                                <div style="font-size: 11px; color: #666; margin-top: 5px; padding-left: 10px;">
+                                    {% for service in item.package.available_services.all %}
+                                        <div>• {{ service.name }} ({{ service.price|floatformat:0 }} ₽)</div>
                                     {% endfor %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="detail-card">
