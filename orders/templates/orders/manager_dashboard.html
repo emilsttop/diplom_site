@@ -476,16 +476,30 @@
                 <div class="detail-card">
                     <div class="detail-label">📦 Состав заказа</div>
                     <div class="detail-value" style="max-height:250px; overflow-y:auto; width: 100%;">
-                        {% for item in order.items.all %}
-                            <div style="margin-bottom: 10px; padding: 8px; background: rgba(220,53,69,0.05); border-radius: 8px;">
-                                <strong>{{ item.package.name }}</strong> x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽
-                                <div style="font-size: 11px; color: #666; margin-top: 5px; padding-left: 10px;">
-                                    {% for service in item.package.available_services.all %}
-                                        <div>• {{ service.name }} ({{ service.price|floatformat:0 }} ₽)</div>
-                                    {% endfor %}
+                        {% if order.services_data.items %}
+                            {% for service_item in order.services_data.items %}
+                                {% if service_item.type == 'custom' %}
+                                    <div style="margin-bottom: 15px; padding: 8px; background: rgba(220,53,69,0.05); border-radius: 8px;">
+                                        <strong>{{ service_item.package_name }}</strong>
+                                        <ul style="margin: 8px 0 0 15px; padding-left: 0;">
+                                            {% for service in service_item.services %}
+                                                <li style="font-size: 12px;">{{ service.name }} — {{ service.price|floatformat:0 }} ₽</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% elif service_item.type == 'package' %}
+                                    <div style="margin-bottom: 10px; padding: 8px; background: rgba(220,53,69,0.05); border-radius: 8px;">
+                                        <strong>{{ service_item.package_name }}</strong> x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for item in order.items.all %}
+                                <div style="margin-bottom: 10px; padding: 8px; background: rgba(220,53,69,0.05); border-radius: 8px;">
+                                    <strong>{{ item.package.name }}</strong> x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                        {% endif %}
                     </div>
                 </div>
                 <div class="detail-card">

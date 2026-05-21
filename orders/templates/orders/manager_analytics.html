@@ -540,16 +540,26 @@
                             <td style="text-align: center;">
                                 <button class="btn-composition" onclick="toggleComposition({{ order.id }})">📋 Показать</button>
                                 <div id="composition-{{ order.id }}" class="composition-details">
-                                    {% for item in order.items.all %}
-                                        <div style="margin-bottom: 8px;">
-                                            <strong>{{ item.package.name }}</strong> x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽
-                                            <div style="font-size: 11px; color: #666; margin-left: 15px;">
-                                                {% for service in item.package.available_services.all %}
-                                                    <div>• {{ service.name }} ({{ service.price|floatformat:0 }} ₽)</div>
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
+                                    {% if order.services_data.items %}
+                                        {% for service_item in order.services_data.items %}
+                                            {% if service_item.type == 'custom' %}
+                                                <div style="margin-bottom: 12px;">
+                                                    <strong>{{ service_item.package_name }}</strong>
+                                                    <ul style="margin: 6px 0 0 20px;">
+                                                        {% for service in service_item.services %}
+                                                            <li>{{ service.name }} — {{ service.price|floatformat:0 }} ₽</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            {% elif service_item.type == 'package' %}
+                                                <div><strong>{{ service_item.package_name }}</strong> x{{ service_item.quantity }} = {{ service_item.total|floatformat:0 }} ₽</div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% for item in order.items.all %}
+                                            <div><strong>{{ item.package.name }}</strong> x{{ item.quantity }} = {{ item.price|floatformat:0 }} ₽</div>
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
